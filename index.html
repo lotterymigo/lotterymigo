@@ -11,15 +11,22 @@
   <style>
     .ball-3d {
       background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e2e8f0 45%, #94a3b8 80%, #475569 100%);
-      box-shadow: inset -2px -2px 5px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.9), 0 4px 6px rgba(0,0,0,0.5);
+      box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), inset 2px 2px 5px rgba(255,255,255,0.95), 0 5px 8px rgba(0,0,0,0.5);
     }
     .ball-3d-special-pb {
       background: radial-gradient(circle at 35% 35%, #fca5a5 0%, #ef4444 45%, #b91c1c 80%, #7f1d1d 100%);
-      box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5), inset 2px 2px 4px rgba(255,255,255,0.7), 0 4px 6px rgba(0,0,0,0.5);
+      box-shadow: inset -2px -2px 6px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.8), 0 5px 8px rgba(0,0,0,0.5);
     }
     .ball-3d-special-mm {
       background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 45%, #ca8a04 80%, #854d0e 100%);
-      box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5), inset 2px 2px 4px rgba(255,255,255,0.7), 0 4px 6px rgba(0,0,0,0.5);
+      box-shadow: inset -2px -2px 6px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.8), 0 5px 8px rgba(0,0,0,0.5);
+    }
+    .ball-pop-in {
+      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
     .custom-scroll::-webkit-scrollbar {
       width: 5px;
@@ -40,7 +47,7 @@
   <!-- TOP COMPLIANCE BAR -->
   <div class="bg-amber-500/10 border-b border-amber-500/20 py-2 px-3 text-[11px] sm:text-xs font-medium text-center text-amber-300 flex flex-wrap items-center justify-center gap-1.5 sm:gap-3">
     <span class="inline-flex items-center gap-1 font-bold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded text-[10px]">18+ / 21+</span>
-    <span>FOR ENTERTAINMENT ONLY • No real-money gambling.</span>
+    <span>FOR ENTERTAINMENT ONLY • DOES NOT GUARANTEE ANY WIN • No real-money gambling.</span>
     <span class="hidden sm:inline text-amber-500">•</span>
     <span class="text-slate-400">Problem Gambling? Call <strong class="text-amber-300 font-bold">1-800-GAMBLER</strong></span>
   </div>
@@ -95,7 +102,7 @@
       <div class="flex items-start gap-2.5">
         <span class="p-1.5 rounded-lg bg-slate-800 text-amber-400 shrink-0 mt-0.5">ℹ️</span>
         <div>
-          <strong class="text-slate-200">Independent Random Trials:</strong> Lottery balls have no memory. Past frequencies or algorithmic suggestions do not mathematically guarantee future wins. Not affiliated with MUSL or Mega Millions.
+          <strong class="text-slate-200">Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or machine suggestions <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions.
         </div>
       </div>
       <div class="flex items-center gap-3 shrink-0 self-end md:self-center">
@@ -119,7 +126,7 @@
           Smarter Picks with <span id="hero-title-game" class="text-rose-500">Historical Probability</span>
         </h1>
         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-          Analyze over a decade of draw frequency patterns, explore hot & cold number momentum, and simulate automated physics draws.
+          Analyze over a decade of draw frequency patterns and simulate physics extractions. <span class="text-amber-400/90 font-medium">Provided for entertainment only — this platform does not guarantee winning outcomes.</span>
         </p>
 
         <!-- STATS PILLS -->
@@ -159,35 +166,37 @@
           </div>
           <h2 class="text-xl sm:text-3xl font-extrabold text-white">Realistic Studio Drum Simulator</h2>
           <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-            Numbered spheres rest inside a spherical acrylic chamber powered by a high-pressure cyclone fan. Use auto-draw to extraction every 5 seconds, manually pull individual balls, or pause the blower at any point.
+            Numbered spheres rest inside a spherical acrylic chamber powered by a cyclone fan. Hit <strong>Start Draw</strong> to roll the balls and automatically extract one ball every 5 seconds, or pull individually using <strong>Next Ball</strong>.
           </p>
 
-          <!-- Selected Balls Display -->
-          <div class="bg-slate-950/90 rounded-2xl p-4 border border-slate-800 shadow-inner space-y-2.5">
+          <!-- Selected Balls Display (Enlarged Balls, No Bouncing) -->
+          <div class="bg-slate-950/90 rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-inner space-y-3">
             <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
               <span>Your Drawn Numbers</span>
               <span id="drawn-count-label" class="text-amber-400">0 / 6 Balls</span>
             </div>
-            <div id="hopper-balls-rack" class="flex items-center gap-2 sm:gap-2.5 min-h-[52px] justify-center sm:justify-start flex-wrap">
-              <span class="text-xs text-slate-500 italic">Press "Auto Draw (5s)" or "Next Ball" to extract...</span>
+            
+            <div id="hopper-balls-rack" class="flex items-center gap-2.5 sm:gap-3.5 min-h-[60px] justify-center sm:justify-start flex-wrap">
+              <span class="text-xs text-slate-500 italic">Press "Start Draw" or "Next Ball" to extract...</span>
             </div>
+            
             <div id="auto-timer-status" class="hidden text-xs text-amber-400 font-mono text-center sm:text-left">
-              ⏱ Next suction extract in: <span id="auto-timer-countdown" class="font-bold text-white text-sm">5</span>s
+              ⏱ Next ball in: <span id="auto-timer-countdown" class="font-bold text-white text-sm">5</span>s
             </div>
           </div>
 
           <!-- Studio Control Panel -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-            <button id="btn-start-blower" onclick="startAutoBlower()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition shadow-lg active:scale-95 text-center">
-              Auto Draw (5s)
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+            <button id="btn-start-blower" onclick="startAutoBlower()" class="px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
+              Start Draw
             </button>
-            <button id="btn-stop-blower" onclick="stopAutoBlower()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition border border-slate-700 active:scale-95 text-center">
+            <button id="btn-stop-blower" onclick="stopAutoBlower()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm transition border border-slate-700 active:scale-95 text-center">
               Stop / Pause
             </button>
-            <button id="btn-next-ball" onclick="drawNextHopperBall()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition shadow-lg active:scale-95 text-center">
+            <button id="btn-next-ball" onclick="drawNextHopperBall()" class="px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
               Next Ball
             </button>
-            <button onclick="resetHopper()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white font-semibold text-xs transition border border-slate-800 active:scale-95 text-center">
+            <button onclick="resetHopper()" class="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white font-semibold text-xs sm:text-sm transition border border-slate-800 active:scale-95 text-center">
               Reset Drum
             </button>
           </div>
@@ -203,17 +212,17 @@
           </div>
 
           <!-- Glass Sphere Chamber -->
-          <div class="relative w-[300px] h-[300px] sm:w-[350px] sm:h-[350px] rounded-full border-4 border-slate-600/80 bg-gradient-to-br from-slate-950/80 via-slate-900/60 to-slate-950/95 shadow-2xl flex items-center justify-center overflow-hidden backdrop-blur-sm">
+          <div class="relative w-[310px] h-[310px] sm:w-[360px] sm:h-[360px] rounded-full border-4 border-slate-600/80 bg-gradient-to-br from-slate-950/80 via-slate-900/60 to-slate-950/95 shadow-2xl flex items-center justify-center overflow-hidden backdrop-blur-sm">
             
-            <canvas id="hopper-canvas" width="350" height="350" class="w-full h-full rounded-full"></canvas>
+            <canvas id="hopper-canvas" width="360" height="360" class="w-full h-full rounded-full"></canvas>
             
-            <!-- Reflections -->
+            <!-- Realistic 3D Reflections -->
             <div class="absolute inset-0 pointer-events-none rounded-full border-[6px] border-slate-600/30"></div>
             <div class="absolute top-4 left-10 w-28 h-14 bg-gradient-to-b from-white/20 to-transparent rounded-full -rotate-45 pointer-events-none filter blur-[1px]"></div>
             <div class="absolute bottom-3 right-8 w-20 h-8 bg-gradient-to-t from-white/10 to-transparent rounded-full rotate-12 pointer-events-none filter blur-[2px]"></div>
           </div>
 
-          <!-- Industrial Base / Air Jet Pedestal -->
+          <!-- Industrial Base Pedestal -->
           <div class="flex flex-col items-center -mt-2">
             <div class="w-24 h-4 bg-gradient-to-r from-slate-600 via-slate-400 to-slate-700 border-x border-slate-500 shadow-md"></div>
             <div class="w-44 h-10 bg-gradient-to-b from-slate-800 to-slate-950 border-2 border-slate-700 rounded-b-2xl shadow-2xl flex items-center justify-between px-4">
@@ -239,7 +248,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 class="text-xl sm:text-3xl font-extrabold text-white">Smart Combinatorial Generator</h2>
-          <p class="text-slate-400 text-xs sm:text-sm">Generate lines based on statistical frequencies and historical odd/even balances.</p>
+          <p class="text-slate-400 text-xs sm:text-sm">Generate lines based on statistical frequencies and historical odd/even balances. <span class="text-amber-400/80">Does not guarantee a win.</span></p>
         </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <select id="gen-strategy" class="bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl px-3 py-2.5 outline-none">
@@ -368,7 +377,7 @@
         <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">About LotteryMigo</span>
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Demystifying Lottery Probability Through Data</h2>
         <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-          LotteryMigo was built to give players an entertaining, mathematically transparent window into high-stakes games like Powerball and Mega Millions. Rather than selling false promises of guaranteed wins, we leverage ten years of empirical drawing records to explore statistical momentum, overdue patterns, and combinatorial mechanics.
+          LotteryMigo was built to give players an entertaining, mathematically transparent window into high-stakes games like Powerball and Mega Millions. <strong>We do not guarantee any lottery win.</strong> Rather than selling false promises of guaranteed wins, we leverage ten years of empirical drawing records to explore statistical momentum, overdue patterns, and combinatorial mechanics.
         </p>
       </div>
 
@@ -437,7 +446,7 @@
         </div>
       </div>
       <p class="text-[10px] text-slate-600 leading-relaxed">
-        Powerball® and Mega Millions® are registered trademarks of their respective consortiums. LotteryMigo is not sponsored by or affiliated with any state or national lottery agency. © 2026 LotteryMigo.com. All rights reserved.
+        <strong>DISCLAIMER:</strong> LotteryMigo does not guarantee any lottery win or prize outcome. Powerball® and Mega Millions® are registered trademarks of their respective consortiums. LotteryMigo is not sponsored by or affiliated with any state or national lottery agency. © 2026 LotteryMigo.com. All rights reserved.
       </p>
     </div>
   </footer>
@@ -446,13 +455,13 @@
   <div id="termsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 text-xs text-slate-300 space-y-3">
       <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 class="font-bold text-sm text-white">Terms of Use</h3>
+        <h3 class="font-bold text-sm text-white">Terms of Use & No Guarantee Disclaimer</h3>
         <button onclick="closeModal('termsModal')" class="text-slate-400 hover:text-white text-lg">&times;</button>
       </div>
       <div class="space-y-2 text-slate-400 max-h-60 overflow-y-auto custom-scroll pr-1">
-        <p>1. LotteryMigo is an educational simulator. It does not accept bets or sell tickets.</p>
-        <p>2. Simulated scratch games and credits hold zero real-world cash or redemption value.</p>
-        <p>3. Operators are not liable for any lottery ticket outcomes or financial decisions made by users.</p>
+        <p><strong>1. Strict No Guarantee Policy:</strong> LotteryMigo makes no warranties, express or implied, regarding any financial reward or lottery win. All numbers are generated for entertainment and educational statistical analysis.</p>
+        <p><strong>2. No Ticket Sales:</strong> We do not sell lottery tickets, accept bets, or operate a syndicate.</p>
+        <p><strong>3. Simulated Play:</strong> Scratch-off mini-games and virtual points have zero real-world monetary value.</p>
       </div>
       <div class="text-right pt-2 border-t border-slate-800">
         <button onclick="closeModal('termsModal')" class="px-4 py-1.5 bg-slate-800 text-white rounded-lg">Close</button>
@@ -606,7 +615,7 @@
       generateTickets(5);
     }
 
-    // --- 1. REALISTIC STUDIO DRUM ENGINE ---
+    // --- 1. REALISTIC STUDIO DRUM ENGINE (BIGGER BALLS, SMOOTH TUMBLING) ---
     let hopperCanvas, ctx;
     let hopperBalls = [];
     let airParticles = [];
@@ -628,18 +637,18 @@
         for (let i = 1; i <= totalBalls; i++) {
           hopperBalls.push({
             num: i,
-            x: 175 + (Math.random() * 120 - 60),
-            y: 255 + (Math.random() * 40 - 20),
+            x: 180 + (Math.random() * 120 - 60),
+            y: 260 + (Math.random() * 40 - 20),
             vx: (Math.random() - 0.5) * 0.4,
             vy: 0,
-            radius: 11
+            radius: 14.5 // Enlarged ball size
           });
         }
 
         for (let p = 0; p < 25; p++) {
           airParticles.push({
-            x: 175 + (Math.random() * 80 - 40),
-            y: 300 - Math.random() * 150,
+            x: 180 + (Math.random() * 80 - 40),
+            y: 310 - Math.random() * 150,
             vy: -(Math.random() * 2 + 1),
             alpha: Math.random() * 0.5
           });
@@ -655,48 +664,51 @@
 
     function animateChamber() {
       if (ctx) {
-        ctx.clearRect(0, 0, 350, 350);
+        ctx.clearRect(0, 0, 360, 360);
 
-        const bgGrad = ctx.createRadialGradient(175, 175, 30, 175, 175, 160);
+        // Glass sphere background
+        const bgGrad = ctx.createRadialGradient(180, 180, 30, 180, 180, 165);
         bgGrad.addColorStop(0, '#0f172a');
         bgGrad.addColorStop(0.7, '#090d16');
         bgGrad.addColorStop(1, '#020617');
         ctx.fillStyle = bgGrad;
         ctx.beginPath();
-        ctx.arc(175, 175, 165, 0, Math.PI * 2);
+        ctx.arc(180, 180, 170, 0, Math.PI * 2);
         ctx.fill();
 
+        // Air streams
         if (blowerActive) {
-          ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
           ctx.lineWidth = 1.5;
           airParticles.forEach(p => {
             p.y += p.vy * 2;
             if (p.y < 40) p.y = 310;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p.x + (Math.random() * 4 - 2), p.y - 10);
+            ctx.lineTo(p.x + (Math.random() * 4 - 2), p.y - 12);
             ctx.stroke();
           });
         }
 
+        // Render balls
         hopperBalls.forEach(b => {
           if (blowerActive) {
             b.x += b.vx;
             b.y += b.vy;
-            b.vy += 0.14;
+            b.vy += 0.14; // Gravity
 
-            const dx = b.x - 175;
-            const dy = b.y - 175;
+            const dx = b.x - 180;
+            const dy = b.y - 180;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist + b.radius > 155) {
+            if (dist + b.radius > 156) {
               const nx = dx / dist;
               const ny = dy / dist;
               const dot = b.vx * nx + b.vy * ny;
               b.vx = (b.vx - 2 * dot * nx) * 0.88;
               b.vy = (b.vy - 2 * dot * ny) * 0.88 - (Math.random() * 2.8);
-              b.x = 175 + nx * (155 - b.radius);
-              b.y = 175 + ny * (155 - b.radius);
+              b.x = 180 + nx * (156 - b.radius);
+              b.y = 180 + ny * (156 - b.radius);
             }
           } else {
             b.vy += 0.25;
@@ -704,24 +716,25 @@
             b.y += b.vy;
             b.vx *= 0.94;
 
-            const dx = b.x - 175;
-            const dy = b.y - 175;
+            const dx = b.x - 180;
+            const dy = b.y - 180;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist + b.radius > 155) {
+            if (dist + b.radius > 156) {
               const nx = dx / dist;
               const ny = dy / dist;
               b.vx *= 0.8;
               b.vy = 0;
-              b.x = 175 + nx * (155 - b.radius);
-              b.y = 175 + ny * (155 - b.radius);
+              b.x = 180 + nx * (156 - b.radius);
+              b.y = 180 + ny * (156 - b.radius);
             }
           }
 
+          // Shaded 3D Sphere Ball
           const ballGrad = ctx.createRadialGradient(
             b.x - b.radius * 0.35, 
             b.y - b.radius * 0.35, 
-            b.radius * 0.1, 
+            b.radius * 0.08, 
             b.x, 
             b.y, 
             b.radius
@@ -737,20 +750,22 @@
           ctx.fill();
 
           ctx.strokeStyle = '#475569';
-          ctx.lineWidth = 0.8;
+          ctx.lineWidth = 1;
           ctx.stroke();
 
+          // Ball text
           ctx.fillStyle = '#0f172a';
-          ctx.font = 'bold 8.5px sans-serif';
+          ctx.font = 'bold 11px sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(b.num, b.x, b.y);
         });
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        // Inner glass rim
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(175, 175, 160, 0, Math.PI * 2);
+        ctx.arc(180, 180, 165, 0, Math.PI * 2);
         ctx.stroke();
       }
 
@@ -766,6 +781,9 @@
       if (led) led.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
       const timerStatus = document.getElementById('auto-timer-status');
       if (timerStatus) timerStatus.classList.remove('hidden');
+
+      const btn = document.getElementById('btn-start-blower');
+      if (btn) btn.innerText = 'Drawing...';
 
       hopperBalls.forEach(b => {
         b.vx = (Math.random() - 0.5) * 6;
@@ -794,6 +812,9 @@
       if (led) led.className = 'w-2.5 h-2.5 rounded-full bg-slate-600';
       const timerStatus = document.getElementById('auto-timer-status');
       if (timerStatus) timerStatus.classList.add('hidden');
+      
+      const btn = document.getElementById('btn-start-blower');
+      if (btn && drawnHopperBalls.length < 6) btn.innerText = 'Start Draw';
     }
 
     function drawNextHopperBall() {
@@ -809,16 +830,23 @@
         } while (drawnHopperBalls.includes(drawnNum));
 
         drawnHopperBalls.push(drawnNum);
-        if (rack) rack.innerHTML += '<div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ball-3d text-slate-950 font-black flex items-center justify-center text-xs border border-slate-300 animate-bounce">' + drawnNum + '</div>';
+        // Bigger balls (w-11 h-11 on mobile, w-12 h-12 on desktop), smooth pop-in, NO bouncing animation
+        if (rack) {
+          rack.innerHTML += '<div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full ball-3d text-slate-950 font-black flex items-center justify-center text-sm sm:text-base border border-slate-300 ball-pop-in shadow-lg">' + drawnNum + '</div>';
+        }
       } else {
         drawnNum = Math.floor(Math.random() * CONFIG[currentGame].maxSpecial) + 1;
         drawnHopperBalls.push(drawnNum);
         const isPB = currentGame === 'POWERBALL';
         const specialStyle = isPB ? 'ball-3d-special-pb text-white' : 'ball-3d-special-mm text-slate-950';
 
-        if (rack) rack.innerHTML += '<div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ' + specialStyle + ' font-black flex items-center justify-center text-xs border border-white/30 animate-bounce">' + drawnNum + '</div>';
+        if (rack) {
+          rack.innerHTML += '<div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full ' + specialStyle + ' font-black flex items-center justify-center text-sm sm:text-base border border-white/30 ball-pop-in shadow-lg">' + drawnNum + '</div>';
+        }
         
         stopAutoBlower();
+        const btn = document.getElementById('btn-start-blower');
+        if (btn) btn.innerText = 'Completed ✓';
       }
 
       const countLabel = document.getElementById('drawn-count-label');
@@ -831,7 +859,11 @@
       const countLabel = document.getElementById('drawn-count-label');
       if (countLabel) countLabel.innerText = '0 / 6 Balls';
       const rack = document.getElementById('hopper-balls-rack');
-      if (rack) rack.innerHTML = '<span class="text-xs text-slate-500 italic">Press "Auto Draw (5s)" or "Next Ball" to extract...</span>';
+      if (rack) rack.innerHTML = '<span class="text-xs text-slate-500 italic">Press "Start Draw" or "Next Ball" to extract...</span>';
+      
+      const btn = document.getElementById('btn-start-blower');
+      if (btn) btn.innerText = 'Start Draw';
+      
       initHopperChamber();
     }
 
@@ -849,7 +881,7 @@
           const lineDiv = document.createElement('div');
           lineDiv.className = 'bg-slate-950/80 border border-slate-800/80 rounded-2xl p-3.5 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3';
           
-          let whiteBallsHtml = line.whites.map(n => '<span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full ball-3d text-slate-950 font-black flex items-center justify-center text-xs">' + n + '</span>').join('');
+          let whiteBallsHtml = line.whites.map(n => '<span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ball-3d text-slate-950 font-black flex items-center justify-center text-xs sm:text-sm">' + n + '</span>').join('');
           let isPB = currentGame === 'POWERBALL';
           let specialClass = isPB ? 'ball-3d-special-pb text-white' : 'ball-3d-special-mm text-slate-950';
           let oddsCount = line.whites.filter(x => x % 2 !== 0).length;
@@ -860,7 +892,7 @@
               <span class="text-xs font-bold text-slate-500 w-7">#0${i}</span>
               <div class="flex items-center gap-1.5 sm:gap-2">
                 ${whiteBallsHtml}
-                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full ${specialClass} font-black flex items-center justify-center text-xs">
+                <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ${specialClass} font-black flex items-center justify-center text-xs sm:text-sm">
                   ${line.special}
                 </span>
               </div>

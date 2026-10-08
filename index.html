@@ -3,61 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LotteryMigo | Powerball & Mega Millions Analytics, Games & Number Generator</title>
-  <meta name="description" content="Calculate lottery number frequencies, play physics ball hopper draws, scratch cards, analyze 10-year draw history, and generate smart tickets for Powerball and Mega Millions." />
+  <title>LotteryMigo | Powerball & Mega Millions Analytics & Games</title>
   
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js & Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              pb: '#dc2626',
-              pbDark: '#991b1b',
-              mm: '#2563eb',
-              mmDark: '#1d4ed8',
-              gold: '#f59e0b',
-              accent: '#10b981'
-            }
-          }
-        }
-      }
-    };
-  </script>
-
   <style>
-    @keyframes pulse-glow {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.05); }
-    }
     .ball-shadow {
-      box-shadow: inset -4px -4px 6px rgba(0,0,0,0.4), inset 3px 3px 5px rgba(255,255,255,0.7), 0 4px 6px rgba(0,0,0,0.3);
+      box-shadow: inset -3px -3px 5px rgba(0,0,0,0.4), inset 2px 2px 4px rgba(255,255,255,0.8), 0 4px 6px rgba(0,0,0,0.3);
     }
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: #475569;
+      background: #334155;
       border-radius: 4px;
-    }
-    .scratch-cursor {
-      cursor: crosshair;
     }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
 
   <!-- TOP ANNOUNCEMENT BAR -->
-  <div class="bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 py-1.5 px-4 text-xs font-semibold text-center text-white flex items-center justify-center gap-2">
+  <div class="bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 py-2 px-4 text-xs font-semibold text-center text-white flex items-center justify-center gap-2">
     <span class="inline-block animate-ping w-2 h-2 rounded-full bg-yellow-300"></span>
     <span>LotteryMigo Probability Engine Active: Analyzing 10+ Years of Official Draw Data</span>
   </div>
@@ -80,4 +51,78 @@
         <button id="btn-toggle-pb" onclick="switchGame('POWERBALL')" class="px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-rose-600 text-white shadow-md">
           <span class="w-2.5 h-2.5 rounded-full bg-white"></span> Powerball
         </button>
-        <button id="btn-toggle-mm" onclick="switchGame('MEGAMILLIONS')" class="
+        <button id="btn-toggle-mm" onclick="switchGame('MEGAMILLIONS')" class="px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Mega Millions
+        </button>
+      </div>
+
+      <!-- NAV SHORTCUTS -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+        <a href="#section-hopper" class="hover:text-amber-400 transition-colors">Hopper Draw</a>
+        <a href="#section-generator" class="hover:text-amber-400 transition-colors">Generator</a>
+        <a href="#section-scratcher" class="hover:text-amber-400 transition-colors">Scratch Card</a>
+        <a href="#section-stats" class="hover:text-amber-400 transition-colors">Frequencies</a>
+        <a href="#section-history" class="hover:text-amber-400 transition-colors">10-Yr History</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative overflow-hidden pt-10 pb-12 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-3xl mx-auto space-y-4">
+        <div id="hero-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Powerball: 5 of 69 + 1 Powerball (1-26)
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white">
+          Smarter Picks with <span id="hero-title-game" class="text-rose-500">Historical Probability</span>
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+          Analyze over 10 years of drawings, uncover hot and cold streaks, simulate live draw physics in our blower drum, and generate strategic tickets.
+        </p>
+
+        <!-- STATS PILLS -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-left">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5">
+            <span class="text-xs text-slate-400 block">Total Draws Logged</span>
+            <span id="stat-total-draws" class="text-xl font-black text-white">1,042</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5">
+            <span class="text-xs text-slate-400 block">Jackpot Odds</span>
+            <span id="stat-jackpot-odds" class="text-xl font-black text-amber-400">1 in 292.2M</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5">
+            <span class="text-xs text-slate-400 block">Hottest Ball</span>
+            <span id="stat-hottest-ball" class="text-xl font-black text-emerald-400">#61 (89x)</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5">
+            <span class="text-xs text-slate-400 block">Most Overdue</span>
+            <span id="stat-coldest-ball" class="text-xl font-black text-rose-400">#13 (48 Draws)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN APPLICATION BODY -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 w-full">
+
+    <!-- 1. INTERACTIVE PHYSICS BALL HOPPER GAME -->
+    <section id="section-hopper" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-sm relative">
+      <div class="flex flex-col lg:flex-row gap-8 items-center justify-between">
+        <div class="w-full lg:w-1/2 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> Physics Blower Simulator
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Live Blower Drum Draw Game</h2>
+          <p class="text-slate-400 text-sm">
+            Watch lottery balls bounce in real-time inside the air chamber. Start the blower machine and pop out numbers sequentially to generate your lucky ticket!
+          </p>
+
+          <!-- Selected Balls Display -->
+          <div class="bg-slate-950/80 rounded-2xl p-4 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+              <span>Your Drawn Numbers</span>
+              <span id="drawn-count-label">0 / 6 Balls</span>
+            </div>
+            <div id="hopper-balls-rack" class="flex items-center gap-2 sm:gap-3 min

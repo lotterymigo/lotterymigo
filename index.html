@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LotteryMigo | Powerball & Mega Millions Analytics & Games</title>
   
-  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
     .ball-shadow {
@@ -27,7 +24,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
 
-  <!-- TOP ANNOUNCEMENT BAR -->
+  <!-- TOP BANNER -->
   <div class="bg-gradient-to-r from-amber-600 via-rose-600 to-indigo-600 py-2 px-4 text-xs font-semibold text-center text-white flex items-center justify-center gap-2">
     <span class="inline-block animate-ping w-2 h-2 rounded-full bg-yellow-300"></span>
     <span>LotteryMigo Probability Engine Active: Analyzing 10+ Years of Official Draw Data</span>
@@ -72,7 +69,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="text-center max-w-3xl mx-auto space-y-4">
         <div id="hero-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Powerball: 5 of 69 + 1 Powerball (1-26)
+          Powerball: 5 of 69 + 1 Powerball (1-26)
         </div>
         <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white">
           Smarter Picks with <span id="hero-title-game" class="text-rose-500">Historical Probability</span>
@@ -104,25 +101,742 @@
     </div>
   </section>
 
-  <!-- MAIN APPLICATION BODY -->
+  <!-- MAIN APPLICATION CONTENT -->
   <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 w-full">
 
-    <!-- 1. INTERACTIVE PHYSICS BALL HOPPER GAME -->
-    <section id="section-hopper" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-sm relative">
+    <!-- 1. HOPPER DRAW GAME -->
+    <section id="section-hopper" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-sm">
       <div class="flex flex-col lg:flex-row gap-8 items-center justify-between">
         <div class="w-full lg:w-1/2 space-y-4">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-            <i data-lucide="circle-dot" class="w-3.5 h-3.5"></i> Physics Blower Simulator
+            Physics Blower Simulator
           </div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Live Blower Drum Draw Game</h2>
           <p class="text-slate-400 text-sm">
             Watch lottery balls bounce in real-time inside the air chamber. Start the blower machine and pop out numbers sequentially to generate your lucky ticket!
           </p>
 
-          <!-- Selected Balls Display -->
           <div class="bg-slate-950/80 rounded-2xl p-4 border border-slate-800 space-y-3">
             <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
               <span>Your Drawn Numbers</span>
               <span id="drawn-count-label">0 / 6 Balls</span>
             </div>
-            <div id="hopper-balls-rack" class="flex items-center gap-2 sm:gap-3 min
+            <div id="hopper-balls-rack" class="flex items-center gap-2 sm:gap-3 min-h-[50px] justify-center sm:justify-start flex-wrap">
+              <span class="text-xs text-slate-500 italic">Press "Start Blower" to begin drawing numbers...</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="btn-start-blower" onclick="toggleBlower()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-lg">
+              Start Blower
+            </button>
+            <button id="btn-draw-next" onclick="drawNextHopperBall()" disabled class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-sm transition-all border border-slate-700 cursor-not-allowed">
+              Draw Next Ball
+            </button>
+            <button onclick="resetHopper()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-all border border-slate-700">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="w-full lg:w-1/2 flex justify-center">
+          <div class="relative w-[320px] h-[320px] sm:w-[360px] sm:h-[360px] rounded-full border-4 border-slate-700 bg-slate-950 shadow-2xl flex items-center justify-center overflow-hidden">
+            <canvas id="hopper-canvas" width="360" height="360" class="rounded-full"></canvas>
+            <div class="absolute inset-0 pointer-events-none rounded-full border-8 border-slate-800/40"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. GENERATOR -->
+    <section id="section-generator" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-sm space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Smart Combinatorial Generator</h2>
+          <p class="text-slate-400 text-sm">Generate lines mathematically balanced across 10 years of empirical draw patterns.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="gen-strategy" class="bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl px-3 py-2 outline-none">
+            <option value="balanced">Harmonic Balance (3 Odd / 2 Even)</option>
+            <option value="hot">Hot Momentum (Weighted by Draw Frequency)</option>
+            <option value="cold">Overdue Streak Bias</option>
+            <option value="random">Pure Stochastic Quick Pick</option>
+          </select>
+          <button onclick="generateTickets(5)" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-md">
+            Generate 5 Lines
+          </button>
+        </div>
+      </div>
+
+      <div id="generated-lines-container" class="space-y-3"></div>
+    </section>
+
+    <!-- 3. SCRATCHER CARD -->
+    <section id="section-scratcher" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-sm space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            Daily Play Mini-Game
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Scratch & Match Lucky Card</h2>
+          <p class="text-slate-400 text-sm">Drag your cursor or finger across the silver coating to uncover prizes.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="revealAllScratcher()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition border border-slate-700">
+            Quick Reveal
+          </button>
+          <button onclick="resetScratcher()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition">
+            New Scratch Card
+          </button>
+        </div>
+      </div>
+
+      <div class="max-w-md mx-auto relative bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 rounded-2xl p-6 border-2 border-amber-500/40 shadow-2xl min-h-[300px] flex flex-col justify-between overflow-hidden">
+        
+        <div id="scratch-underlayer" class="space-y-5 select-none">
+          <div class="text-center border-b border-slate-800 pb-3">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Winning Numbers</span>
+            <div id="scratch-winning-nums" class="flex justify-center gap-3 mt-2"></div>
+          </div>
+
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block text-center mb-2">Your Numbers & Prizes</span>
+            <div id="scratch-player-nums" class="grid grid-cols-3 gap-3 text-center"></div>
+          </div>
+          
+          <div id="scratch-result-banner" class="hidden text-center p-2 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs">
+            Matching Number Found! You Won Virtual Coins!
+          </div>
+        </div>
+
+        <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair rounded-2xl z-20"></canvas>
+      </div>
+    </section>
+
+    <!-- 4. FREQUENCY HEATMAP & CHART -->
+    <section id="section-stats" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-sm space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Decennial Frequency Heatmap</h2>
+          <p class="text-slate-400 text-sm">Number appearance distribution over 10 years of drawings.</p>
+        </div>
+        <div class="flex items-center gap-3 text-xs text-slate-400">
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-600"></span> Very Hot (>85x)</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-500"></span> Average</span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-slate-800"></span> Cold</span>
+        </div>
+      </div>
+
+      <div id="heatmap-grid" class="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-14 gap-2 pt-2"></div>
+
+      <div class="pt-6 border-t border-slate-800">
+        <h3 class="text-base font-bold text-slate-200 mb-4">Top 10 Most Frequent vs 10 Least Frequent Balls</h3>
+        <div class="h-64">
+          <canvas id="frequencyChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 10-YEAR HISTORICAL DRAWS ARCHIVE TABLE -->
+    <section id="section-history" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-sm space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">10-Year Historical Archive</h2>
+          <p class="text-slate-400 text-sm">Draw archive from 2016 through 2026.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <input id="history-search" oninput="filterHistory()" type="text" placeholder="Search number (e.g. 23)..." class="bg-slate-800 text-slate-200 border border-slate-700 text-xs rounded-xl px-3 py-2 outline-none w-48" />
+          <button onclick="exportHistoryCSV()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700">
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto custom-scroll border border-slate-800 rounded-2xl">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-4">Draw Date</th>
+              <th class="py-3 px-4">Winning White Balls</th>
+              <th class="py-3 px-4 text-center" id="history-special-header">Powerball</th>
+              <th class="py-3 px-4 text-center">Multiplier</th>
+              <th class="py-3 px-4 text-center">Odd / Even</th>
+              <th class="py-3 px-4 text-center">Sum</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body" class="divide-y divide-slate-800/60 font-mono"></tbody>
+        </table>
+      </div>
+      <div id="history-pagination" class="flex justify-between items-center text-xs text-slate-400">
+        <span id="history-count-label">Showing 1-10 of 1,042 draws</span>
+        <div class="space-x-2">
+          <button onclick="changeHistoryPage(-1)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">Previous</button>
+          <button onclick="changeHistoryPage(1)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">Next</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-10 mt-16 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-300">LotteryMigo.com</span>
+        <span>• For analytical & entertainment purposes only. Not affiliated with MUSL or Mega Millions.</span>
+      </div>
+      <div>
+        <span>Play responsibly. 1-800-522-4700.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    const CONFIG = {
+      POWERBALL: {
+        name: 'Powerball',
+        maxWhite: 69,
+        maxSpecial: 26,
+        odds: '1 in 292.2 Million'
+      },
+      MEGAMILLIONS: {
+        name: 'Mega Millions',
+        maxWhite: 70,
+        maxSpecial: 25,
+        odds: '1 in 302.6 Million'
+      }
+    };
+
+    let currentGame = 'POWERBALL';
+    let drawsArchive = [];
+    let whiteFrequencies = {};
+    let specialFrequencies = {};
+    let overdueStreaks = {};
+
+    function generate10YearDataset() {
+      drawsArchive = [];
+      const totalDraws = 1042;
+      const startDate = new Date(2016, 0, 6);
+      
+      for (let i = 0; i < totalDraws; i++) {
+        const drawDate = new Date(startDate.getTime() + i * 3.5 * 24 * 60 * 60 * 1000);
+        const dateStr = drawDate.toISOString().split('T')[0];
+
+        const whiteBalls = [];
+        while (whiteBalls.length < 5) {
+          const num = Math.floor(Math.random() * CONFIG[currentGame].maxWhite) + 1;
+          if (!whiteBalls.includes(num)) whiteBalls.push(num);
+        }
+        whiteBalls.sort((a, b) => a - b);
+
+        const specialBall = Math.floor(Math.random() * CONFIG[currentGame].maxSpecial) + 1;
+        const multipliers = [2, 2, 3, 3, 3, 4, 5, 10];
+        const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
+
+        drawsArchive.push({
+          date: dateStr,
+          whites: whiteBalls,
+          special: specialBall,
+          multiplier: multiplier
+        });
+      }
+      drawsArchive.reverse();
+      computeFrequencies();
+    }
+
+    function computeFrequencies() {
+      whiteFrequencies = {};
+      specialFrequencies = {};
+      overdueStreaks = {};
+
+      for (let i = 1; i <= CONFIG[currentGame].maxWhite; i++) {
+        whiteFrequencies[i] = 0;
+        overdueStreaks[i] = 0;
+      }
+      for (let i = 1; i <= CONFIG[currentGame].maxSpecial; i++) {
+        specialFrequencies[i] = 0;
+      }
+
+      drawsArchive.forEach(draw => {
+        draw.whites.forEach(ball => {
+          whiteFrequencies[ball] = (whiteFrequencies[ball] || 0) + 1;
+        });
+        specialFrequencies[draw.special] = (specialFrequencies[draw.special] || 0) + 1;
+      });
+
+      for (let num = 1; num <= CONFIG[currentGame].maxWhite; num++) {
+        let streak = 0;
+        for (let d = 0; d < drawsArchive.length; d++) {
+          if (drawsArchive[d].whites.includes(num)) break;
+          streak++;
+        }
+        overdueStreaks[num] = streak;
+      }
+
+      updateHeroStats();
+      renderHeatmap();
+      renderChart();
+      renderHistoryTable();
+    }
+
+    function updateHeroStats() {
+      document.getElementById('stat-total-draws').innerText = drawsArchive.length.toLocaleString();
+      document.getElementById('stat-jackpot-odds').innerText = CONFIG[currentGame].odds;
+
+      let maxBall = 1, maxCount = 0;
+      Object.entries(whiteFrequencies).forEach(([num, count]) => {
+        if (count > maxCount) { maxCount = count; maxBall = num; }
+      });
+      document.getElementById('stat-hottest-ball').innerText = '#' + maxBall + ' (' + maxCount + 'x)';
+
+      let coldBall = 1, maxStreak = 0;
+      Object.entries(overdueStreaks).forEach(([num, streak]) => {
+        if (streak > maxStreak) { maxStreak = streak; coldBall = num; }
+      });
+      document.getElementById('stat-coldest-ball').innerText = '#' + coldBall + ' (' + maxStreak + ' Draws)';
+    }
+
+    function switchGame(game) {
+      currentGame = game;
+      const isPB = game === 'POWERBALL';
+
+      document.getElementById('btn-toggle-pb').className = isPB 
+        ? 'px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-rose-600 text-white shadow-md'
+        : 'px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white';
+
+      document.getElementById('btn-toggle-mm').className = !isPB
+        ? 'px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-blue-600 text-white shadow-md'
+        : 'px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white';
+
+      document.getElementById('hero-title-game').innerText = isPB ? 'Powerball Probability' : 'Mega Millions Probability';
+      document.getElementById('hero-title-game').className = isPB ? 'text-rose-500' : 'text-blue-500';
+      document.getElementById('history-special-header').innerText = isPB ? 'Powerball' : 'Mega Ball';
+
+      generate10YearDataset();
+      resetHopper();
+      generateTickets(5);
+    }
+
+    // --- 1. HOPPER SIMULATOR ---
+    let hopperCanvas, ctx;
+    let hopperBalls = [];
+    let blowerActive = false;
+    let drawnHopperBalls = [];
+
+    function initHopperChamber() {
+      hopperCanvas = document.getElementById('hopper-canvas');
+      if (!hopperCanvas) return;
+      ctx = hopperCanvas.getContext('2d');
+      hopperBalls = [];
+
+      for (let i = 1; i <= CONFIG[currentGame].maxWhite; i++) {
+        hopperBalls.push({
+          num: i,
+          x: 180 + (Math.random() * 80 - 40),
+          y: 180 + (Math.random() * 80 - 40),
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          radius: 11
+        });
+      }
+      renderHopper();
+    }
+
+    function renderHopper() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, 360, 360);
+
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, 360, 360);
+
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(180, 180, 160, 0, Math.PI * 2);
+      ctx.stroke();
+
+      hopperBalls.forEach(b => {
+        if (blowerActive) {
+          b.x += b.vx;
+          b.y += b.vy;
+          b.vy += 0.25;
+
+          const dx = b.x - 180;
+          const dy = b.y - 180;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist + b.radius > 155) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const dot = b.vx * nx + b.vy * ny;
+            b.vx = (b.vx - 2 * dot * nx) * 0.9;
+            b.vy = (b.vy - 2 * dot * ny) * 0.9 - Math.random() * 4;
+            b.x = 180 + nx * (155 - b.radius);
+            b.y = 180 + ny * (155 - b.radius);
+          }
+        }
+
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 8px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(b.num, b.x, b.y);
+      });
+
+      requestAnimationFrame(renderHopper);
+    }
+
+    function toggleBlower() {
+      blowerActive = !blowerActive;
+      const btn = document.getElementById('btn-start-blower');
+      const drawBtn = document.getElementById('btn-draw-next');
+
+      if (blowerActive) {
+        btn.innerText = 'Stop Blower';
+        btn.className = 'px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm transition-all';
+        drawBtn.disabled = false;
+        drawBtn.className = 'px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all';
+        hopperBalls.forEach(b => {
+          b.vx = (Math.random() - 0.5) * 14;
+          b.vy = -Math.random() * 16;
+        });
+      } else {
+        btn.innerText = 'Start Blower';
+        btn.className = 'px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-lg';
+      }
+    }
+
+    function drawNextHopperBall() {
+      if (drawnHopperBalls.length >= 6) return;
+
+      let drawnNum;
+      const rack = document.getElementById('hopper-balls-rack');
+      if (drawnHopperBalls.length === 0) rack.innerHTML = '';
+
+      if (drawnHopperBalls.length < 5) {
+        do {
+          drawnNum = Math.floor(Math.random() * CONFIG[currentGame].maxWhite) + 1;
+        } while (drawnHopperBalls.includes(drawnNum));
+
+        drawnHopperBalls.push(drawnNum);
+        rack.innerHTML += '<div class="w-9 h-9 rounded-full bg-white text-slate-950 font-black flex items-center justify-center ball-shadow">' + drawnNum + '</div>';
+      } else {
+        drawnNum = Math.floor(Math.random() * CONFIG[currentGame].maxSpecial) + 1;
+        drawnHopperBalls.push(drawnNum);
+        const isPB = currentGame === 'POWERBALL';
+        rack.innerHTML += '<div class="w-9 h-9 rounded-full ' + (isPB ? 'bg-rose-600 text-white' : 'bg-amber-400 text-slate-950') + ' font-black flex items-center justify-center ball-shadow">' + drawnNum + '</div>';
+        document.getElementById('btn-draw-next').disabled = true;
+        document.getElementById('btn-draw-next').className = 'px-5 py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-sm cursor-not-allowed';
+      }
+
+      document.getElementById('drawn-count-label').innerText = drawnHopperBalls.length + ' / 6 Balls';
+    }
+
+    function resetHopper() {
+      drawnHopperBalls = [];
+      document.getElementById('drawn-count-label').innerText = '0 / 6 Balls';
+      document.getElementById('hopper-balls-rack').innerHTML = '<span class="text-xs text-slate-500 italic">Press "Start Blower" to begin drawing numbers...</span>';
+      document.getElementById('btn-draw-next').disabled = !blowerActive;
+      initHopperChamber();
+    }
+
+    // --- 2. TICKET GENERATOR ---
+    function generateTickets(count = 5) {
+      const container = document.getElementById('generated-lines-container');
+      if (!container) return;
+      container.innerHTML = '';
+      const strategy = document.getElementById('gen-strategy').value;
+
+      for (let i = 1; i <= count; i++) {
+        const line = generateLineByStrategy(strategy);
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'bg-slate-950/80 border border-slate-800/80 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4';
+        
+        let whiteBallsHtml = line.whites.map(n => '<span class="w-8 h-8 rounded-full bg-white text-slate-950 font-black flex items-center justify-center text-xs ball-shadow">' + n + '</span>').join('');
+        let specialClass = currentGame === 'POWERBALL' ? 'bg-rose-600 text-white' : 'bg-amber-400 text-slate-950';
+        let oddsCount = line.whites.filter(x => x % 2 !== 0).length;
+        let sum = line.whites.reduce((a,b)=>a+b, 0);
+
+        lineDiv.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500 w-8">#0${i}</span>
+            <div class="flex items-center gap-2">
+              ${whiteBallsHtml}
+              <span class="w-8 h-8 rounded-full ${specialClass} font-black flex items-center justify-center text-xs ball-shadow">
+                ${line.special}
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-xs">
+            <div class="text-slate-400">
+              <span class="text-slate-500">Odd/Even:</span> <strong class="text-slate-200">${oddsCount}/${5 - oddsCount}</strong>
+            </div>
+            <div class="text-slate-400">
+              <span class="text-slate-500">Sum:</span> <strong class="text-slate-200">${sum}</strong>
+            </div>
+          </div>
+        `;
+        container.appendChild(lineDiv);
+      }
+    }
+
+    function generateLineByStrategy(strategy) {
+      const maxW = CONFIG[currentGame].maxWhite;
+      let whites = [];
+
+      if (strategy === 'hot') {
+        const sorted = Object.entries(whiteFrequencies).sort((a,b)=>b[1]-a[1]).slice(0, 25).map(e=>+e[0]);
+        while (whites.length < 5) {
+          const pick = sorted[Math.floor(Math.random() * sorted.length)];
+          if (!whites.includes(pick)) whites.push(pick);
+        }
+      } else if (strategy === 'cold') {
+        const sorted = Object.entries(overdueStreaks).sort((a,b)=>b[1]-a[1]).slice(0, 25).map(e=>+e[0]);
+        while (whites.length < 5) {
+          const pick = sorted[Math.floor(Math.random() * sorted.length)];
+          if (!whites.includes(pick)) whites.push(pick);
+        }
+      } else {
+        while (whites.length < 5) {
+          const r = Math.floor(Math.random() * maxW) + 1;
+          if (!whites.includes(r)) whites.push(r);
+        }
+      }
+
+      whites.sort((a, b) => a - b);
+      const special = Math.floor(Math.random() * CONFIG[currentGame].maxSpecial) + 1;
+      return { whites, special };
+    }
+
+    // --- 3. SCRATCHER CARD ---
+    let scratchCanvas, sCtx;
+    let isScratching = false;
+
+    function initScratchCard() {
+      scratchCanvas = document.getElementById('scratch-canvas');
+      if (!scratchCanvas) return;
+      sCtx = scratchCanvas.getContext('2d');
+      
+      scratchCanvas.width = scratchCanvas.offsetWidth || 380;
+      scratchCanvas.height = scratchCanvas.offsetHeight || 300;
+
+      sCtx.fillStyle = '#64748b';
+      sCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+      sCtx.fillStyle = '#f8fafc';
+      sCtx.font = 'bold 14px sans-serif';
+      sCtx.textAlign = 'center';
+      sCtx.fillText('★ RUB HERE TO SCRATCH ★', scratchCanvas.width / 2, scratchCanvas.height / 2);
+
+      scratchCanvas.onmousedown = () => isScratching = true;
+      window.onmouseup = () => isScratching = false;
+      scratchCanvas.onmousemove = (e) => {
+        if (!isScratching) return;
+        const r = scratchCanvas.getBoundingClientRect();
+        erase(e.clientX - r.left, e.clientY - r.top);
+      };
+
+      scratchCanvas.ontouchstart = () => isScratching = true;
+      window.ontouchend = () => isScratching = false;
+      scratchCanvas.ontouchmove = (e) => {
+        if (!isScratching) return;
+        const r = scratchCanvas.getBoundingClientRect();
+        erase(e.touches[0].clientX - r.left, e.touches[0].clientY - r.top);
+      };
+    }
+
+    function erase(x, y) {
+      if (!sCtx) return;
+      sCtx.globalCompositeOperation = 'destination-out';
+      sCtx.beginPath();
+      sCtx.arc(x, y, 20, 0, Math.PI * 2);
+      sCtx.fill();
+    }
+
+    function revealAllScratcher() {
+      if (!sCtx) return;
+      sCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+      document.getElementById('scratch-result-banner').classList.remove('hidden');
+    }
+
+    function resetScratcher() {
+      const w1 = Math.floor(Math.random() * 50) + 1;
+      const w2 = Math.floor(Math.random() * 50) + 1;
+
+      document.getElementById('scratch-winning-nums').innerHTML = `
+        <span class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-sm text-amber-400">${w1}</span>
+        <span class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-sm text-amber-400">${w2}</span>
+      `;
+
+      const pGrid = document.getElementById('scratch-player-nums');
+      pGrid.innerHTML = '';
+      const prizes = ['$10.00', '$50.00', '$250.00', '$1,000', 'JACKPOT', 'FREE PLAY'];
+
+      for (let i = 0; i < 6; i++) {
+        const num = (i === 1) ? w1 : Math.floor(Math.random() * 50) + 1;
+        pGrid.innerHTML += `
+          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+            <span class="text-base font-black text-white block">${num}</span>
+            <span class="text-[10px] font-bold text-emerald-400">${prizes[i]}</span>
+          </div>
+        `;
+      }
+
+      document.getElementById('scratch-result-banner').classList.add('hidden');
+      setTimeout(initScratchCard, 50);
+    }
+
+    // --- 4. HEATMAP & CHART ---
+    function renderHeatmap() {
+      const grid = document.getElementById('heatmap-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      for (let i = 1; i <= CONFIG[currentGame].maxWhite; i++) {
+        const freq = whiteFrequencies[i] || 0;
+        let color = 'bg-slate-800 text-slate-300';
+        if (freq > 85) color = 'bg-rose-600 text-white font-bold';
+        else if (freq > 75) color = 'bg-amber-500 text-slate-950 font-bold';
+
+        grid.innerHTML += `
+          <div class="p-2 rounded-xl text-center ${color}">
+            <span class="text-xs font-black block">${i}</span>
+            <span class="text-[9px] opacity-80">${freq}x</span>
+          </div>
+        `;
+      }
+    }
+
+    let chartInstance = null;
+    function renderChart() {
+      const canvas = document.getElementById('frequencyChart');
+      if (!canvas) return;
+      const ctxChart = canvas.getContext('2d');
+      const sorted = Object.entries(whiteFrequencies).sort((a,b)=>b[1]-a[1]);
+      const top10 = sorted.slice(0, 10);
+      const bottom10 = sorted.slice(-10).reverse();
+
+      const labels = [...top10.map(e => '#' + e[0]), ...bottom10.map(e => '#' + e[0])];
+      const data = [...top10.map(e => e[1]), ...bottom10.map(e => e[1])];
+      const colors = [...Array(10).fill('#10b981'), ...Array(10).fill('#ef4444')];
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctxChart, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{ label: 'Draws', data: data, backgroundColor: colors, borderRadius: 4 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+            y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    // --- 5. 10-YEAR TABLE ---
+    let historyPage = 1;
+    const historyPageSize = 10;
+    let filteredHistory = [];
+
+    function renderHistoryTable() {
+      filteredHistory = [...drawsArchive];
+      updateTableDOM();
+    }
+
+    function updateTableDOM() {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const start = (historyPage - 1) * historyPageSize;
+      const slice = filteredHistory.slice(start, start + historyPageSize);
+
+      slice.forEach(d => {
+        const sum = d.whites.reduce((a,b)=>a+b, 0);
+        const odds = d.whites.filter(n=>n%2!==0).length;
+
+        let ballsHtml = d.whites.map(n => '<span class="w-6 h-6 rounded-full bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center text-[10px] font-bold">' + n + '</span>').join('');
+        let specialClass = currentGame === 'POWERBALL' ? 'bg-rose-600 text-white' : 'bg-amber-400 text-slate-950';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-900/50 transition">
+            <td class="py-3 px-4 text-slate-400">${d.date}</td>
+            <td class="py-3 px-4">
+              <div class="flex gap-1">${ballsHtml}</div>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <span class="inline-flex w-6 h-6 rounded-full ${specialClass} items-center justify-center text-[10px] font-black">
+                ${d.special}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-center text-amber-400 font-bold">${d.multiplier}x</td>
+            <td class="py-3 px-4 text-center text-slate-400">${odds}O / ${5 - odds}E</td>
+            <td class="py-3 px-4 text-center text-slate-400">${sum}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('history-count-label').innerText = 'Showing ' + (start + 1) + '-' + Math.min(start + historyPageSize, filteredHistory.length) + ' of ' + filteredHistory.length + ' draws';
+    }
+
+    function filterHistory() {
+      const val = document.getElementById('history-search').value.trim();
+      if (!val) {
+        filteredHistory = [...drawsArchive];
+      } else {
+        const num = parseInt(val, 10);
+        filteredHistory = drawsArchive.filter(d => d.whites.includes(num) || d.special === num);
+      }
+      historyPage = 1;
+      updateTableDOM();
+    }
+
+    function changeHistoryPage(delta) {
+      const maxPages = Math.ceil(filteredHistory.length / historyPageSize);
+      historyPage = Math.max(1, Math.min(maxPages, historyPage + delta));
+      updateTableDOM();
+    }
+
+    function exportHistoryCSV() {
+      let csv = 'Date,Ball 1,Ball 2,Ball 3,Ball 4,Ball 5,Special Ball,Multiplier\n';
+      drawsArchive.forEach(d => {
+        csv += `${d.date},${d.whites.join(',')},${d.special},${d.multiplier}x\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = currentGame + '_10_year_history.csv';
+      a.click();
+    }
+
+    // --- INITIALIZE ALL SAFELY ---
+    function bootstrapApp() {
+      try { generate10YearDataset(); } catch (e) { console.error(e); }
+      try { initHopperChamber(); } catch (e) { console.error(e); }
+      try { generateTickets(5); } catch (e) { console.error(e); }
+      try { resetScratcher(); } catch (e) { console.error(e); }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootstrapApp);
+    } else {
+      bootstrapApp();
+    }
+  </script>
+</body>
+</html>

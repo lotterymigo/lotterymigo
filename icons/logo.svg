@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LotteryMigo">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B7A4B"/>
+      <stop offset="100%" stop-color="#0A9A9A"/>
+    </linearGradient>
+    <radialGradient id="ball" cx="36%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="58%" stop-color="#F3F7F5"/>
+      <stop offset="100%" stop-color="#D5DED8"/>
+    </radialGradient>
+    <radialGradient id="shade" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0B4A32" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#0B4A32" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="ball-clip">
+      <circle cx="256" cy="274" r="158"/>
+    </clipPath>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#tile)"/>
+  <circle cx="256" cy="274" r="158" fill="url(#ball)"/>
+  <ellipse cx="256" cy="392" rx="128" ry="46" fill="url(#shade)" clip-path="url(#ball-clip)"/>
+  <ellipse cx="196" cy="206" rx="72" ry="34" fill="#FFFFFF" opacity="0.62" transform="rotate(-32 196 206)" clip-path="url(#ball-clip)"/>
+  <!-- Bold italic 7, outlined so it does not depend on a webfont -->
+  <g transform="translate(256 286) scale(0.158 -0.158) translate(-589 -670)">
+    <path fill="#083D28" d="M254 958H167L235 1341H1092L1078 1262L345 0H86L860 1138H331Z"/>
+  </g>
+  <g transform="translate(404 108)" aria-hidden="true">
+    <polygon fill="#F6C445" points="0,-42 8,-8 42,0 8,8 0,42 -8,8 -42,0 -8,-8"/>
+    <polygon fill="#FFF6D4" points="0,-16 3.5,-3.5 16,0 3.5,3.5 0,16 -3.5,3.5 -16,0 -3.5,-3.5"/>
+  </g>
+</svg>

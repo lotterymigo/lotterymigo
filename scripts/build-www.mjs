@@ -6,7 +6,7 @@ import * as esbuild from 'esbuild';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const www = path.join(root, 'www');
 
-const pages = ['index.html', 'about.html', 'privacy.html', 'terms.html', 'contact.html', 'robots.txt', 'sitemap.xml'];
+const pages = ['index.html', 'about.html', 'privacy.html', 'terms.html', 'contact.html', 'robots.txt', 'sitemap.xml', 'manifest.webmanifest'];
 
 await esbuild.build({
   absWorkingDir: root,
@@ -26,6 +26,7 @@ for (const file of pages) {
   await cp(path.join(root, file), path.join(www, file));
 }
 await cp(path.join(root, 'assets'), path.join(www, 'assets'), { recursive: true });
+await cp(path.join(root, 'icons'), path.join(www, 'icons'), { recursive: true });
 await mkdir(path.join(www, 'data'), { recursive: true });
 await cp(path.join(root, 'data', 'draws.json'), path.join(www, 'data', 'draws.json'));
 

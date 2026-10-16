@@ -20,7 +20,7 @@ The branch that added this shell was cut from the latest `main` **plus** the unm
 - No upload keystore, distribution certificate, or provisioning profile was created.
 - No `.aab` or `.ipa` was built or uploaded.
 - No AdMob production app was created. Test IDs cannot earn money and do not prove the app is allowed to show ads.
-- Page styles and the chart still load from public CDNs. A phone with no network can still read the saved draw file, but the page may look unstyled until those CDN files are vendored. Vendoring them is a remaining step if offline appearance matters.
+- Page styles live in `assets/design.css`. Inter and Chart.js still load from public CDNs. A phone with no network can still read the saved draw file, but type and the chart may look unfinished until those CDN files are vendored. Vendoring them is a remaining step if offline appearance matters.
 
 ## 1. Accounts you must open yourself
 
@@ -199,11 +199,11 @@ Lottery and gambling apps are restricted. Many of them need a license, a country
 
 ## 8. Icons, notifications, and offline limits
 
-- Replace the default Capacitor icon and splash before you submit. Android and iOS both reject or look unfinished with the template icon.
+- The launcher icon is already the LotteryMigo mark. The source is `icons/logo.svg`, and `icons/icon-1024.png` was copied into the iOS app icon and the Android mipmaps. Replace the splash screens and the Android notification small icon before you submit. Those are still the Capacitor defaults.
 - Android notification small icons must be white-on-transparent. The shell uses the plugin default until you add one.
 - Draw alerts need a real device to confirm the permission prompt. An emulator can skip or break notifications.
 - The saved `draws.json` goes stale until you ship a new binary or the phone reaches `https://lotterymigo.com/data/draws.json`.
-- Tailwind and Chart.js are still loaded from CDNs.
+- Inter and Chart.js are still loaded from CDNs. Page CSS is local.
 
 ## 9. Remaining manual steps
 
@@ -213,7 +213,7 @@ Check these off yourself. None of them were done for this repository:
 - [ ] On a Mac, install Xcode, resolve iOS packages, and run the app on a simulator and a device.
 - [ ] Run the Android app on an emulator and a device. Confirm favorites survive a restart, draw alerts ask permission only after the button tap, and the scratch result’s **Try again** button is not under a banner.
 - [ ] Confirm the bundled draw file appears when the phone is offline, and that a newer hosted file wins when the phone is online.
-- [ ] Replace icons and splash screens.
+- [ ] Replace splash screens and the Android notification icon. The launcher icon is already the brand mark.
 - [ ] Create the Apple Developer account, App Store Connect app, certificate, and provisioning profile.
 - [ ] Create the Play Console account and an upload keystore. Turn on Play App Signing. Do not commit the keystore.
 - [ ] Raise `targetSdk` / iOS deployment target if the stores require a newer OS than this project has.

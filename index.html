@@ -281,6 +281,11 @@
       </div>
 
       <div id="generated-lines-container" class="space-y-3"></div>
+      <div id="favorites-panel" class="border-t border-slate-700 pt-4 space-y-3">
+        <h3 class="text-xl font-bold text-white">Saved favorite numbers</h3>
+        <p class="text-slate-200">These stay on this device only. Saving a line does not make it more likely to win.</p>
+        <div id="favorites-list" class="space-y-3"></div>
+      </div>
     </section>
 
     <!-- 3. SCRATCHER CARD -->
@@ -398,6 +403,12 @@
       </div>
     </section>
 
+    <section id="section-alerts" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 space-y-3">
+      <h2 class="font-extrabold text-white">Draw alerts</h2>
+      <p id="draw-alert-copy" class="text-slate-200">The Android and iOS app can notify you when a newer drawing is in the list. This website does not send those alerts. An alert is not a prediction.</p>
+      <button type="button" id="btn-draw-alerts" class="hidden min-h-12 px-4 py-3 rounded-xl bg-amber-500 text-slate-950 font-bold" aria-pressed="false">Turn on draw alerts</button>
+    </section>
+
     <!-- 6. ABOUT LOTTERYMIGO -->
     <section id="section-about" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-10 backdrop-blur-sm space-y-6">
       <div class="max-w-3xl space-y-3">
@@ -502,6 +513,7 @@
     let drawsArchive = [];
     let drawData = null;
     let usingFallbackDraws = false;
+    let drawFileSource = 'sample';
     let whiteFrequencies = {};
     let specialFrequencies = {};
     let overdueStreaks = {};
@@ -525,22 +537,84 @@
       };
     }
 
-    async function loadOfficialDraws() {
-      try {
-        const url = new URL('data/draws.json', document.baseURI);
-        const response = await fetch(url.href, { cache: 'no-cache' });
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const payload = await response.json();
-        const powerball = payload.games && payload.games.POWERBALL && payload.games.POWERBALL.draws;
-        const mega = payload.games && payload.games.MEGAMILLIONS && payload.games.MEGAMILLIONS.draws;
-        if (!powerball || !powerball.length || !mega || !mega.length) throw new Error('Draw file is incomplete');
-        drawData = payload;
-      } catch (err) {
-        console.warn('Official draw file unavailable, using sample archive.', err);
-        drawData = null;
-      }
-      applyCurrentDraws();
+    function drawFileIsComplete(payload) {
+      const powerball = payload && payload.games && payload.games.POWERBALL && payload.games.POWERBALL.draws;
+      const mega = payload && payload.games && payload.games.MEGAMILLIONS && payload.games.MEGAMILLIONS.draws;
+      return !!(powerball && powerball.length && mega && mega.length);
     }
+
+    function newestDateIn(payload) {
+      let newest = '';
+      ['POWERBALL', 'MEGAMILLIONS'].forEach((key) => {
+        (payload.games[key].draws || []).forEach((draw) => {
+          if (draw.date && draw.date > newest) newest = draw.date;
+        });
+      });
+      return newest;
+    }
+
+    async function fetchDrawFile(href) {
+      const response = await fetch(href, { cache: 'no-cache' });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const payload = await response.json();
+      if (!drawFileIsComplete(payload)) throw new Error('Draw file is incomplete');
+      return payload;
+    }
+
+    function publishDrawLoad() {
+      applyCurrentDraws();
+      document.dispatchEvent(new CustomEvent('lm-draws-ready'));
+    }
+
+    async function loadOfficialDraws() {
+      const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+      let bundled = null;
+      try {
+        bundled = await fetchDrawFile(new URL('data/draws.json', document.baseURI).href);
+      } catch (err) {
+        console.warn('Local draw file unavailable.', err);
+      }
+
+      let remote = null;
+      if (native) {
+        try {
+          remote = await fetchDrawFile('https://lotterymigo.com/data/draws.json');
+        } catch (err) {
+          console.warn('Hosted draw file unavailable. Using the copy saved in the app.', err);
+        }
+      }
+
+      if (remote && bundled) {
+        const remoteNewer = newestDateIn(remote) >= newestDateIn(bundled);
+        drawData = remoteNewer ? remote : bundled;
+        drawFileSource = remoteNewer ? 'remote' : 'bundled';
+      } else if (remote) {
+        drawData = remote;
+        drawFileSource = 'remote';
+      } else if (bundled) {
+        drawData = bundled;
+        drawFileSource = native ? 'bundled' : 'site';
+      } else {
+        drawData = null;
+        drawFileSource = 'sample';
+      }
+      publishDrawLoad();
+    }
+
+    window.lmReloadDraws = function () {
+      return loadOfficialDraws();
+    };
+
+    window.lmGetDrawAlertSnapshot = function () {
+      if (!drawData || !drawData.games) return null;
+      const powerball = drawData.games.POWERBALL || {};
+      const mega = drawData.games.MEGAMILLIONS || {};
+      return {
+        source: drawFileSource,
+        powerball: powerball.latestDrawDate || (powerball.draws && powerball.draws[0] && powerball.draws[0].date) || '',
+        megamillions: mega.latestDrawDate || (mega.draws && mega.draws[0] && mega.draws[0].date) || ''
+      };
+    };
 
     function applyCurrentDraws() {
       const gameDraws = drawData && drawData.games && drawData.games[currentGame] && drawData.games[currentGame].draws;
@@ -555,6 +629,7 @@
 
     function generateFallbackDraws() {
       usingFallbackDraws = true;
+      drawFileSource = 'sample';
       drawsArchive = [];
       const totalDraws = 1042;
       const startDate = new Date(2016, 0, 6);
@@ -599,7 +674,10 @@
       const newest = drawsArchive[0].date;
       const oldest = drawsArchive[drawsArchive.length - 1].date;
       const dataset = drawData.games[currentGame];
-      if (latest) latest.textContent = 'Latest ' + gameName + ' draw: ' + formatDrawDate(newest);
+      if (latest) {
+        const savedCopy = drawFileSource === 'bundled';
+        latest.textContent = (savedCopy ? 'Saved in the app, latest ' : 'Latest ') + gameName + ' draw: ' + formatDrawDate(newest) + (savedCopy ? '. Connect to the internet to check for a newer list.' : '');
+      }
       if (history) {
         history.textContent = gameName + ' results from NY Open Data (' + dataset.datasetId + '), ' + formatDrawDate(oldest) + ' through ' + formatDrawDate(newest) + '.';
       }
@@ -696,6 +774,7 @@
       applyCurrentDraws();
       resetHopper();
       generateTickets(5);
+      renderFavorites();
     }
 
     // --- 1. REALISTIC STUDIO DRUM ENGINE (BIGGER BALLS, SMOOTH TUMBLING) ---
@@ -1006,6 +1085,7 @@
               <div>
                 <span class="text-slate-200">Sum:</span> <strong class="text-white">${sum}</strong>
               </div>
+              <button type="button" class="min-h-12 px-4 py-3 rounded-xl bg-slate-800 text-slate-100 font-bold border border-slate-500" data-save-favorite data-whites="${line.whites.join(',')}" data-special="${line.special}">Save these numbers</button>
             </div>
           `;
           container.appendChild(lineDiv);
@@ -1013,6 +1093,53 @@
       } catch (err) {
         console.error("Generator error:", err);
       }
+    }
+
+    const FAVORITES_KEY = 'lotterymigo_favorites';
+
+    function readFavorites() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (err) {
+        return [];
+      }
+    }
+
+    function writeFavorites(items) {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(items.slice(0, 12)));
+      renderFavorites();
+    }
+
+    function renderFavorites() {
+      const list = document.getElementById('favorites-list');
+      if (!list) return;
+      const mine = readFavorites().filter(item => item.game === currentGame);
+      if (!mine.length) {
+        list.innerHTML = '<p class="text-slate-200">No saved numbers for this game yet. Make a line, then press Save these numbers.</p>';
+        return;
+      }
+      const isPB = currentGame === 'POWERBALL';
+      const specialClass = isPB ? 'ball-3d-special-pb text-white' : 'ball-3d-special-mm text-slate-950';
+      list.innerHTML = mine.map((item, index) => {
+        const whites = (item.whites || []).map(n => '<span class="w-12 h-12 rounded-full ball-3d text-slate-950 font-black inline-flex items-center justify-center">' + n + '</span>').join('');
+        return '<div class="bg-slate-950/80 border border-slate-700 rounded-2xl p-4 flex flex-col gap-3">' +
+          '<div class="flex flex-wrap items-center gap-2">' + whites +
+          '<span class="w-12 h-12 rounded-full ' + specialClass + ' font-black inline-flex items-center justify-center">' + item.special + '</span></div>' +
+          '<button type="button" class="min-h-12 px-4 py-3 rounded-xl bg-slate-800 text-slate-100 font-bold border border-slate-500 self-start" data-remove-favorite="' + index + '">Remove</button></div>';
+      }).join('');
+    }
+
+    function saveFavoriteFromButton(button) {
+      const whites = String(button.getAttribute('data-whites') || '').split(',').map(Number).filter(n => n);
+      const special = Number(button.getAttribute('data-special'));
+      if (whites.length !== 5 || !special) return;
+      const next = readFavorites().filter(item => {
+        return !(item.game === currentGame && String(item.whites) === String(whites) && Number(item.special) === special);
+      });
+      next.unshift({ game: currentGame, whites: whites, special: special });
+      writeFavorites(next);
+      button.textContent = 'Saved on this device';
     }
 
     function generateLineByStrategy(strategy) {
@@ -1580,6 +1707,26 @@
       bindPress(document.getElementById('btn-scratch-reveal'), revealAllScratcher);
       bindPress(document.getElementById('btn-scratch-new'), resetScratcher);
       bindPress(document.getElementById('btn-scratch-again'), resetScratcher);
+      const lines = document.getElementById('generated-lines-container');
+      if (lines) {
+        lines.addEventListener('click', (event) => {
+          const button = event.target.closest('[data-save-favorite]');
+          if (button) saveFavoriteFromButton(button);
+        });
+      }
+      const favorites = document.getElementById('favorites-list');
+      if (favorites) {
+        favorites.addEventListener('click', (event) => {
+          const button = event.target.closest('[data-remove-favorite]');
+          if (!button) return;
+          const visibleIndex = Number(button.getAttribute('data-remove-favorite'));
+          const all = readFavorites();
+          const mine = all.filter(item => item.game === currentGame);
+          const target = mine[visibleIndex];
+          if (!target) return;
+          writeFavorites(all.filter(item => item !== target));
+        });
+      }
     }
 
     window.lmRefreshChart = function () {
@@ -1594,8 +1741,12 @@
       bindMobileControls();
       initHopperChamber();
       resetScratcher();
-      loadOfficialDraws().then(() => generateTickets(5));
+      loadOfficialDraws().then(() => {
+        generateTickets(5);
+        renderFavorites();
+      });
     });
   </script>
+  <script type="module" src="assets/native-shell.js"></script>
 </body>
 </html>

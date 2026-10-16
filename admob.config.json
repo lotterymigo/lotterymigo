@@ -1,0 +1,16 @@
+{
+  "useTestAds": true,
+  "comment": "useTestAds must stay true until a real AdMob account is allowed to serve ads for this app. Test IDs are Google's public demo IDs. They do not earn money. To switch later, set useTestAds to false, fill production, and put the same application IDs in android/app/src/main/res/values/strings.xml (admob_app_id) and ios/App/App/Info.plist (GADApplicationIdentifier). Do that only after reading the AdMob and Play gambling policies. This file alone does not make the app store-ready.",
+  "test": {
+    "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+    "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+    "androidBannerId": "ca-app-pub-3940256099942544/6300978111",
+    "iosBannerId": "ca-app-pub-3940256099942544/2934735716"
+  },
+  "production": {
+    "androidAppId": "",
+    "iosAppId": "",
+    "androidBannerId": "",
+    "iosBannerId": ""
+  }
+}

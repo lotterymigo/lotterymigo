@@ -26,6 +26,12 @@
 
 ---
 
+## Native app shell
+
+`package.json` and `capacitor.config.json` wrap this site with Capacitor (`com.lotterymigo.app`). The app is **not store-ready**. See [docs/APP_STORE_GUIDE.md](docs/APP_STORE_GUIDE.md) for the manual account, signing, policy, and submission steps that are still required.
+
+`npm run build:web` copies the pages, `assets/`, and `data/draws.json` into `www/` so the app can open the draw list without a network. On a phone it still tries the hosted file and keeps the newer copy.
+
 ## 💻 Running Locally on Windows
 
 You do not need a complex build pipeline or Node.js environment to test this on Windows.

@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Entertainment-only Powerball and Mega Millions frequency stats, longest-gap counts, and number tools. Past draws do not predict future results." />
+  <link rel="canonical" href="https://lotterymigo.com/" />
   <title>LotteryMigo | Powerball & Mega Millions Analytics, Games & Generator</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -123,7 +125,7 @@
           Powerball: 5 of 69 + 1 Powerball (1-26)
         </div>
         <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
-          Smarter Picks with <span id="hero-title-game" class="text-rose-500">Historical Probability</span>
+          Most Frequent &amp; Longest Gap for <span id="hero-title-game" class="text-rose-500">Powerball</span>
         </h1>
         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
           Analyze over a decade of draw frequency patterns and simulate physics extractions. <span class="text-amber-400/90 font-medium">Provided for entertainment only — this platform does not guarantee winning outcomes.</span>
@@ -140,11 +142,11 @@
             <span id="stat-jackpot-odds" class="text-base sm:text-xl font-black text-amber-400">1 in 292.2M</span>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Hottest Ball</span>
+            <span class="text-[10px] sm:text-xs text-slate-400 block">Most Frequent</span>
             <span id="stat-hottest-ball" class="text-base sm:text-xl font-black text-emerald-400">#61 (89x)</span>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Most Overdue</span>
+            <span class="text-[10px] sm:text-xs text-slate-400 block">Longest Gap</span>
             <span id="stat-coldest-ball" class="text-base sm:text-xl font-black text-rose-400">#13 (48 Draws)</span>
           </div>
         </div>
@@ -253,8 +255,8 @@
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <select id="gen-strategy" class="bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl px-3 py-2.5 outline-none">
             <option value="balanced">Harmonic Balance (3 Odd / 2 Even)</option>
-            <option value="hot">Hot Momentum (Weighted by Frequency)</option>
-            <option value="cold">Overdue Streak Bias</option>
+            <option value="hot">Recent Frequency</option>
+            <option value="cold">Longest Gap Bias</option>
             <option value="random">Pure Quick Pick</option>
           </select>
           <button onclick="generateTickets(5)" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-md active:scale-95 text-center">
@@ -440,7 +442,8 @@
           <span class="font-bold text-slate-300">LotteryMigo.com</span>
           <span class="block text-[10px] text-slate-500">Independent Probability & Gaming Platform</span>
         </div>
-        <div class="flex flex-wrap gap-4 text-[11px]">
+        <div class="flex flex-wrap items-center gap-4 text-[11px]">
+          <span>Contact: <a href="mailto:contact@example.com" class="text-amber-400 hover:underline">contact@example.com</a> <span class="text-slate-600">(placeholder — replace with a real email)</span></span>
           <button onclick="openModal('termsModal')" class="hover:text-amber-400">Terms of Use</button>
           <button onclick="openModal('privacyModal')" class="hover:text-amber-400">Privacy Policy</button>
         </div>
@@ -606,7 +609,7 @@
         ? 'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-blue-600 text-white shadow'
         : 'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white';
 
-      document.getElementById('hero-title-game').innerText = isPB ? 'Powerball Probability' : 'Mega Millions Probability';
+      document.getElementById('hero-title-game').innerText = isPB ? 'Powerball' : 'Mega Millions';
       document.getElementById('hero-title-game').className = isPB ? 'text-rose-500' : 'text-blue-500';
       document.getElementById('history-special-header').innerText = isPB ? 'Powerball' : 'Mega Ball';
 

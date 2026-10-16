@@ -1,0 +1,27 @@
+{
+  "name": "lotterymigo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "LotteryMigo website plus a Capacitor shell for Android and iOS. Not store-ready.",
+  "scripts": {
+    "build:web": "node scripts/build-www.mjs",
+    "cap:sync": "npm run build:web && cap sync",
+    "cap:android": "npm run build:web && cap sync android",
+    "cap:ios": "npm run build:web && cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3",
+    "@capacitor/local-notifications": "8.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "esbuild": "0.28.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

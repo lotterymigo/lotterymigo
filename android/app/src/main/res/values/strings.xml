@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LotteryMigo</string>
+    <string name="title_activity_main">LotteryMigo</string>
+    <string name="package_name">com.lotterymigo.app</string>
+    <string name="custom_url_scheme">com.lotterymigo.app</string>
+    <!-- Google's public TEST application id. Not a production AdMob id. -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
+</resources>

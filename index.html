@@ -114,8 +114,8 @@
         </div>
       </div>
       <div class="flex items-center gap-3 shrink-0 self-end md:self-center">
-        <button onclick="openModal('termsModal')" class="text-xs text-amber-400 hover:underline">Terms</button>
-        <button onclick="openModal('privacyModal')" class="text-xs text-amber-400 hover:underline">Privacy</button>
+        <a href="terms.html" class="text-xs text-amber-400 hover:underline">Terms</a>
+        <a href="privacy.html" class="text-xs text-amber-400 hover:underline">Privacy</a>
         <button onclick="dismissLegalAlert()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition active:scale-95 shadow">
           OK
         </button>
@@ -134,14 +134,15 @@
           Most Frequent &amp; Longest Gap for <span id="hero-title-game" class="text-rose-500">Powerball</span>
         </h1>
         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-          Analyze over a decade of draw frequency patterns and simulate physics extractions. <span class="text-amber-400/90 font-medium">Provided for entertainment only — this platform does not guarantee winning outcomes.</span>
+          Analyze official draw frequencies and gaps, then simulate extractions. <span class="text-amber-400/90 font-medium">Entertainment only — past draws do not predict future results, and this site does not guarantee a win.</span>
         </p>
+        <p id="latest-draw-note" class="text-[11px] sm:text-xs text-slate-500">Loading official draw dates…</p>
 
         <!-- STATS PILLS -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3 text-left">
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
             <span class="text-[10px] sm:text-xs text-slate-400 block">Total Draws</span>
-            <span id="stat-total-draws" class="text-base sm:text-xl font-black text-white">1,042</span>
+            <span id="stat-total-draws" class="text-base sm:text-xl font-black text-white">…</span>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
             <span class="text-[10px] sm:text-xs text-slate-400 block">Jackpot Odds</span>
@@ -149,11 +150,11 @@
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
             <span class="text-[10px] sm:text-xs text-slate-400 block">Most Frequent</span>
-            <span id="stat-hottest-ball" class="text-base sm:text-xl font-black text-emerald-400">#61 (89x)</span>
+            <span id="stat-hottest-ball" class="text-base sm:text-xl font-black text-emerald-400">…</span>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
             <span class="text-[10px] sm:text-xs text-slate-400 block">Longest Gap</span>
-            <span id="stat-coldest-ball" class="text-base sm:text-xl font-black text-rose-400">#13 (48 Draws)</span>
+            <span id="stat-coldest-ball" class="text-base sm:text-xl font-black text-rose-400">…</span>
           </div>
         </div>
       </div>
@@ -325,12 +326,12 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 class="text-xl sm:text-3xl font-extrabold text-white">Decennial Frequency Heatmap</h2>
-          <p class="text-slate-400 text-xs sm:text-sm">Historical appearance rate per ball over 1,000+ past drawings.</p>
+          <p id="heatmap-blurb" class="text-slate-400 text-xs sm:text-sm">Historical appearance rate per white ball in the loaded archive.</p>
         </div>
-        <div class="flex items-center gap-3 text-[11px] text-slate-400">
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-600"></span> Hot (>85x)</span>
+        <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-600"></span> Higher</span>
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span> Mid</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-slate-800"></span> Cold</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-slate-800"></span> Lower</span>
         </div>
       </div>
 
@@ -348,12 +349,12 @@
     <section id="section-history" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 backdrop-blur-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-xl sm:text-3xl font-extrabold text-white">10-Year Historical Archive</h2>
-          <p class="text-slate-400 text-xs sm:text-sm">Full decennial draw records (2016 - 2026).</p>
+          <h2 class="text-xl sm:text-3xl font-extrabold text-white">Official Draw Archive</h2>
+          <p id="history-blurb" class="text-slate-400 text-xs sm:text-sm">Official winning numbers from NY Open Data.</p>
         </div>
         <div class="flex items-center gap-2">
-          <input id="history-search" oninput="filterHistory()" type="text" placeholder="Search number..." class="bg-slate-800 text-slate-200 border border-slate-700 text-xs rounded-xl px-3 py-2 outline-none w-36 sm:w-48" />
-          <button onclick="exportHistoryCSV()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700">
+          <input id="history-search" oninput="filterHistory()" type="text" placeholder="Search number..." class="min-h-11 bg-slate-800 text-slate-200 border border-slate-700 text-xs rounded-xl px-3 py-2 outline-none w-36 sm:w-48" />
+          <button type="button" id="btn-export-csv" class="min-h-11 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700">
             CSV
           </button>
         </div>
@@ -388,7 +389,7 @@
         <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">About LotteryMigo</span>
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Demystifying Lottery Probability Through Data</h2>
         <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-          LotteryMigo was built to give players an entertaining, mathematically transparent window into high-stakes games like Powerball and Mega Millions. <strong>We do not guarantee any lottery win.</strong> Rather than selling false promises of guaranteed wins, we leverage ten years of empirical drawing records to explore statistical momentum, overdue patterns, and combinatorial mechanics.
+          LotteryMigo is an entertainment-only view of Powerball and Mega Millions. Official winning numbers are loaded from NY Open Data and counted as frequencies and gaps. <strong>Past draws do not predict future results. This is not gambling advice, and it does not guarantee any win.</strong>
         </p>
       </div>
 
@@ -451,10 +452,12 @@
           <span class="font-bold text-slate-300">LotteryMigo.com</span>
           <span class="block text-[10px] text-slate-500">Independent Probability & Gaming Platform</span>
         </div>
-        <div class="flex flex-wrap items-center gap-4 text-[11px]">
-          <span>Contact: <a href="mailto:info@lotterymigo.com" class="text-amber-400 hover:underline">info@lotterymigo.com</a></span>
-          <button onclick="openModal('termsModal')" class="hover:text-amber-400">Terms of Use</button>
-          <button onclick="openModal('privacyModal')" class="hover:text-amber-400">Privacy Policy</button>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
+          <a href="about.html" class="inline-flex items-center min-h-11 hover:text-amber-400">About</a>
+          <a href="privacy.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Privacy Policy</a>
+          <a href="terms.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Terms</a>
+          <a href="contact.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Contact</a>
+          <a href="mailto:info@lotterymigo.com" class="inline-flex items-center min-h-11 text-amber-400 hover:underline">info@lotterymigo.com</a>
         </div>
       </div>
       <p class="text-[10px] text-slate-600 leading-relaxed">
@@ -462,39 +465,6 @@
       </p>
     </div>
   </footer>
-
-  <!-- MODALS -->
-  <div id="termsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 text-xs text-slate-300 space-y-3">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 class="font-bold text-sm text-white">Terms of Use & No Guarantee Disclaimer</h3>
-        <button onclick="closeModal('termsModal')" class="text-slate-400 hover:text-white text-lg">&times;</button>
-      </div>
-      <div class="space-y-2 text-slate-400 max-h-60 overflow-y-auto custom-scroll pr-1">
-        <p><strong>1. Strict No Guarantee Policy:</strong> LotteryMigo makes no warranties, express or implied, regarding any financial reward or lottery win. All numbers are generated for entertainment and educational statistical analysis.</p>
-        <p><strong>2. No Ticket Sales:</strong> We do not sell lottery tickets, accept bets, or operate a syndicate.</p>
-        <p><strong>3. Simulated Play:</strong> Scratch-off mini-games and virtual points have zero real-world monetary value.</p>
-      </div>
-      <div class="text-right pt-2 border-t border-slate-800">
-        <button onclick="closeModal('termsModal')" class="px-4 py-1.5 bg-slate-800 text-white rounded-lg">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="privacyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 text-xs text-slate-300 space-y-3">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 class="font-bold text-sm text-white">Privacy Policy</h3>
-        <button onclick="closeModal('privacyModal')" class="text-slate-400 hover:text-white text-lg">&times;</button>
-      </div>
-      <div class="space-y-2 text-slate-400 max-h-60 overflow-y-auto custom-scroll pr-1">
-        <p>LotteryMigo does not collect personal identifiers or location traces. Calculations run completely client-side in your device browser.</p>
-      </div>
-      <div class="text-right pt-2 border-t border-slate-800">
-        <button onclick="closeModal('privacyModal')" class="px-4 py-1.5 bg-slate-800 text-white rounded-lg">Close</button>
-      </div>
-    </div>
-  </div>
 
   <!-- SCRIPT ENGINE -->
   <script>
@@ -515,15 +485,65 @@
 
     let currentGame = 'POWERBALL';
     let drawsArchive = [];
+    let drawData = null;
+    let usingFallbackDraws = false;
     let whiteFrequencies = {};
     let specialFrequencies = {};
     let overdueStreaks = {};
 
-    function generate10YearDataset() {
+    function formatDrawDate(iso) {
+      const parts = String(iso || '').split('-').map(Number);
+      if (parts.length < 3 || parts.some(part => !part)) return iso || '';
+      return new Date(parts[0], parts[1] - 1, parts[2]).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    function normalizeLoadedDraw(draw) {
+      return {
+        date: draw.date,
+        whites: (draw.whites || []).map(Number).sort((a, b) => a - b),
+        special: Number(draw.special),
+        multiplier: draw.multiplier == null || draw.multiplier === '' ? null : Number(draw.multiplier)
+      };
+    }
+
+    async function loadOfficialDraws() {
+      try {
+        const url = new URL('data/draws.json', document.baseURI);
+        const response = await fetch(url.href, { cache: 'no-cache' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const payload = await response.json();
+        const powerball = payload.games && payload.games.POWERBALL && payload.games.POWERBALL.draws;
+        const mega = payload.games && payload.games.MEGAMILLIONS && payload.games.MEGAMILLIONS.draws;
+        if (!powerball || !powerball.length || !mega || !mega.length) throw new Error('Draw file is incomplete');
+        drawData = payload;
+      } catch (err) {
+        console.warn('Official draw file unavailable, using sample archive.', err);
+        drawData = null;
+      }
+      applyCurrentDraws();
+    }
+
+    function applyCurrentDraws() {
+      const gameDraws = drawData && drawData.games && drawData.games[currentGame] && drawData.games[currentGame].draws;
+      if (gameDraws && gameDraws.length) {
+        usingFallbackDraws = false;
+        drawsArchive = gameDraws.map(normalizeLoadedDraw).sort((a, b) => b.date.localeCompare(a.date));
+        computeFrequencies();
+        return;
+      }
+      generateFallbackDraws();
+    }
+
+    function generateFallbackDraws() {
+      usingFallbackDraws = true;
       drawsArchive = [];
       const totalDraws = 1042;
       const startDate = new Date(2016, 0, 6);
-      
+
       for (let i = 0; i < totalDraws; i++) {
         const drawDate = new Date(startDate.getTime() + i * 3.5 * 24 * 60 * 60 * 1000);
         const dateStr = drawDate.toISOString().split('T')[0];
@@ -550,6 +570,27 @@
       computeFrequencies();
     }
 
+    function updateDrawNotes() {
+      const latest = document.getElementById('latest-draw-note');
+      const history = document.getElementById('history-blurb');
+      const heatmap = document.getElementById('heatmap-blurb');
+      const gameName = CONFIG[currentGame].name;
+      if (usingFallbackDraws || !drawsArchive.length) {
+        if (latest) latest.textContent = 'Showing a sample archive because the official draw file did not load.';
+        if (history) history.textContent = 'Sample draws only. Open the hosted site, or this folder over http, to load NY Open Data results.';
+        if (heatmap) heatmap.textContent = 'Sample appearance counts. These are not official draw results.';
+        return;
+      }
+      const newest = drawsArchive[0].date;
+      const oldest = drawsArchive[drawsArchive.length - 1].date;
+      const dataset = drawData.games[currentGame];
+      if (latest) latest.textContent = 'Latest ' + gameName + ' draw: ' + formatDrawDate(newest);
+      if (history) {
+        history.textContent = gameName + ' results from NY Open Data (' + dataset.datasetId + '), ' + formatDrawDate(oldest) + ' through ' + formatDrawDate(newest) + '.';
+      }
+      if (heatmap) heatmap.textContent = 'White-ball counts in the current number range, from ' + drawsArchive.length.toLocaleString() + ' official draws.';
+    }
+
     function computeFrequencies() {
       whiteFrequencies = {};
       specialFrequencies = {};
@@ -565,9 +606,13 @@
 
       drawsArchive.forEach(draw => {
         draw.whites.forEach(ball => {
-          whiteFrequencies[ball] = (whiteFrequencies[ball] || 0) + 1;
+          if (ball >= 1 && ball <= CONFIG[currentGame].maxWhite) {
+            whiteFrequencies[ball] = (whiteFrequencies[ball] || 0) + 1;
+          }
         });
-        specialFrequencies[draw.special] = (specialFrequencies[draw.special] || 0) + 1;
+        if (draw.special >= 1 && draw.special <= CONFIG[currentGame].maxSpecial) {
+          specialFrequencies[draw.special] = (specialFrequencies[draw.special] || 0) + 1;
+        }
       });
 
       for (let num = 1; num <= CONFIG[currentGame].maxWhite; num++) {
@@ -580,6 +625,7 @@
       }
 
       updateHeroStats();
+      updateDrawNotes();
       renderHeatmap();
       renderChart();
       renderHistoryTable();
@@ -623,7 +669,7 @@
       document.getElementById('hero-title-game').className = isPB ? 'text-rose-500' : 'text-blue-500';
       document.getElementById('history-special-header').innerText = isPB ? 'Powerball' : 'Mega Ball';
 
-      generate10YearDataset();
+      applyCurrentDraws();
       resetHopper();
       generateTickets(5);
     }
@@ -930,23 +976,17 @@
       const maxW = CONFIG[currentGame].maxWhite;
       let whites = [];
 
-      if (strategy === 'hot') {
-        const sorted = Object.entries(whiteFrequencies).sort((a,b)=>b[1]-a[1]).slice(0, 25).map(e=>+e[0]);
-        while (whites.length < 5) {
+      if (strategy === 'hot' || strategy === 'cold') {
+        const source = strategy === 'hot' ? whiteFrequencies : overdueStreaks;
+        const sorted = Object.entries(source).sort((a, b) => b[1] - a[1]).slice(0, 25).map(entry => +entry[0]).filter(n => n >= 1);
+        while (sorted.length && whites.length < 5 && whites.length < sorted.length) {
           const pick = sorted[Math.floor(Math.random() * sorted.length)];
           if (!whites.includes(pick)) whites.push(pick);
         }
-      } else if (strategy === 'cold') {
-        const sorted = Object.entries(overdueStreaks).sort((a,b)=>b[1]-a[1]).slice(0, 25).map(e=>+e[0]);
-        while (whites.length < 5) {
-          const pick = sorted[Math.floor(Math.random() * sorted.length)];
-          if (!whites.includes(pick)) whites.push(pick);
-        }
-      } else {
-        while (whites.length < 5) {
-          const r = Math.floor(Math.random() * maxW) + 1;
-          if (!whites.includes(r)) whites.push(r);
-        }
+      }
+      while (whites.length < 5) {
+        const r = Math.floor(Math.random() * maxW) + 1;
+        if (!whites.includes(r)) whites.push(r);
       }
 
       whites.sort((a, b) => a - b);
@@ -1284,11 +1324,17 @@
         if (!grid) return;
         grid.innerHTML = '';
 
+        const values = [];
+        for (let n = 1; n <= CONFIG[currentGame].maxWhite; n++) values.push(whiteFrequencies[n] || 0);
+        const ranked = values.slice().sort((a, b) => a - b);
+        const midCut = ranked[Math.floor(ranked.length * 0.45)] || 0;
+        const highCut = ranked[Math.floor(ranked.length * 0.8)] || 0;
+
         for (let i = 1; i <= CONFIG[currentGame].maxWhite; i++) {
           const freq = whiteFrequencies[i] || 0;
           let color = 'bg-slate-800 text-slate-300';
-          if (freq > 85) color = 'bg-rose-600 text-white font-bold';
-          else if (freq > 75) color = 'bg-amber-500 text-slate-950 font-bold';
+          if (freq > highCut) color = 'bg-rose-600 text-white font-bold';
+          else if (freq > midCut) color = 'bg-amber-500 text-slate-950 font-bold';
 
           grid.innerHTML += `
             <div class="p-1.5 sm:p-2 rounded-lg text-center ${color}">
@@ -1345,7 +1391,10 @@
     let filteredHistory = [];
 
     function renderHistoryTable() {
+      historyPage = 1;
       filteredHistory = [...drawsArchive];
+      const search = document.getElementById('history-search');
+      if (search) search.value = '';
       updateTableDOM();
     }
 
@@ -1373,7 +1422,7 @@
                   ${d.special}
                 </span>
               </td>
-              <td class="py-2.5 px-3 text-center text-amber-400 font-bold">${d.multiplier}x</td>
+              <td class="py-2.5 px-3 text-center text-amber-400 font-bold">${d.multiplier == null ? '—' : d.multiplier + 'x'}</td>
               <td class="py-2.5 px-3 text-center text-slate-400 text-[11px]">${odds}O / ${5 - odds}E</td>
             </tr>
           `;
@@ -1407,7 +1456,7 @@
     function exportHistoryCSV() {
       let csv = 'Date,Ball 1,Ball 2,Ball 3,Ball 4,Ball 5,Special Ball,Multiplier\n';
       drawsArchive.forEach(d => {
-        csv += `${d.date},${d.whites.join(',')},${d.special},${d.multiplier}x\n`;
+        csv += `${d.date},${d.whites.join(',')},${d.special},${d.multiplier == null ? '' : d.multiplier + 'x'}\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
@@ -1431,15 +1480,6 @@
         const banner = document.getElementById('legal-alert-banner');
         if (banner) banner.style.display = 'none';
       }
-    }
-
-    function openModal(id) {
-      const m = document.getElementById(id);
-      if (m) m.classList.remove('hidden');
-    }
-    function closeModal(id) {
-      const m = document.getElementById(id);
-      if (m) m.classList.add('hidden');
     }
 
     function bindPress(el, fn) {
@@ -1480,6 +1520,7 @@
       bindPress(document.getElementById('btn-next-ball'), drawNextHopperBall);
       bindPress(document.getElementById('btn-reset-hopper'), resetHopper);
       bindPress(document.getElementById('btn-generate'), () => generateTickets(5));
+      bindPress(document.getElementById('btn-export-csv'), exportHistoryCSV);
       bindPress(document.getElementById('btn-scratch-reveal'), revealAllScratcher);
       bindPress(document.getElementById('btn-scratch-new'), resetScratcher);
       bindPress(document.getElementById('btn-scratch-again'), resetScratcher);
@@ -1489,10 +1530,9 @@
     window.addEventListener('DOMContentLoaded', () => {
       checkDismissedAlert();
       bindMobileControls();
-      generate10YearDataset();
       initHopperChamber();
-      generateTickets(5);
       resetScratcher();
+      loadOfficialDraws().then(() => generateTickets(5));
     });
   </script>
 </body>

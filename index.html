@@ -9,6 +9,8 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="assets/a11y.css" />
+  <script src="assets/a11y.js"></script>
 
   <style>
     .ball-3d {
@@ -57,67 +59,67 @@
     <span class="inline-flex items-center gap-1 font-bold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded text-[10px]">18+ / 21+</span>
     <span>FOR ENTERTAINMENT ONLY • DOES NOT GUARANTEE ANY WIN • No real-money gambling.</span>
     <span class="hidden sm:inline text-amber-500">•</span>
-    <span class="text-slate-400">Problem Gambling? Call <strong class="text-amber-300 font-bold">1-800-GAMBLER</strong></span>
+    <span class="text-slate-100">Need help with gambling? Call <a class="text-amber-300 font-bold underline" href="tel:18004262537">1-800-GAMBLER</a></span>
   </div>
 
   <!-- NAVIGATION HEADER -->
   <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/95 border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:h-16 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
-      <div class="flex items-center gap-2.5 shrink-0">
+      <div class="flex items-center gap-2.5 min-w-0 max-w-full">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-black text-lg text-white shadow-md shadow-rose-900/30">
           LM
         </div>
         <div>
-          <span class="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-amber-400 bg-clip-text text-transparent">LotteryMigo</span>
-          <span class="hidden sm:block text-[9px] tracking-widest text-slate-400 uppercase -mt-0.5">Analytics & Studio</span>
+          <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white">LotteryMigo</span>
+          <span class="hidden sm:block text-slate-300 -mt-0.5">Number tools for fun</span>
         </div>
       </div>
 
       <!-- ACTIVE GAME TOGGLE -->
-      <div class="order-last sm:order-none flex w-full sm:w-auto items-center bg-slate-800/90 p-1 rounded-full border border-slate-700">
-        <button id="btn-toggle-pb" onclick="switchGame('POWERBALL')" class="flex-1 sm:flex-none justify-center min-h-11 sm:min-h-0 px-3 sm:px-4 py-2 sm:py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-rose-600 text-white shadow">
-          <span class="w-2 h-2 rounded-full bg-white"></span> Powerball
+      <div id="game-toggle" role="group" aria-label="Choose a lottery" class="order-last sm:order-none flex w-full sm:w-auto items-center bg-slate-800/90 p-1 rounded-full border border-slate-700">
+        <button id="btn-toggle-pb" type="button" onclick="switchGame('POWERBALL')" aria-pressed="true" class="flex-1 sm:flex-none justify-center min-h-12 px-4 py-3 rounded-full text-base font-bold flex items-center gap-2 bg-rose-600 text-white shadow">
+          <span class="w-2 h-2 rounded-full bg-white" aria-hidden="true"></span> Powerball
         </button>
-        <button id="btn-toggle-mm" onclick="switchGame('MEGAMILLIONS')" class="flex-1 sm:flex-none justify-center min-h-11 sm:min-h-0 px-3 sm:px-4 py-2 sm:py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white">
-          <span class="w-2 h-2 rounded-full bg-blue-500"></span> Mega Millions
+        <button id="btn-toggle-mm" type="button" onclick="switchGame('MEGAMILLIONS')" aria-pressed="false" class="flex-1 sm:flex-none justify-center min-h-12 px-4 py-3 rounded-full text-base font-bold flex items-center gap-2 text-slate-300 hover:text-white">
+          <span class="w-2 h-2 rounded-full bg-blue-300" aria-hidden="true"></span> Mega Millions
         </button>
       </div>
 
       <!-- DESKTOP NAV -->
-      <nav class="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-300">
-        <a href="#section-hopper" class="hover:text-amber-400 transition-colors">Hopper Draw</a>
-        <a href="#section-generator" class="hover:text-amber-400 transition-colors">Generator</a>
-        <a href="#section-scratcher" class="hover:text-amber-400 transition-colors">Scratcher</a>
-        <a href="#section-stats" class="hover:text-amber-400 transition-colors">Frequencies</a>
-        <a href="#section-about" class="hover:text-amber-400 transition-colors">About</a>
+      <nav aria-label="On this page" class="hidden lg:flex items-center gap-5 text-base font-semibold text-slate-200">
+        <a href="#section-hopper" class="hover:text-amber-400">Draw balls</a>
+        <a href="#section-generator" class="hover:text-amber-400">Number ideas</a>
+        <a href="#section-scratcher" class="hover:text-amber-400">Scratch cards</a>
+        <a href="#section-stats" class="hover:text-amber-400">How often</a>
+        <a href="#section-about" class="hover:text-amber-400">About</a>
       </nav>
     </div>
 
     <!-- MOBILE NAV -->
-    <div class="lg:hidden flex items-center gap-4 overflow-x-auto max-w-full custom-scroll px-4 py-2 border-t border-slate-800/60 bg-slate-900/60 text-xs font-medium text-slate-400 whitespace-nowrap">
-      <a href="#section-hopper" class="hover:text-white">Blower Draw</a>
-      <a href="#section-generator" class="hover:text-white">Generator</a>
-      <a href="#section-scratcher" class="hover:text-white">Scratch Card</a>
-      <a href="#section-stats" class="hover:text-white">Frequencies</a>
-      <a href="#section-history" class="hover:text-white">10-Yr Archive</a>
+    <nav aria-label="On this page" class="lg:hidden flex items-center gap-4 overflow-x-auto max-w-full custom-scroll px-4 py-2 border-t border-slate-800/60 bg-slate-900/60 text-base font-medium text-slate-200 whitespace-nowrap">
+      <a href="#section-hopper" class="hover:text-white">Draw balls</a>
+      <a href="#section-generator" class="hover:text-white">Number ideas</a>
+      <a href="#section-scratcher" class="hover:text-white">Scratch cards</a>
+      <a href="#section-stats" class="hover:text-white">How often</a>
+      <a href="#section-history" class="hover:text-white">Past draws</a>
       <a href="#section-about" class="hover:text-white">About</a>
-    </div>
+    </nav>
   </header>
 
   <!-- DISMISSIBLE LEGAL ALERT BANNER -->
   <div id="legal-alert-banner" class="max-w-7xl mx-auto px-4 sm:px-6 mt-4">
     <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-slate-400">
       <div class="flex items-start gap-2.5">
-        <span class="p-1.5 rounded-lg bg-slate-800 text-amber-400 shrink-0 mt-0.5">ℹ️</span>
+        <span class="p-1.5 rounded-lg bg-slate-800 text-amber-400 shrink-0 mt-0.5" aria-hidden="true">ℹ️</span>
         <div>
           <strong class="text-slate-200">Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or machine suggestions <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions.
         </div>
       </div>
-      <div class="flex items-center gap-3 shrink-0 self-end md:self-center">
+      <div class="flex flex-wrap items-center gap-3 self-end md:self-center max-w-full">
         <a href="terms.html" class="text-xs text-amber-400 hover:underline">Terms</a>
         <a href="privacy.html" class="text-xs text-amber-400 hover:underline">Privacy</a>
-        <button onclick="dismissLegalAlert()" class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition active:scale-95 shadow">
-          OK
+        <button type="button" onclick="dismissLegalAlert()" class="px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold">
+          OK, hide this note
         </button>
       </div>
     </div>
@@ -127,34 +129,38 @@
   <section class="relative overflow-hidden pt-6 pb-10 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-b border-slate-800/80">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
       <div class="text-center max-w-2xl mx-auto space-y-3">
-        <div id="hero-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-          Powerball: 5 of 69 + 1 Powerball (1-26)
-        </div>
-        <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
-          Most Frequent &amp; Longest Gap for <span id="hero-title-game" class="text-rose-500">Powerball</span>
-        </h1>
-        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-          Analyze official draw frequencies and gaps, then simulate extractions. <span class="text-amber-400/90 font-medium">Entertainment only — past draws do not predict future results, and this site does not guarantee a win.</span>
+        <p id="hero-badge" class="block max-w-full px-3 py-2 rounded-2xl font-semibold bg-rose-500/10 text-rose-300 border border-rose-500/20">
+          Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.
         </p>
-        <p id="latest-draw-note" class="text-[11px] sm:text-xs text-slate-500">Loading official draw dates…</p>
+        <h1 class="font-black tracking-tight text-white leading-tight">
+          Most Frequent and Longest Gap for <span id="hero-title-game" class="text-rose-300">Powerball</span>
+        </h1>
+        <p class="text-slate-200 leading-relaxed">
+          See how often each number was drawn, then try the draw drum, number ideas, or a free scratch card. <span class="text-amber-300 font-medium">For fun only. Past draws do not predict the next one, and this site does not promise a win.</span>
+        </p>
+        <p id="latest-draw-note" class="text-slate-200">Loading official draw dates…</p>
 
         <!-- STATS PILLS -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3 text-left">
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Total Draws</span>
-            <span id="stat-total-draws" class="text-base sm:text-xl font-black text-white">…</span>
+            <span class="text-slate-200 block">Total draws</span>
+            <span id="stat-total-draws" class="text-xl sm:text-2xl font-black text-white">…</span>
+            <p class="lm-help">How many drawings are in this list.</p>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Jackpot Odds</span>
-            <span id="stat-jackpot-odds" class="text-base sm:text-xl font-black text-amber-400">1 in 292.2M</span>
+            <span class="text-slate-200 block">Jackpot odds</span>
+            <span id="stat-jackpot-odds" class="text-xl sm:text-2xl font-black text-amber-300">1 in 292.2M</span>
+            <p class="lm-help">The chance of matching every number. Past draws do not change it.</p>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Most Frequent</span>
-            <span id="stat-hottest-ball" class="text-base sm:text-xl font-black text-emerald-400">…</span>
+            <span class="text-slate-200 block">Most Frequent</span>
+            <span id="stat-hottest-ball" class="text-xl sm:text-2xl font-black text-emerald-300">…</span>
+            <p class="lm-help">The white-ball number drawn the most times in this list.</p>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Longest Gap</span>
-            <span id="stat-coldest-ball" class="text-base sm:text-xl font-black text-rose-400">…</span>
+            <span class="text-slate-200 block">Longest Gap</span>
+            <span id="stat-coldest-ball" class="text-xl sm:text-2xl font-black text-rose-300">…</span>
+            <p class="lm-help">The white-ball number that has gone the most drawings without appearing. A long wait does not mean it is due next.</p>
           </div>
         </div>
       </div>
@@ -162,7 +168,7 @@
   </section>
 
   <!-- MAIN APPLICATION CONTENT -->
-  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12 sm:space-y-16 w-full">
+  <main id="main" tabindex="-1" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-12 sm:space-y-16 w-full">
 
     <!-- 1. REALISTIC STUDIO HOPPER MACHINE -->
     <section id="section-hopper" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 backdrop-blur-sm">
@@ -170,23 +176,23 @@
         
         <!-- Controls & Information -->
         <div class="w-full lg:w-1/2 space-y-4">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            Precision Air Jet Tumbler • Studio Blower
-          </div>
-          <h2 class="text-xl sm:text-3xl font-extrabold text-white">Realistic Studio Drum Simulator</h2>
-          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-            Numbered spheres rest inside a spherical acrylic chamber powered by a cyclone fan. Hit <strong>Start Draw</strong> to roll the balls and automatically extract one ball every 5 seconds, or pull individually using <strong>Next Ball</strong>.
+          <p class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+            Practice draw. Not a real lottery machine.
+          </p>
+          <h2 class="font-extrabold text-white">Draw the balls</h2>
+          <p class="text-slate-200 leading-relaxed">
+            Balls sit in a round drum. Press <strong>Start Draw</strong> to tumble them and pull one ball every 5 seconds, or press <strong>Next Ball</strong> to pull one at a time. The picture is only for show. The numbers you drew are listed above the buttons.
           </p>
 
           <!-- Selected Balls Display (Enlarged Balls, No Bouncing) -->
           <div class="bg-slate-950/90 rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-inner space-y-3">
-            <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              <span>Your Drawn Numbers</span>
-              <span id="drawn-count-label" class="text-amber-400">0 / 6 Balls</span>
+            <div class="flex items-center justify-between text-slate-200 font-semibold">
+              <span>Numbers you drew</span>
+              <span id="drawn-count-label" class="text-amber-300">0 of 6 balls</span>
             </div>
             
-            <div id="hopper-balls-rack" class="flex items-center gap-2.5 sm:gap-3.5 min-h-[60px] justify-center sm:justify-start flex-wrap">
-              <span class="text-xs text-slate-500 italic">Press "Start Draw" or "Next Ball" to extract...</span>
+            <div id="hopper-balls-rack" class="flex items-center gap-2.5 sm:gap-3.5 min-h-[60px] justify-center sm:justify-start flex-wrap" aria-live="polite" aria-atomic="true">
+              <span class="text-slate-200">Press Start Draw or Next Ball.</span>
             </div>
             
             <div id="auto-timer-status" class="hidden text-xs text-amber-400 font-mono text-center sm:text-left">
@@ -196,17 +202,17 @@
 
           <!-- Studio Control Panel -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2">
-            <button type="button" id="btn-start-blower" class="min-h-11 px-3 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
+            <button type="button" id="btn-start-blower" class="min-h-12 px-3 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-center">
               Start Draw
             </button>
-            <button type="button" id="btn-stop-blower" class="min-h-11 px-3 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm transition border border-slate-700 active:scale-95 text-center">
-              Stop / Pause
+            <button type="button" id="btn-stop-blower" class="min-h-12 px-3 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold border border-slate-500 text-center">
+              Stop
             </button>
-            <button type="button" id="btn-next-ball" class="min-h-11 px-3 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
+            <button type="button" id="btn-next-ball" class="min-h-12 px-3 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-center">
               Next Ball
             </button>
-            <button type="button" id="btn-reset-hopper" class="min-h-11 px-3 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white font-semibold text-xs sm:text-sm transition border border-slate-800 active:scale-95 text-center">
-              Reset Drum
+            <button type="button" id="btn-reset-hopper" class="min-h-12 px-3 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-100 font-semibold border border-slate-500 text-center">
+              Reset
             </button>
           </div>
         </div>
@@ -223,7 +229,7 @@
           <!-- Glass Sphere Chamber -->
           <div class="relative w-full max-w-[280px] sm:max-w-[360px] aspect-square rounded-full border-4 border-slate-600/80 bg-gradient-to-br from-slate-950/80 via-slate-900/60 to-slate-950/95 shadow-2xl flex items-center justify-center overflow-hidden backdrop-blur-sm">
             
-            <canvas id="hopper-canvas" width="360" height="360" class="w-full h-full rounded-full"></canvas>
+            <canvas id="hopper-canvas" width="360" height="360" class="w-full h-full rounded-full" aria-hidden="true"></canvas>
             
             <!-- Realistic 3D Reflections -->
             <div class="absolute inset-0 pointer-events-none rounded-full border-[6px] border-slate-600/30"></div>
@@ -234,10 +240,10 @@
           <!-- Industrial Base Pedestal -->
           <div class="flex flex-col items-center -mt-2">
             <div class="w-24 h-4 bg-gradient-to-r from-slate-600 via-slate-400 to-slate-700 border-x border-slate-500 shadow-md"></div>
-            <div class="w-44 h-10 bg-gradient-to-b from-slate-800 to-slate-950 border-2 border-slate-700 rounded-b-2xl shadow-2xl flex items-center justify-between px-4">
+            <div class="w-full max-w-44 h-10 bg-gradient-to-b from-slate-800 to-slate-950 border-2 border-slate-700 rounded-b-2xl shadow-2xl flex items-center justify-between px-4">
               <div class="flex items-center gap-1.5">
                 <span id="turbine-led" class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
-                <span class="text-[9px] font-mono text-slate-400 uppercase font-bold tracking-wider">Air Jet</span>
+                <span class="font-bold text-slate-200">Fan</span>
               </div>
               <div class="flex gap-1">
                 <div class="w-1 h-3 bg-slate-700 rounded-full"></div>
@@ -256,18 +262,20 @@
     <section id="section-generator" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 backdrop-blur-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-xl sm:text-3xl font-extrabold text-white">Smart Combinatorial Generator</h2>
-          <p class="text-slate-400 text-xs sm:text-sm">Generate lines based on statistical frequencies and historical odd/even balances. <span class="text-amber-400/80">Does not guarantee a win.</span></p>
+          <h2 class="font-extrabold text-white">Number ideas</h2>
+          <p class="text-slate-200">Make five sets of numbers. <span class="text-amber-300">This does not raise your chance of winning.</span></p>
+          <p class="lm-help">“Seen more often” uses numbers that showed up a lot in the past. “Longest wait” uses numbers that have been missing. Neither one means that number is due.</p>
         </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <select id="gen-strategy" class="min-h-11 bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl px-3 py-2.5 outline-none">
-            <option value="balanced">Harmonic Balance (3 Odd / 2 Even)</option>
-            <option value="hot">Recent Frequency</option>
-            <option value="cold">Longest Gap Bias</option>
-            <option value="random">Pure Quick Pick</option>
+          <label for="gen-strategy" class="sr-only">How to pick the numbers</label>
+          <select id="gen-strategy" class="min-h-12 bg-slate-800 text-slate-100 border border-slate-500 font-semibold rounded-xl px-3 py-2.5">
+            <option value="balanced">Balanced mix: 3 odd and 2 even</option>
+            <option value="hot">Seen more often (Recent Frequency)</option>
+            <option value="cold">Longest wait (Longest Gap Bias)</option>
+            <option value="random">Random quick pick</option>
           </select>
-          <button type="button" id="btn-generate" class="min-h-11 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-md active:scale-95 text-center">
-            Generate 5 Lines
+          <button type="button" id="btn-generate" class="min-h-12 px-4 py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold text-center">
+            Make 5 lines
           </button>
         </div>
       </div>
@@ -282,14 +290,14 @@
           <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
             Free mini-game · No real-money value
           </div>
-          <h2 class="text-xl sm:text-3xl font-extrabold text-white mt-1">Scratch Cards</h2>
-          <p class="text-slate-400 text-xs sm:text-sm">Rub the coating with a finger or mouse. About 1 in 4 cards wins virtual points only. Points cannot be cashed out.</p>
+          <h2 class="font-extrabold text-white mt-1">Scratch cards</h2>
+          <p class="text-slate-200">Rub the gray coating with a finger or mouse, or press Quick Reveal. About 1 in 4 cards wins virtual points only. Points cannot be cashed out.</p>
         </div>
         <div class="relative z-10 flex flex-wrap items-center gap-2 self-stretch sm:self-center">
-          <button type="button" id="btn-scratch-reveal" class="min-h-11 flex-1 sm:flex-none px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition border border-slate-700">
+          <button type="button" id="btn-scratch-reveal" class="min-h-12 flex-1 sm:flex-none px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-bold border border-slate-500">
             Quick Reveal
           </button>
-          <button type="button" id="btn-scratch-new" class="min-h-11 flex-1 sm:flex-none px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition">
+          <button type="button" id="btn-scratch-new" class="min-h-12 flex-1 sm:flex-none px-4 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-bold">
             New Card
           </button>
         </div>
@@ -310,37 +318,38 @@
           </div>
         </div>
 
-        <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair rounded-2xl z-20 touch-none"></canvas>
+        <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair rounded-2xl z-20 touch-none" role="img" aria-label="Scratch coating. Rub to reveal the card, or use the Quick Reveal button."></canvas>
 
         <div id="scratch-result" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center text-center gap-3 p-5 bg-slate-950/95" aria-live="polite">
           <p id="scratch-result-title" class="text-base sm:text-lg font-black text-white leading-snug"></p>
           <p id="scratch-result-detail" class="text-xs text-slate-300 leading-relaxed max-w-xs"></p>
-          <button type="button" id="btn-scratch-again" class="min-h-11 px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">Try Again</button>
+          <button type="button" id="btn-scratch-again" class="min-h-12 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold">Try Again</button>
         </div>
       </div>
-      <p class="text-center text-[11px] text-slate-500 italic">Free entertainment only. Virtual points have no cash value and cannot be redeemed.</p>
+      <p class="text-center text-slate-200">Free game only. Virtual points have no cash value and cannot be redeemed.</p>
     </section>
 
     <!-- 4. FREQUENCY HEATMAP & CHART -->
     <section id="section-stats" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 backdrop-blur-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-xl sm:text-3xl font-extrabold text-white">Decennial Frequency Heatmap</h2>
-          <p id="heatmap-blurb" class="text-slate-400 text-xs sm:text-sm">Historical appearance rate per white ball in the loaded archive.</p>
+          <h2 class="font-extrabold text-white">How often each number was drawn</h2>
+          <p id="heatmap-blurb" class="text-slate-200">A heatmap is a color grid. Each square is one white-ball number. Brighter squares were drawn more often. The colors describe the past. They do not predict the next draw.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-600"></span> Higher</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span> Mid</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-slate-800"></span> Lower</span>
+        <div class="flex flex-wrap items-center gap-4 text-slate-100" aria-hidden="true">
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-rose-600 border border-white"></span> Drawn more often</span>
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-amber-500 border border-white"></span> In the middle</span>
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-slate-800 border border-white"></span> Drawn less often</span>
         </div>
       </div>
 
       <div id="heatmap-grid" class="grid grid-cols-5 sm:grid-cols-10 md:grid-cols-14 gap-1.5 pt-1"></div>
 
       <div class="pt-5 border-t border-slate-800">
-        <h3 class="text-sm font-bold text-slate-200 mb-3">Top 10 Most Frequent vs 10 Least Frequent Numbers</h3>
-        <div class="h-56 sm:h-64">
-          <canvas id="frequencyChart"></canvas>
+        <h3 class="text-xl font-bold text-white mb-2">Ten most drawn and ten least drawn</h3>
+        <p id="chart-summary" class="text-slate-200 mb-3">The chart loads with the draw list. Green bars were drawn more often. Red bars were drawn less often. This is history, not a forecast.</p>
+        <div class="h-72 sm:h-80">
+          <canvas id="frequencyChart" role="img" aria-labelledby="chart-summary"></canvas>
         </div>
       </div>
     </section>
@@ -349,36 +358,42 @@
     <section id="section-history" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 backdrop-blur-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-xl sm:text-3xl font-extrabold text-white">Official Draw Archive</h2>
-          <p id="history-blurb" class="text-slate-400 text-xs sm:text-sm">Official winning numbers from NY Open Data.</p>
+          <h2 class="font-extrabold text-white">Past winning numbers</h2>
+          <p id="history-blurb" class="text-slate-200">Official winning numbers from NY Open Data.</p>
+          <p class="lm-help">The multiplier is Power Play or Megaplier when the official file lists one. A dash means it was not listed. On a phone, swipe the table sideways to see every column.</p>
         </div>
-        <div class="flex items-center gap-2">
-          <input id="history-search" oninput="filterHistory()" type="text" placeholder="Search number..." class="min-h-11 bg-slate-800 text-slate-200 border border-slate-700 text-xs rounded-xl px-3 py-2 outline-none w-36 sm:w-48" />
-          <button type="button" id="btn-export-csv" class="min-h-11 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700">
-            CSV
+        <div class="flex flex-wrap items-end gap-2">
+          <div class="flex flex-col gap-1 min-w-0 w-full sm:w-auto sm:max-w-xs">
+            <label for="history-search" class="text-slate-100 font-semibold">Find a number</label>
+            <input id="history-search" oninput="filterHistory()" type="text" inputmode="numeric" placeholder="Such as 12" aria-describedby="history-search-help" class="min-h-12 bg-slate-800 text-slate-100 border border-slate-500 rounded-xl px-3 py-2 w-full max-w-full" />
+          </div>
+          <button type="button" id="btn-export-csv" class="min-h-12 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl font-semibold border border-slate-500">
+            Download CSV
           </button>
         </div>
       </div>
+      <p id="history-search-help" class="lm-help">Shows drawings that used the number you type.</p>
 
-      <div class="overflow-x-auto custom-scroll border border-slate-800 rounded-2xl">
-        <table class="w-full text-left text-xs text-slate-300 min-w-[500px]">
-          <thead class="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
+      <div class="overflow-x-auto custom-scroll border border-slate-600 rounded-2xl max-w-full" tabindex="0" role="region" aria-label="Winning numbers table. Swipe sideways on a small screen.">
+        <table class="w-full text-left text-slate-100 min-w-[36rem]">
+          <caption>Newest drawings are listed first.</caption>
+          <thead class="bg-slate-950 text-slate-100 font-semibold border-b border-slate-600">
             <tr>
-              <th class="py-3 px-3">Date</th>
-              <th class="py-3 px-3">Winning Numbers</th>
-              <th class="py-3 px-3 text-center" id="history-special-header">Powerball</th>
-              <th class="py-3 px-3 text-center">Multiplier</th>
-              <th class="py-3 px-3 text-center">Odd/Even</th>
+              <th scope="col" class="py-3 px-3">Date</th>
+              <th scope="col" class="py-3 px-3">White balls</th>
+              <th scope="col" class="py-3 px-3 text-center" id="history-special-header">Powerball</th>
+              <th scope="col" class="py-3 px-3 text-center">Multiplier</th>
+              <th scope="col" class="py-3 px-3 text-center">Odd and even</th>
             </tr>
           </thead>
-          <tbody id="history-table-body" class="divide-y divide-slate-800/60 font-mono"></tbody>
+          <tbody id="history-table-body" class="divide-y divide-slate-700"></tbody>
         </table>
       </div>
-      <div id="history-pagination" class="flex justify-between items-center text-xs text-slate-400 pt-1">
+      <div id="history-pagination" class="flex flex-wrap justify-between items-center gap-3 text-slate-100 pt-1">
         <span id="history-count-label">Showing 1-10 of 1,042 draws</span>
-        <div class="space-x-1.5">
-          <button onclick="changeHistoryPage(-1)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">Prev</button>
-          <button onclick="changeHistoryPage(1)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">Next</button>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="changeHistoryPage(-1)" class="min-h-12 px-4 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-500" aria-label="Previous page of drawings">Previous</button>
+          <button type="button" onclick="changeHistoryPage(1)" class="min-h-12 px-4 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-500" aria-label="Next page of drawings">Next</button>
         </div>
       </div>
     </section>
@@ -387,32 +402,32 @@
     <section id="section-about" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-10 backdrop-blur-sm space-y-6">
       <div class="max-w-3xl space-y-3">
         <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">About LotteryMigo</span>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Demystifying Lottery Probability Through Data</h2>
-        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-          LotteryMigo is an entertainment-only view of Powerball and Mega Millions. Official winning numbers are loaded from NY Open Data and counted as frequencies and gaps. <strong>Past draws do not predict future results. This is not gambling advice, and it does not guarantee any win.</strong>
+        <h2 class="font-extrabold text-white">What this site shows</h2>
+        <p class="text-slate-100 leading-relaxed">
+          LotteryMigo is a free look at Powerball and Mega Millions. Official winning numbers come from NY Open Data. The site counts how often each number appeared and how long it has been missing. <strong>Past draws do not predict future results. This is not gambling advice, and it does not guarantee any win.</strong>
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
         <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-2">
-          <div class="text-rose-400 text-lg font-bold">01. Empirical Frequency</div>
-          <h4 class="text-sm font-bold text-white">Decennial Archive</h4>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            We catalog drawing histories to trace how each ball behaves over long horizons, comparing actual draw counts against theoretical expectations.
+          <div class="text-rose-300 text-lg font-bold">1. How often</div>
+          <h3 class="text-lg font-bold text-white">Past drawings</h3>
+          <p class="text-slate-200 leading-relaxed">
+            Each white-ball number is counted across the loaded drawings. The count is history. It is not a forecast.
           </p>
         </div>
         <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-2">
-          <div class="text-amber-400 text-lg font-bold">02. Combinatorial Logic</div>
-          <h4 class="text-sm font-bold text-white">Harmonic Distribution</h4>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Historically, sets with an extreme distribution (like all odd or all high numbers) account for less than 3% of winning draws. Our generator designs balanced sets.
+          <div class="text-amber-300 text-lg font-bold">2. Number ideas</div>
+          <h3 class="text-lg font-bold text-white">Mix of odd and even</h3>
+          <p class="text-slate-200 leading-relaxed">
+            One option builds a line with 3 odd numbers and 2 even numbers. That pattern is only a style of pick. It does not improve the odds.
           </p>
         </div>
         <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-2">
-          <div class="text-indigo-400 text-lg font-bold">03. Interactive Physics</div>
-          <h4 class="text-sm font-bold text-white">True Random Simulation</h4>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Our HTML5 canvas blower drums simulate real-world air chambers, allowing users to watch numbers get picked organically without opaque black-box scripts.
+          <div class="text-indigo-300 text-lg font-bold">3. The drum</div>
+          <h3 class="text-lg font-bold text-white">A picture of a draw</h3>
+          <p class="text-slate-200 leading-relaxed">
+            The round drum shows balls moving. You can turn that motion off. The numbers still appear in the list. Nothing on this page plays sound.
           </p>
         </div>
       </div>
@@ -420,24 +435,24 @@
 
     <!-- 7. RESPONSIBLE GAMING RESOURCES -->
     <section class="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 sm:p-7 space-y-3">
-      <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Responsible Play & Helplines
-      </h3>
-      <p class="text-[11px] sm:text-xs text-slate-400 leading-relaxed">
-        Lottery tickets should only ever be purchased for casual entertainment. If you or someone you know is experiencing gambling-related difficulties, free 24/7 confidential help is available:
+      <h2 class="text-xl font-bold text-white flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-emerald-400" aria-hidden="true"></span> Help with gambling problems
+      </h2>
+      <p class="text-slate-200 leading-relaxed">
+        Buy lottery tickets only for fun, if you buy them at all. If gambling is causing harm, free confidential help is available all day:
       </p>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs pt-1">
-        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-          <span class="text-slate-400 block text-[10px]">National Helpline</span>
-          <strong class="text-amber-400 text-sm font-bold">1-800-522-4700</strong>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-600">
+          <span class="text-slate-200 block">National helpline</span>
+          <a class="text-amber-300 text-xl font-bold" href="tel:18005224700">1-800-522-4700</a>
         </div>
-        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-          <span class="text-slate-400 block text-[10px]">1-800-GAMBLER Network</span>
-          <strong class="text-amber-400 text-sm font-bold">1-800-426-2537</strong>
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-600">
+          <span class="text-slate-200 block">1-800-GAMBLER</span>
+          <a class="text-amber-300 text-xl font-bold" href="tel:18004262537">1-800-426-2537</a>
         </div>
-        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-          <span class="text-slate-400 block text-[10px]">Online Guidance</span>
-          <strong class="text-amber-400 text-sm font-bold">ncpgambling.org</strong>
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-600">
+          <span class="text-slate-200 block">More information</span>
+          <a class="text-amber-300 text-xl font-bold" href="https://www.ncpgambling.org/">ncpgambling.org</a>
         </div>
       </div>
     </section>
@@ -450,17 +465,17 @@
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-900 pb-4">
         <div>
           <span class="font-bold text-slate-300">LotteryMigo.com</span>
-          <span class="block text-[10px] text-slate-500">Independent Probability & Gaming Platform</span>
+          <span class="block text-slate-200">Free number tools. Not a place to buy tickets.</span>
         </div>
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
+        <nav aria-label="Site pages" class="flex flex-wrap items-center gap-x-4 gap-y-1">
           <a href="about.html" class="inline-flex items-center min-h-11 hover:text-amber-400">About</a>
           <a href="privacy.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Privacy Policy</a>
           <a href="terms.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Terms</a>
           <a href="contact.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Contact</a>
           <a href="mailto:info@lotterymigo.com" class="inline-flex items-center min-h-11 text-amber-400 hover:underline">info@lotterymigo.com</a>
-        </div>
+        </nav>
       </div>
-      <p class="text-[10px] text-slate-600 leading-relaxed">
+      <p class="text-slate-200 leading-relaxed">
         <strong>DISCLAIMER:</strong> LotteryMigo does not guarantee any lottery win or prize outcome. Powerball® and Mega Millions® are registered trademarks of their respective consortiums. LotteryMigo is not sponsored by or affiliated with any state or national lottery agency. © 2026 LotteryMigo.com. All rights reserved.
       </p>
     </div>
@@ -576,9 +591,9 @@
       const heatmap = document.getElementById('heatmap-blurb');
       const gameName = CONFIG[currentGame].name;
       if (usingFallbackDraws || !drawsArchive.length) {
-        if (latest) latest.textContent = 'Showing a sample archive because the official draw file did not load.';
-        if (history) history.textContent = 'Sample draws only. Open the hosted site, or this folder over http, to load NY Open Data results.';
-        if (heatmap) heatmap.textContent = 'Sample appearance counts. These are not official draw results.';
+        if (latest) latest.textContent = 'Showing a sample list because the official draw file did not load.';
+        if (history) history.textContent = 'These are sample drawings, not official results. Open the site in a browser over http to load NY Open Data.';
+        if (heatmap) heatmap.textContent = 'A heatmap is a color grid. These sample colors are not official results, and they do not predict the next draw.';
         return;
       }
       const newest = drawsArchive[0].date;
@@ -588,7 +603,7 @@
       if (history) {
         history.textContent = gameName + ' results from NY Open Data (' + dataset.datasetId + '), ' + formatDrawDate(oldest) + ' through ' + formatDrawDate(newest) + '.';
       }
-      if (heatmap) heatmap.textContent = 'White-ball counts in the current number range, from ' + drawsArchive.length.toLocaleString() + ' official draws.';
+      if (heatmap) heatmap.textContent = 'A heatmap is a color grid. Each square is one white-ball number. Brighter squares were drawn more often in ' + drawsArchive.length.toLocaleString() + ' official drawings. Brighter does not mean that number will be drawn next.';
     }
 
     function computeFrequencies() {
@@ -656,17 +671,26 @@
       currentGame = game;
       const isPB = game === 'POWERBALL';
 
-      const toggleBase = 'flex-1 sm:flex-none justify-center min-h-11 sm:min-h-0 px-3 sm:px-4 py-2 sm:py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5';
-      document.getElementById('btn-toggle-pb').className = isPB
+      const toggleBase = 'flex-1 sm:flex-none justify-center min-h-12 px-4 py-3 rounded-full text-base font-bold flex items-center gap-2';
+      const pbBtn = document.getElementById('btn-toggle-pb');
+      const mmBtn = document.getElementById('btn-toggle-mm');
+      pbBtn.className = isPB
         ? toggleBase + ' bg-rose-600 text-white shadow'
-        : toggleBase + ' text-slate-400 hover:text-white';
-
-      document.getElementById('btn-toggle-mm').className = !isPB
+        : toggleBase + ' text-slate-200 hover:text-white';
+      mmBtn.className = !isPB
         ? toggleBase + ' bg-blue-600 text-white shadow'
-        : toggleBase + ' text-slate-400 hover:text-white';
+        : toggleBase + ' text-slate-200 hover:text-white';
+      pbBtn.setAttribute('aria-pressed', isPB ? 'true' : 'false');
+      mmBtn.setAttribute('aria-pressed', isPB ? 'false' : 'true');
 
       document.getElementById('hero-title-game').innerText = isPB ? 'Powerball' : 'Mega Millions';
-      document.getElementById('hero-title-game').className = isPB ? 'text-rose-500' : 'text-blue-500';
+      document.getElementById('hero-title-game').className = isPB ? 'text-rose-300' : 'text-blue-300';
+      const badge = document.getElementById('hero-badge');
+      if (badge) {
+        badge.textContent = isPB
+          ? 'Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.'
+          : 'Mega Millions uses 5 numbers from 1 to 70, plus 1 Mega Ball from 1 to 25.';
+      }
       document.getElementById('history-special-header').innerText = isPB ? 'Powerball' : 'Mega Ball';
 
       applyCurrentDraws();
@@ -722,6 +746,7 @@
     }
 
     function animateChamber() {
+      const allowMotion = window.lmMotionAllowed !== false;
       if (ctx) {
         ctx.clearRect(0, 0, 360, 360);
 
@@ -736,7 +761,7 @@
         ctx.fill();
 
         // Air streams
-        if (blowerActive) {
+        if (blowerActive && allowMotion) {
           ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
           ctx.lineWidth = 1.5;
           airParticles.forEach(p => {
@@ -751,7 +776,9 @@
 
         // Render balls
         hopperBalls.forEach(b => {
-          if (blowerActive) {
+          if (!allowMotion) {
+            // Leave each ball where it is. Draws still add numbers to the list.
+          } else if (blowerActive) {
             b.x += b.vx;
             b.y += b.vy;
             b.vy += 0.14; // Gravity
@@ -828,8 +855,24 @@
         ctx.stroke();
       }
 
+      if (!allowMotion) {
+        animFrameId = 0;
+        return;
+      }
       animFrameId = requestAnimationFrame(animateChamber);
     }
+
+    window.lmSyncMotion = function () {
+      if (window.lmMotionAllowed === false) {
+        if (animFrameId) {
+          cancelAnimationFrame(animFrameId);
+          animFrameId = 0;
+        }
+        if (ctx) animateChamber();
+        return;
+      }
+      if (!animFrameId && ctx) animateChamber();
+    };
 
     function startAutoBlower() {
       if (drawnHopperBalls.length >= 6) {
@@ -905,20 +948,20 @@
         
         stopAutoBlower();
         const btn = document.getElementById('btn-start-blower');
-        if (btn) btn.innerText = 'Completed ✓';
+        if (btn) btn.innerText = 'All 6 drawn';
       }
 
       const countLabel = document.getElementById('drawn-count-label');
-      if (countLabel) countLabel.innerText = drawnHopperBalls.length + ' / 6 Balls';
+      if (countLabel) countLabel.innerText = drawnHopperBalls.length + ' of 6 balls';
     }
 
     function resetHopper() {
       stopAutoBlower();
       drawnHopperBalls = [];
       const countLabel = document.getElementById('drawn-count-label');
-      if (countLabel) countLabel.innerText = '0 / 6 Balls';
+      if (countLabel) countLabel.innerText = '0 of 6 balls';
       const rack = document.getElementById('hopper-balls-rack');
-      if (rack) rack.innerHTML = '<span class="text-xs text-slate-500 italic">Press "Start Draw" or "Next Ball" to extract...</span>';
+      if (rack) rack.innerHTML = '<span class="text-slate-200">Press Start Draw or Next Ball.</span>';
       
       const btn = document.getElementById('btn-start-blower');
       if (btn) btn.innerText = 'Start Draw';
@@ -940,7 +983,7 @@
           const lineDiv = document.createElement('div');
           lineDiv.className = 'bg-slate-950/80 border border-slate-800/80 rounded-2xl p-3.5 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3';
           
-          let whiteBallsHtml = line.whites.map(n => '<span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ball-3d text-slate-950 font-black flex items-center justify-center text-xs sm:text-sm">' + n + '</span>').join('');
+          let whiteBallsHtml = line.whites.map(n => '<span class="w-12 h-12 rounded-full ball-3d text-slate-950 font-black flex items-center justify-center text-base">' + n + '</span>').join('');
           let isPB = currentGame === 'POWERBALL';
           let specialClass = isPB ? 'ball-3d-special-pb text-white' : 'ball-3d-special-mm text-slate-950';
           let oddsCount = line.whites.filter(x => x % 2 !== 0).length;
@@ -948,20 +991,20 @@
 
           lineDiv.innerHTML = `
             <div class="flex items-center gap-2 min-w-0">
-              <span class="text-xs font-bold text-slate-500 w-7 shrink-0">#0${i}</span>
-              <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span class="font-bold text-slate-200 w-10 shrink-0">#0${i}</span>
+              <div class="flex flex-wrap items-center gap-2">
                 ${whiteBallsHtml}
-                <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ${specialClass} font-black flex items-center justify-center text-xs sm:text-sm">
+                <span class="w-12 h-12 rounded-full ${specialClass} font-black flex items-center justify-center text-base">
                   ${line.special}
                 </span>
               </div>
             </div>
-            <div class="flex items-center gap-3 text-[11px] sm:text-xs">
-              <div class="text-slate-400">
-                <span class="text-slate-500">Odd/Even:</span> <strong class="text-slate-200">${oddsCount}/${5 - oddsCount}</strong>
+            <div class="flex flex-wrap items-center gap-4 text-slate-100">
+              <div>
+                <span class="text-slate-200">Odd and even:</span> <strong class="text-white">${oddsCount} odd, ${5 - oddsCount} even</strong>
               </div>
-              <div class="text-slate-400">
-                <span class="text-slate-500">Sum:</span> <strong class="text-slate-200">${sum}</strong>
+              <div>
+                <span class="text-slate-200">Sum:</span> <strong class="text-white">${sum}</strong>
               </div>
             </div>
           `;
@@ -1092,6 +1135,7 @@
           button.type = 'button';
           button.textContent = theme.name;
           button.setAttribute('role', 'tab');
+          button.setAttribute('aria-label', theme.name + ' scratch card');
           bindPress(button, () => {
             scratchThemeIndex = index;
             resetScratcher();
@@ -1102,9 +1146,9 @@
       [...picker.children].forEach((button, index) => {
         const active = index === scratchThemeIndex;
         button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        button.className = 'min-h-11 px-3 py-2 rounded-full border text-xs font-bold ' + (active
-          ? 'bg-amber-500 text-slate-950 border-amber-400'
-          : 'bg-slate-950 text-slate-300 border-slate-700');
+        button.className = 'min-h-12 px-4 py-3 rounded-full border font-bold ' + (active
+          ? 'bg-amber-500 text-slate-950 border-amber-300'
+          : 'bg-slate-950 text-slate-100 border-slate-500');
       });
     }
 
@@ -1186,14 +1230,14 @@
       sCtx.fillStyle = theme.ink;
       sCtx.textAlign = 'center';
       sCtx.textBaseline = 'middle';
-      sCtx.font = 'bold ' + Math.round(11 * scale) + 'px sans-serif';
-      const coatingLabel = 'FREE GAME · NO CASH VALUE';
+      sCtx.font = 'bold ' + Math.round(18 * scale) + 'px sans-serif';
+      const coatingLabel = 'FREE GAME. NO CASH VALUE';
       const labelWidth = sCtx.measureText(coatingLabel).width;
       if (labelWidth > scratchCanvas.width * 0.88) {
-        sCtx.font = 'bold ' + Math.round(11 * scale * (scratchCanvas.width * 0.88 / labelWidth)) + 'px sans-serif';
+        sCtx.font = 'bold ' + Math.round(18 * scale * (scratchCanvas.width * 0.88 / labelWidth)) + 'px sans-serif';
       }
-      sCtx.fillText(coatingLabel, scratchCanvas.width / 2, scratchCanvas.height / 2 - 14 * scale);
-      sCtx.font = 'bold ' + Math.round(13 * scale) + 'px sans-serif';
+      sCtx.fillText(coatingLabel, scratchCanvas.width / 2, scratchCanvas.height / 2 - 16 * scale);
+      sCtx.font = 'bold ' + Math.round(20 * scale) + 'px sans-serif';
       sCtx.fillText('RUB HERE TO SCRATCH', scratchCanvas.width / 2, scratchCanvas.height / 2 + 10 * scale);
     }
 
@@ -1337,9 +1381,9 @@
           else if (freq > midCut) color = 'bg-amber-500 text-slate-950 font-bold';
 
           grid.innerHTML += `
-            <div class="p-1.5 sm:p-2 rounded-lg text-center ${color}">
-              <span class="text-[11px] sm:text-xs font-black block">${i}</span>
-              <span class="text-[8px] sm:text-[9px] opacity-80">${freq}x</span>
+            <div class="p-2 rounded-lg text-center border border-slate-500 ${color}" role="img" aria-label="Number ${i} was drawn ${freq} times">
+              <span class="font-black block">${i}</span>
+              <span class="block">${freq}</span>
             </div>
           `;
         }
@@ -1360,7 +1404,19 @@
 
         const labels = [...top10.map(e => '#' + e[0]), ...bottom10.map(e => '#' + e[0])];
         const data = [...top10.map(e => e[1]), ...bottom10.map(e => e[1])];
-        const colors = [...Array(10).fill('#10b981'), ...Array(10).fill('#ef4444')];
+        const highContrast = document.documentElement.classList.contains('lm-contrast');
+        const colors = highContrast
+          ? [...Array(10).fill('#ffd000'), ...Array(10).fill('#ffffff')]
+          : [...Array(10).fill('#34d399'), ...Array(10).fill('#fda4af')];
+        const tickColor = highContrast ? '#ffffff' : '#e8eef6';
+        const gridColor = highContrast ? '#ffffff' : '#334155';
+        const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 18;
+        const tickSize = Math.max(16, Math.round(rootPx * 0.85));
+        const summary = document.getElementById('chart-summary');
+        if (summary) {
+          summary.textContent = 'Drawn most often: ' + top10.map(e => 'number ' + e[0] + ' (' + e[1] + ' times)').join(', ') + '. Drawn least often: ' + bottom10.map(e => 'number ' + e[0] + ' (' + e[1] + ' times)').join(', ') + '. These counts describe the past only.';
+        }
+        canvas.setAttribute('aria-label', summary ? summary.textContent : 'Bar chart of how often numbers were drawn.');
 
         if (chartInstance) chartInstance.destroy();
 
@@ -1368,15 +1424,15 @@
           type: 'bar',
           data: {
             labels: labels,
-            datasets: [{ label: 'Draws', data: data, backgroundColor: colors, borderRadius: 4 }]
+            datasets: [{ label: 'Times drawn', data: data, backgroundColor: colors, borderRadius: 4 }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-              y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+              x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: tickSize } } },
+              y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: tickSize } } }
             }
           }
         });
@@ -1408,28 +1464,28 @@
 
         slice.forEach(d => {
           const odds = d.whites.filter(n=>n%2!==0).length;
-          let ballsHtml = d.whites.map(n => '<span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center text-[9px] sm:text-[10px] font-bold">' + n + '</span>').join('');
+          let ballsHtml = d.whites.map(n => '<span class="history-ball rounded-full bg-slate-800 text-white border border-slate-400 inline-flex items-center justify-center font-bold">' + n + '</span>').join('');
           let specialClass = currentGame === 'POWERBALL' ? 'bg-rose-600 text-white' : 'bg-amber-400 text-slate-950';
 
           tbody.innerHTML += `
-            <tr class="hover:bg-slate-900/50 transition">
-              <td class="py-2.5 px-3 text-slate-400 text-[11px] whitespace-nowrap">${d.date}</td>
-              <td class="py-2.5 px-3">
-                <div class="flex gap-1">${ballsHtml}</div>
+            <tr>
+              <td class="text-slate-100 whitespace-nowrap">${d.date}</td>
+              <td>
+                <div class="flex flex-wrap gap-1">${ballsHtml}</div>
               </td>
-              <td class="py-2.5 px-3 text-center">
-                <span class="inline-flex w-5 h-5 sm:w-6 sm:h-6 rounded-full ${specialClass} items-center justify-center text-[9px] sm:text-[10px] font-black">
+              <td class="text-center">
+                <span class="history-ball rounded-full ${specialClass} inline-flex items-center justify-center font-black">
                   ${d.special}
                 </span>
               </td>
-              <td class="py-2.5 px-3 text-center text-amber-400 font-bold">${d.multiplier == null ? '—' : d.multiplier + 'x'}</td>
-              <td class="py-2.5 px-3 text-center text-slate-400 text-[11px]">${odds}O / ${5 - odds}E</td>
+              <td class="text-center text-amber-300 font-bold">${d.multiplier == null ? '—' : d.multiplier + 'x'}</td>
+              <td class="text-center text-slate-100">${odds} odd, ${5 - odds} even</td>
             </tr>
           `;
         });
 
         const lbl = document.getElementById('history-count-label');
-        if (lbl) lbl.innerText = 'Showing ' + (start + 1) + '-' + Math.min(start + historyPageSize, filteredHistory.length) + ' of ' + filteredHistory.length;
+        if (lbl) lbl.innerText = 'Showing ' + (start + 1) + ' to ' + Math.min(start + historyPageSize, filteredHistory.length) + ' of ' + filteredHistory.length + ' drawings';
       } catch (err) {
         console.error("Table DOM error:", err);
       }
@@ -1525,6 +1581,12 @@
       bindPress(document.getElementById('btn-scratch-new'), resetScratcher);
       bindPress(document.getElementById('btn-scratch-again'), resetScratcher);
     }
+
+    window.lmRefreshChart = function () {
+      const canvas = document.getElementById('frequencyChart');
+      if (!canvas || !Object.keys(whiteFrequencies).length) return;
+      try { renderChart(); } catch (err) {}
+    };
 
     // --- INITIALIZATION ---
     window.addEventListener('DOMContentLoaded', () => {

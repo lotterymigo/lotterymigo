@@ -8,7 +8,7 @@
 ## 📌 Features
 
 - **Dual-Game Architecture:** Instant switching between Powerball (1–69 + PB 1–26) and Mega Millions (1–70 + MB 1–25).
-- **Physics Ball Hopper:** Canvas-driven blower chamber simulating bouncing ping-pong balls with real-time audio pops and picks.
+- **Physics Ball Hopper:** Canvas-driven blower chamber. Ball motion follows the system reduced-motion setting and can be paused. The site does not play sound or confetti.
 - **Interactive Scratch-Off Cards:** Several free themes. About 1 in 4 cards wins virtual points only; losses show a try-again message. No cash value.
 - **Smart Combinatorial Ticket Generator:** Generates lines based on mathematical models (Harmonic 3/2 balance, Recent Frequency, Longest Gap Bias, and Quick Pick).
 - **10-Year Historical Archive:** Instant searching, sorting, and CSV export for draws from 2016 through 2026.
@@ -19,7 +19,7 @@
 ## 🛠️ Tech Stack
 
 - **Frontend:** Semantic HTML5, Tailwind CSS (via CDN)
-- **Visuals & Charts:** Chart.js, HTML5 Canvas 2D Physics, Canvas-Confetti
+- **Visuals & Charts:** Chart.js and HTML5 Canvas 2D physics. Text size, high contrast, and motion choices are stored in the browser.
 - **Icons:** Lucide Icons
 - **Deployment & Hosting:** Vercel / GitHub Continuous Deployment
 - **DNS / Domain:** GoDaddy (`lotterymigo.com`)

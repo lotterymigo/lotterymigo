@@ -1,0 +1,43 @@
+name: Update lottery draws
+
+# Powerball draws Monday, Wednesday, and Saturday nights. Mega Millions draws
+# Tuesday and Friday nights (about 11pm US Eastern, early the next UTC day).
+# These three runs are after those nights and refresh the full archive.
+on:
+  schedule:
+    - cron: '0 12 * * 2,4,0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-draws
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fetch NY Open Data draws
+        run: node scripts/fetch-draws.mjs
+
+      - name: Commit archive when draws changed
+        run: |
+          if git diff --quiet -- data/draws.json; then
+            echo "No draw changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/draws.json
+          git commit -m "Update Powerball and Mega Millions draw archive"
+          git push

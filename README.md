@@ -41,3 +41,15 @@ If you have Python installed on Windows:
 ```powershell
 # Open PowerShell in the project folder and run:
 python -m http.server 3000
+```
+
+Opening `index.html` as a file still loads the page. Some browsers block `data/draws.json` from a `file://` address, and the page then uses its built-in sample archive. Use the local server, or the hosted site, when you want the NY Open Data draws.
+
+## Official draw archive
+
+Winning numbers live in `data/draws.json`. `scripts/fetch-draws.mjs` downloads them from the NY Open Data Socrata API:
+
+- Powerball: dataset [`d6yy-54nr`](https://data.ny.gov/d/d6yy-54nr)
+- Mega Millions: dataset [`5xaw-6ayf`](https://data.ny.gov/d/5xaw-6ayf)
+
+`.github/workflows/update-draws.yml` runs Tuesday, Thursday, and Sunday at 12:00 UTC, after draw nights, and can also be started by hand. It commits `data/draws.json` only when the draws changed so the host can redeploy.

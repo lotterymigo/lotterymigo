@@ -9,7 +9,7 @@
 
 - **Dual-Game Architecture:** Instant switching between Powerball (1–69 + PB 1–26) and Mega Millions (1–70 + MB 1–25).
 - **Physics Ball Hopper:** Canvas-driven blower chamber simulating bouncing ping-pong balls with real-time audio pops and picks.
-- **Interactive Scratch-Off Card:** Real tactile silver foil scratching mini-game with instant match checks and prize feedback.
+- **Interactive Scratch-Off Cards:** Several free themes. About 1 in 4 cards wins virtual points only; losses show a try-again message. No cash value.
 - **Smart Combinatorial Ticket Generator:** Generates lines based on mathematical models (Harmonic 3/2 balance, Recent Frequency, Longest Gap Bias, and Quick Pick).
 - **10-Year Historical Archive:** Instant searching, sorting, and CSV export for draws from 2016 through 2026.
 - **Decennial Heatmap & Charting:** Visualizes high-frequency vs. dormant numbers using Chart.js.

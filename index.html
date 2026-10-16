@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Entertainment-only Powerball and Mega Millions frequency stats, longest-gap counts, and number tools. Past draws do not predict future results." />
+  <link rel="canonical" href="https://lotterymigo.com/" />
   <title>LotteryMigo | Powerball & Mega Millions Analytics, Games & Generator</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -40,6 +42,12 @@
       -webkit-tap-highlight-color: transparent;
       scroll-behavior: smooth;
     }
+    button, a, select {
+      touch-action: manipulation;
+    }
+    #scratch-canvas {
+      touch-action: none;
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
@@ -54,7 +62,7 @@
 
   <!-- NAVIGATION HEADER -->
   <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/95 border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:h-16 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
       <div class="flex items-center gap-2.5 shrink-0">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-black text-lg text-white shadow-md shadow-rose-900/30">
           LM
@@ -66,11 +74,11 @@
       </div>
 
       <!-- ACTIVE GAME TOGGLE -->
-      <div class="flex items-center bg-slate-800/90 p-1 rounded-full border border-slate-700 shrink-0">
-        <button id="btn-toggle-pb" onclick="switchGame('POWERBALL')" class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-rose-600 text-white shadow">
+      <div class="order-last sm:order-none flex w-full sm:w-auto items-center bg-slate-800/90 p-1 rounded-full border border-slate-700">
+        <button id="btn-toggle-pb" onclick="switchGame('POWERBALL')" class="flex-1 sm:flex-none justify-center min-h-11 sm:min-h-0 px-3 sm:px-4 py-2 sm:py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-rose-600 text-white shadow">
           <span class="w-2 h-2 rounded-full bg-white"></span> Powerball
         </button>
-        <button id="btn-toggle-mm" onclick="switchGame('MEGAMILLIONS')" class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white">
+        <button id="btn-toggle-mm" onclick="switchGame('MEGAMILLIONS')" class="flex-1 sm:flex-none justify-center min-h-11 sm:min-h-0 px-3 sm:px-4 py-2 sm:py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white">
           <span class="w-2 h-2 rounded-full bg-blue-500"></span> Mega Millions
         </button>
       </div>
@@ -86,7 +94,7 @@
     </div>
 
     <!-- MOBILE NAV -->
-    <div class="lg:hidden flex items-center gap-4 overflow-x-auto custom-scroll px-4 py-2 border-t border-slate-800/60 bg-slate-900/60 text-xs font-medium text-slate-400 whitespace-nowrap">
+    <div class="lg:hidden flex items-center gap-4 overflow-x-auto max-w-full custom-scroll px-4 py-2 border-t border-slate-800/60 bg-slate-900/60 text-xs font-medium text-slate-400 whitespace-nowrap">
       <a href="#section-hopper" class="hover:text-white">Blower Draw</a>
       <a href="#section-generator" class="hover:text-white">Generator</a>
       <a href="#section-scratcher" class="hover:text-white">Scratch Card</a>
@@ -123,7 +131,7 @@
           Powerball: 5 of 69 + 1 Powerball (1-26)
         </div>
         <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
-          Smarter Picks with <span id="hero-title-game" class="text-rose-500">Historical Probability</span>
+          Most Frequent &amp; Longest Gap for <span id="hero-title-game" class="text-rose-500">Powerball</span>
         </h1>
         <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
           Analyze over a decade of draw frequency patterns and simulate physics extractions. <span class="text-amber-400/90 font-medium">Provided for entertainment only — this platform does not guarantee winning outcomes.</span>
@@ -140,11 +148,11 @@
             <span id="stat-jackpot-odds" class="text-base sm:text-xl font-black text-amber-400">1 in 292.2M</span>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Hottest Ball</span>
+            <span class="text-[10px] sm:text-xs text-slate-400 block">Most Frequent</span>
             <span id="stat-hottest-ball" class="text-base sm:text-xl font-black text-emerald-400">#61 (89x)</span>
           </div>
           <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-            <span class="text-[10px] sm:text-xs text-slate-400 block">Most Overdue</span>
+            <span class="text-[10px] sm:text-xs text-slate-400 block">Longest Gap</span>
             <span id="stat-coldest-ball" class="text-base sm:text-xl font-black text-rose-400">#13 (48 Draws)</span>
           </div>
         </div>
@@ -186,17 +194,17 @@
           </div>
 
           <!-- Studio Control Panel -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-            <button id="btn-start-blower" onclick="startAutoBlower()" class="px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2">
+            <button type="button" id="btn-start-blower" class="min-h-11 px-3 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
               Start Draw
             </button>
-            <button id="btn-stop-blower" onclick="stopAutoBlower()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm transition border border-slate-700 active:scale-95 text-center">
+            <button type="button" id="btn-stop-blower" class="min-h-11 px-3 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm transition border border-slate-700 active:scale-95 text-center">
               Stop / Pause
             </button>
-            <button id="btn-next-ball" onclick="drawNextHopperBall()" class="px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
+            <button type="button" id="btn-next-ball" class="min-h-11 px-3 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 text-center">
               Next Ball
             </button>
-            <button onclick="resetHopper()" class="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white font-semibold text-xs sm:text-sm transition border border-slate-800 active:scale-95 text-center">
+            <button type="button" id="btn-reset-hopper" class="min-h-11 px-3 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white font-semibold text-xs sm:text-sm transition border border-slate-800 active:scale-95 text-center">
               Reset Drum
             </button>
           </div>
@@ -212,7 +220,7 @@
           </div>
 
           <!-- Glass Sphere Chamber -->
-          <div class="relative w-[310px] h-[310px] sm:w-[360px] sm:h-[360px] rounded-full border-4 border-slate-600/80 bg-gradient-to-br from-slate-950/80 via-slate-900/60 to-slate-950/95 shadow-2xl flex items-center justify-center overflow-hidden backdrop-blur-sm">
+          <div class="relative w-full max-w-[280px] sm:max-w-[360px] aspect-square rounded-full border-4 border-slate-600/80 bg-gradient-to-br from-slate-950/80 via-slate-900/60 to-slate-950/95 shadow-2xl flex items-center justify-center overflow-hidden backdrop-blur-sm">
             
             <canvas id="hopper-canvas" width="360" height="360" class="w-full h-full rounded-full"></canvas>
             
@@ -251,13 +259,13 @@
           <p class="text-slate-400 text-xs sm:text-sm">Generate lines based on statistical frequencies and historical odd/even balances. <span class="text-amber-400/80">Does not guarantee a win.</span></p>
         </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <select id="gen-strategy" class="bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl px-3 py-2.5 outline-none">
+          <select id="gen-strategy" class="min-h-11 bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl px-3 py-2.5 outline-none">
             <option value="balanced">Harmonic Balance (3 Odd / 2 Even)</option>
-            <option value="hot">Hot Momentum (Weighted by Frequency)</option>
-            <option value="cold">Overdue Streak Bias</option>
+            <option value="hot">Recent Frequency</option>
+            <option value="cold">Longest Gap Bias</option>
             <option value="random">Pure Quick Pick</option>
           </select>
-          <button onclick="generateTickets(5)" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-md active:scale-95 text-center">
+          <button type="button" id="btn-generate" class="min-h-11 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-md active:scale-95 text-center">
             Generate 5 Lines
           </button>
         </div>
@@ -267,46 +275,49 @@
     </section>
 
     <!-- 3. SCRATCHER CARD -->
-    <section id="section-scratcher" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 backdrop-blur-sm space-y-5">
+    <section id="section-scratcher" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-4 sm:p-8 backdrop-blur-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            Mini-Game • Zero Real-Money Value
+            Free mini-game · No real-money value
           </div>
-          <h2 class="text-xl sm:text-3xl font-extrabold text-white mt-1">Scratch & Match Lucky Card</h2>
-          <p class="text-slate-400 text-xs sm:text-sm">Touch and rub your finger across the coating on your phone screen to scratch.</p>
+          <h2 class="text-xl sm:text-3xl font-extrabold text-white mt-1">Scratch Cards</h2>
+          <p class="text-slate-400 text-xs sm:text-sm">Rub the coating with a finger or mouse. About 1 in 4 cards wins virtual points only. Points cannot be cashed out.</p>
         </div>
-        <div class="flex items-center gap-2 self-start sm:self-center">
-          <button onclick="revealAllScratcher()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition border border-slate-700">
+        <div class="relative z-10 flex flex-wrap items-center gap-2 self-stretch sm:self-center">
+          <button type="button" id="btn-scratch-reveal" class="min-h-11 flex-1 sm:flex-none px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition border border-slate-700">
             Quick Reveal
           </button>
-          <button onclick="resetScratcher()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition">
+          <button type="button" id="btn-scratch-new" class="min-h-11 flex-1 sm:flex-none px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition">
             New Card
           </button>
         </div>
       </div>
 
-      <div class="max-w-md mx-auto relative bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 rounded-2xl p-5 border-2 border-amber-500/40 shadow-2xl min-h-[290px] flex flex-col justify-between overflow-hidden">
-        
+      <div id="scratch-theme-picker" class="flex flex-wrap gap-2" role="tablist" aria-label="Scratch card themes"></div>
+
+      <div id="scratch-card" class="max-w-md mx-auto relative rounded-2xl p-4 sm:p-5 border-2 shadow-2xl min-h-[320px] overflow-hidden touch-none bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 border-amber-500/40">
         <div id="scratch-underlayer" class="space-y-4 select-none">
           <div class="text-center border-b border-slate-800 pb-2.5">
-            <span class="text-[11px] font-bold text-amber-400 uppercase tracking-widest">Winning Numbers</span>
-            <div id="scratch-winning-nums" class="flex justify-center gap-3 mt-1.5"></div>
+            <span id="scratch-win-label" class="text-[11px] font-bold text-amber-400 uppercase tracking-widest">Winning Numbers</span>
+            <div id="scratch-winning-nums" class="flex flex-wrap justify-center gap-2 mt-1.5"></div>
           </div>
 
           <div>
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block text-center mb-2">Your Numbers & Virtual Points</span>
-            <div id="scratch-player-nums" class="grid grid-cols-3 gap-2.5 text-center"></div>
-          </div>
-          
-          <div id="scratch-result-banner" class="hidden text-center p-2 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs">
-            🎉 Match Found! You Won Virtual Score Points!
+            <span id="scratch-player-label" class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block text-center mb-2">Your Numbers</span>
+            <div id="scratch-player-nums" class="grid grid-cols-3 gap-2 text-center"></div>
           </div>
         </div>
 
         <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair rounded-2xl z-20 touch-none"></canvas>
+
+        <div id="scratch-result" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center text-center gap-3 p-5 bg-slate-950/95" aria-live="polite">
+          <p id="scratch-result-title" class="text-base sm:text-lg font-black text-white leading-snug"></p>
+          <p id="scratch-result-detail" class="text-xs text-slate-300 leading-relaxed max-w-xs"></p>
+          <button type="button" id="btn-scratch-again" class="min-h-11 px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">Try Again</button>
+        </div>
       </div>
-      <p class="text-center text-[11px] text-slate-500 italic">Simulated scratch card for recreational purposes only. Virtual tokens carry no monetary consideration.</p>
+      <p class="text-center text-[11px] text-slate-500 italic">Free entertainment only. Virtual points have no cash value and cannot be redeemed.</p>
     </section>
 
     <!-- 4. FREQUENCY HEATMAP & CHART -->
@@ -440,7 +451,8 @@
           <span class="font-bold text-slate-300">LotteryMigo.com</span>
           <span class="block text-[10px] text-slate-500">Independent Probability & Gaming Platform</span>
         </div>
-        <div class="flex flex-wrap gap-4 text-[11px]">
+        <div class="flex flex-wrap items-center gap-4 text-[11px]">
+          <span>Contact: <a href="mailto:info@lotterymigo.com" class="text-amber-400 hover:underline">info@lotterymigo.com</a></span>
           <button onclick="openModal('termsModal')" class="hover:text-amber-400">Terms of Use</button>
           <button onclick="openModal('privacyModal')" class="hover:text-amber-400">Privacy Policy</button>
         </div>
@@ -598,15 +610,16 @@
       currentGame = game;
       const isPB = game === 'POWERBALL';
 
-      document.getElementById('btn-toggle-pb').className = isPB 
-        ? 'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-rose-600 text-white shadow'
-        : 'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white';
+      const toggleBase = 'flex-1 sm:flex-none justify-center min-h-11 sm:min-h-0 px-3 sm:px-4 py-2 sm:py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5';
+      document.getElementById('btn-toggle-pb').className = isPB
+        ? toggleBase + ' bg-rose-600 text-white shadow'
+        : toggleBase + ' text-slate-400 hover:text-white';
 
       document.getElementById('btn-toggle-mm').className = !isPB
-        ? 'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 bg-blue-600 text-white shadow'
-        : 'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white';
+        ? toggleBase + ' bg-blue-600 text-white shadow'
+        : toggleBase + ' text-slate-400 hover:text-white';
 
-      document.getElementById('hero-title-game').innerText = isPB ? 'Powerball Probability' : 'Mega Millions Probability';
+      document.getElementById('hero-title-game').innerText = isPB ? 'Powerball' : 'Mega Millions';
       document.getElementById('hero-title-game').className = isPB ? 'text-rose-500' : 'text-blue-500';
       document.getElementById('history-special-header').innerText = isPB ? 'Powerball' : 'Mega Ball';
 
@@ -888,9 +901,9 @@
           let sum = line.whites.reduce((a,b)=>a+b, 0);
 
           lineDiv.innerHTML = `
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-slate-500 w-7">#0${i}</span>
-              <div class="flex items-center gap-1.5 sm:gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-xs font-bold text-slate-500 w-7 shrink-0">#0${i}</span>
+              <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 ${whiteBallsHtml}
                 <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ${specialClass} font-black flex items-center justify-center text-xs sm:text-sm">
                   ${line.special}
@@ -942,94 +955,325 @@
     }
 
     // --- 3. SCRATCHER CARD ---
+    const SCRATCH_WIN_ODDS = 0.25;
+    const SCRATCH_THEMES = [
+      {
+        id: 'numbers',
+        name: 'Lucky Numbers',
+        eyebrow: 'Winning Numbers',
+        playerLabel: 'Your Numbers',
+        coating: '#64748b',
+        ink: '#f8fafc',
+        cardClass: 'bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 border-amber-500/40',
+        accent: 'text-amber-400',
+        pool: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30'],
+        prizes: ['10 PTS', '25 PTS', '50 PTS', '100 PTS', '250 PTS', '500 PTS']
+      },
+      {
+        id: 'stars',
+        name: 'Starlight',
+        eyebrow: 'Lucky Stars',
+        playerLabel: 'Your Stars',
+        coating: '#312e81',
+        ink: '#e0e7ff',
+        cardClass: 'bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 border-indigo-400/40',
+        accent: 'text-indigo-300',
+        pool: ['★', '☆', '✦', '✧', '✴', '✵', '✶', '✷', '✸', '✹', '✺', '✻'],
+        prizes: ['5 PTS', '15 PTS', '40 PTS', '80 PTS', '200 PTS', '400 PTS']
+      },
+      {
+        id: 'gold',
+        name: 'Gold Rush',
+        eyebrow: 'Target Bars',
+        playerLabel: 'Your Bars',
+        coating: '#854d0e',
+        ink: '#fef3c7',
+        cardClass: 'bg-gradient-to-br from-slate-950 via-amber-950 to-yellow-950 border-amber-400/50',
+        accent: 'text-amber-300',
+        pool: ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3'],
+        prizes: ['20 PTS', '40 PTS', '75 PTS', '150 PTS', '300 PTS', '600 PTS']
+      },
+      {
+        id: 'clover',
+        name: 'Clover Patch',
+        eyebrow: 'Lucky Marks',
+        playerLabel: 'Your Patch',
+        coating: '#14532d',
+        ink: '#dcfce7',
+        cardClass: 'bg-gradient-to-br from-slate-950 via-emerald-950 to-green-950 border-emerald-400/40',
+        accent: 'text-emerald-300',
+        pool: ['♣', '♠', '♥', '♦', '☘', '✿', '❀', '❁', '🍀', '🌸', '🌼', '☀'],
+        prizes: ['8 PTS', '16 PTS', '32 PTS', '64 PTS', '128 PTS', '256 PTS']
+      },
+      {
+        id: 'gems',
+        name: 'Gem Match',
+        eyebrow: 'Target Gems',
+        playerLabel: 'Your Gems',
+        coating: '#9f1239',
+        ink: '#ffe4e6',
+        cardClass: 'bg-gradient-to-br from-slate-950 via-rose-950 to-pink-950 border-rose-400/40',
+        accent: 'text-rose-300',
+        pool: ['Ruby', 'Jade', 'Opal', 'Onyx', 'Pearl', 'Topaz', 'Amber', 'Garnet', 'Quartz', 'Agate', 'Coral', 'Flint'],
+        prizes: ['12 PTS', '24 PTS', '48 PTS', '96 PTS', '180 PTS', '360 PTS']
+      }
+    ];
+
     let scratchCanvas, sCtx;
     let isScratching = false;
+    let scratchListenersBound = false;
+    let scratchRevealed = false;
+    let scratchThemeIndex = 0;
+    let scratchOutcome = null;
+
+    function currentScratchTheme() {
+      return SCRATCH_THEMES[scratchThemeIndex] || SCRATCH_THEMES[0];
+    }
+
+    function pickDistinct(pool, count, blocked) {
+      const banned = new Set(blocked || []);
+      const choices = pool.filter(value => !banned.has(value));
+      const picked = [];
+      let guard = 0;
+      while (picked.length < count && choices.length && guard < 1000) {
+        guard++;
+        const value = choices[Math.floor(Math.random() * choices.length)];
+        if (!picked.includes(value)) picked.push(value);
+      }
+      return picked;
+    }
+
+    function renderThemePicker() {
+      const picker = document.getElementById('scratch-theme-picker');
+      if (!picker) return;
+      if (!picker.childElementCount) {
+        SCRATCH_THEMES.forEach((theme, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = theme.name;
+          button.setAttribute('role', 'tab');
+          bindPress(button, () => {
+            scratchThemeIndex = index;
+            resetScratcher();
+          });
+          picker.appendChild(button);
+        });
+      }
+      [...picker.children].forEach((button, index) => {
+        const active = index === scratchThemeIndex;
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        button.className = 'min-h-11 px-3 py-2 rounded-full border text-xs font-bold ' + (active
+          ? 'bg-amber-500 text-slate-950 border-amber-400'
+          : 'bg-slate-950 text-slate-300 border-slate-700');
+      });
+    }
+
+    function dealScratchCard() {
+      const theme = currentScratchTheme();
+      const won = Math.random() < SCRATCH_WIN_ODDS;
+      const winning = pickDistinct(theme.pool, 2);
+      const player = pickDistinct(theme.pool, 6, winning);
+      let prize = '';
+      if (won && player.length) {
+        const matchAt = Math.floor(Math.random() * player.length);
+        player[matchAt] = winning[Math.floor(Math.random() * winning.length)];
+        prize = theme.prizes[matchAt] || theme.prizes[0];
+      }
+      scratchOutcome = { won, prize, winning, player };
+      return scratchOutcome;
+    }
+
+    function paintScratchCard() {
+      const theme = currentScratchTheme();
+      const card = document.getElementById('scratch-card');
+      if (card) {
+        card.className = 'max-w-md mx-auto relative rounded-2xl p-4 sm:p-5 border-2 shadow-2xl min-h-[320px] overflow-hidden touch-none ' + theme.cardClass;
+      }
+      const winLabel = document.getElementById('scratch-win-label');
+      const playerLabel = document.getElementById('scratch-player-label');
+      if (winLabel) {
+        winLabel.textContent = theme.eyebrow;
+        winLabel.className = 'text-[11px] font-bold uppercase tracking-widest ' + theme.accent;
+      }
+      if (playerLabel) playerLabel.textContent = theme.playerLabel;
+
+      const outcome = scratchOutcome || dealScratchCard();
+      const winNums = document.getElementById('scratch-winning-nums');
+      if (winNums) {
+        winNums.innerHTML = outcome.winning.map(value =>
+          '<span class="min-w-8 h-8 px-2 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs ' + theme.accent + '">' + value + '</span>'
+        ).join('');
+      }
+      const grid = document.getElementById('scratch-player-nums');
+      if (grid) {
+        grid.innerHTML = outcome.player.map((value, index) =>
+          '<div class="bg-slate-950 p-2 rounded-xl border border-slate-800 min-w-0">' +
+            '<span class="text-sm font-black text-white block truncate">' + value + '</span>' +
+            '<span class="text-[9px] font-bold ' + theme.accent + '">' + theme.prizes[index] + '</span>' +
+          '</div>'
+        ).join('');
+      }
+    }
 
     function initScratchCard() {
       try {
         scratchCanvas = document.getElementById('scratch-canvas');
-        if (!scratchCanvas) return;
+        if (!scratchCanvas || scratchRevealed) return;
+        const rect = scratchCanvas.getBoundingClientRect();
+        if (rect.width < 20 || rect.height < 20) {
+          requestAnimationFrame(initScratchCard);
+          return;
+        }
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        scratchCanvas.width = Math.max(1, Math.round(rect.width * dpr));
+        scratchCanvas.height = Math.max(1, Math.round(rect.height * dpr));
         sCtx = scratchCanvas.getContext('2d');
-        
-        scratchCanvas.width = scratchCanvas.offsetWidth || 340;
-        scratchCanvas.height = scratchCanvas.offsetHeight || 290;
-
-        sCtx.fillStyle = '#64748b';
-        sCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-        sCtx.fillStyle = '#f8fafc';
-        sCtx.font = 'bold 13px sans-serif';
-        sCtx.textAlign = 'center';
-        sCtx.fillText('★ RUB HERE TO SCRATCH ★', scratchCanvas.width / 2, scratchCanvas.height / 2);
-
-        scratchCanvas.onmousedown = () => isScratching = true;
-        window.onmouseup = () => isScratching = false;
-        scratchCanvas.onmousemove = (e) => {
-          if (!isScratching) return;
-          const r = scratchCanvas.getBoundingClientRect();
-          erase(e.clientX - r.left, e.clientY - r.top);
-        };
-
-        scratchCanvas.ontouchstart = () => isScratching = true;
-        window.ontouchend = () => isScratching = false;
-        scratchCanvas.ontouchmove = (e) => {
-          if (!isScratching) return;
-          const r = scratchCanvas.getBoundingClientRect();
-          erase(e.touches[0].clientX - r.left, e.touches[0].clientY - r.top);
-        };
+        paintCoating();
+        ensureScratchListeners();
       } catch (err) {
-        console.error("Scratcher init error:", err);
+        console.error('Scratcher init error:', err);
       }
     }
 
-    function erase(x, y) {
-      if (!sCtx) return;
+    function paintCoating() {
+      if (!sCtx || !scratchCanvas) return;
+      const theme = currentScratchTheme();
+      const rect = scratchCanvas.getBoundingClientRect();
+      const scale = rect.width ? scratchCanvas.width / rect.width : 1;
+      sCtx.globalCompositeOperation = 'source-over';
+      sCtx.fillStyle = theme.coating;
+      sCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+      sCtx.fillStyle = theme.ink;
+      sCtx.textAlign = 'center';
+      sCtx.textBaseline = 'middle';
+      sCtx.font = 'bold ' + Math.round(11 * scale) + 'px sans-serif';
+      const coatingLabel = 'FREE GAME · NO CASH VALUE';
+      const labelWidth = sCtx.measureText(coatingLabel).width;
+      if (labelWidth > scratchCanvas.width * 0.88) {
+        sCtx.font = 'bold ' + Math.round(11 * scale * (scratchCanvas.width * 0.88 / labelWidth)) + 'px sans-serif';
+      }
+      sCtx.fillText(coatingLabel, scratchCanvas.width / 2, scratchCanvas.height / 2 - 14 * scale);
+      sCtx.font = 'bold ' + Math.round(13 * scale) + 'px sans-serif';
+      sCtx.fillText('RUB HERE TO SCRATCH', scratchCanvas.width / 2, scratchCanvas.height / 2 + 10 * scale);
+    }
+
+    function eraseAt(clientX, clientY) {
+      if (!sCtx || !scratchCanvas) return;
+      const rect = scratchCanvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = (clientX - rect.left) * (scratchCanvas.width / rect.width);
+      const y = (clientY - rect.top) * (scratchCanvas.height / rect.height);
+      const radius = 22 * (scratchCanvas.width / rect.width);
       sCtx.globalCompositeOperation = 'destination-out';
       sCtx.beginPath();
-      sCtx.arc(x, y, 18, 0, Math.PI * 2);
+      sCtx.arc(x, y, radius, 0, Math.PI * 2);
       sCtx.fill();
     }
 
+    function scratchedFraction() {
+      if (!sCtx || !scratchCanvas) return 0;
+      const data = sCtx.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height).data;
+      let clear = 0;
+      let samples = 0;
+      for (let i = 3; i < data.length; i += 32) {
+        samples++;
+        if (data[i] < 48) clear++;
+      }
+      return samples ? clear / samples : 0;
+    }
+
+    function ensureScratchListeners() {
+      if (scratchListenersBound || !scratchCanvas) return;
+      scratchListenersBound = true;
+
+      scratchCanvas.addEventListener('pointerdown', (event) => {
+        if (scratchRevealed) return;
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        isScratching = true;
+        try { scratchCanvas.setPointerCapture(event.pointerId); } catch (err) {}
+        event.preventDefault();
+        eraseAt(event.clientX, event.clientY);
+      }, { passive: false });
+
+      scratchCanvas.addEventListener('pointermove', (event) => {
+        if (!isScratching || scratchRevealed) return;
+        event.preventDefault();
+        eraseAt(event.clientX, event.clientY);
+      }, { passive: false });
+
+      const endPointer = () => {
+        if (!isScratching) return;
+        isScratching = false;
+        if (scratchedFraction() >= 0.5) finishScratch();
+      };
+      scratchCanvas.addEventListener('pointerup', endPointer);
+      scratchCanvas.addEventListener('pointercancel', () => { isScratching = false; });
+
+      scratchCanvas.addEventListener('touchstart', (event) => {
+        if (scratchRevealed) return;
+        event.preventDefault();
+        if (window.PointerEvent || !event.touches[0]) return;
+        isScratching = true;
+        eraseAt(event.touches[0].clientX, event.touches[0].clientY);
+      }, { passive: false });
+
+      scratchCanvas.addEventListener('touchmove', (event) => {
+        if (scratchRevealed) return;
+        event.preventDefault();
+        if (window.PointerEvent || !isScratching || !event.touches[0]) return;
+        eraseAt(event.touches[0].clientX, event.touches[0].clientY);
+      }, { passive: false });
+
+      scratchCanvas.addEventListener('touchend', () => {
+        if (window.PointerEvent) return;
+        if (!isScratching) return;
+        isScratching = false;
+        if (scratchedFraction() >= 0.5) finishScratch();
+      });
+    }
+
+    function finishScratch() {
+      if (scratchRevealed) return;
+      scratchRevealed = true;
+      isScratching = false;
+      if (sCtx && scratchCanvas) {
+        sCtx.globalCompositeOperation = 'source-over';
+        sCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+      }
+      if (scratchCanvas) scratchCanvas.style.pointerEvents = 'none';
+      const outcome = scratchOutcome || { won: false, prize: '' };
+      const title = document.getElementById('scratch-result-title');
+      const detail = document.getElementById('scratch-result-detail');
+      const result = document.getElementById('scratch-result');
+      if (outcome.won) {
+        if (title) title.textContent = 'You won ' + outcome.prize + ' in virtual points!';
+        if (detail) detail.textContent = 'Free game only. These points have no cash value and cannot be redeemed.';
+      } else {
+        if (title) title.textContent = "Sorry, you're not a winner. Try again!";
+        if (detail) detail.textContent = 'Most cards do not win. This is a free game with no real-money prizes.';
+      }
+      if (result) result.classList.remove('hidden');
+    }
+
     function revealAllScratcher() {
-      if (!sCtx) return;
-      sCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-      const banner = document.getElementById('scratch-result-banner');
-      if (banner) banner.classList.remove('hidden');
+      if (!scratchCanvas || !sCtx) initScratchCard();
+      finishScratch();
     }
 
     function resetScratcher() {
       try {
-        const w1 = Math.floor(Math.random() * 50) + 1;
-        const w2 = Math.floor(Math.random() * 50) + 1;
-
-        const winNums = document.getElementById('scratch-winning-nums');
-        if (winNums) {
-          winNums.innerHTML = `
-            <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs sm:text-sm text-amber-400">${w1}</span>
-            <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs sm:text-sm text-amber-400">${w2}</span>
-          `;
-        }
-
-        const pGrid = document.getElementById('scratch-player-nums');
-        if (pGrid) {
-          pGrid.innerHTML = '';
-          const prizes = ['10 PTS', '50 PTS', '250 PTS', '1,000 PTS', 'JACKPOT', 'FREE PLAY'];
-
-          for (let i = 0; i < 6; i++) {
-            const num = (i === 1) ? w1 : Math.floor(Math.random() * 50) + 1;
-            pGrid.innerHTML += `
-              <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
-                <span class="text-sm sm:text-base font-black text-white block">${num}</span>
-                <span class="text-[9px] font-bold text-amber-400">${prizes[i]}</span>
-              </div>
-            `;
-          }
-        }
-
-        const banner = document.getElementById('scratch-result-banner');
-        if (banner) banner.classList.add('hidden');
-        setTimeout(initScratchCard, 60);
+        scratchRevealed = false;
+        isScratching = false;
+        scratchOutcome = null;
+        renderThemePicker();
+        dealScratchCard();
+        paintScratchCard();
+        const result = document.getElementById('scratch-result');
+        if (result) result.classList.add('hidden');
+        if (scratchCanvas) scratchCanvas.style.pointerEvents = '';
+        requestAnimationFrame(initScratchCard);
       } catch (err) {
-        console.error("Scratcher reset error:", err);
+        console.error('Scratcher reset error:', err);
       }
     }
 
@@ -1198,9 +1442,53 @@
       if (m) m.classList.add('hidden');
     }
 
+    function bindPress(el, fn) {
+      if (!el) return;
+      let fromPointer = false;
+      el.addEventListener('pointerdown', (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        fromPointer = false;
+        el._pressX = event.clientX;
+        el._pressY = event.clientY;
+        try { el.setPointerCapture(event.pointerId); } catch (err) {}
+      });
+      el.addEventListener('pointerup', (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        const dx = Math.abs(event.clientX - (el._pressX ?? event.clientX));
+        const dy = Math.abs(event.clientY - (el._pressY ?? event.clientY));
+        if (dx > 18 || dy > 18) return;
+        fromPointer = true;
+        fn();
+      });
+      el.addEventListener('click', () => {
+        if (fromPointer) {
+          fromPointer = false;
+          return;
+        }
+        fn();
+      });
+      el.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        fn();
+      });
+    }
+
+    function bindMobileControls() {
+      bindPress(document.getElementById('btn-start-blower'), startAutoBlower);
+      bindPress(document.getElementById('btn-stop-blower'), stopAutoBlower);
+      bindPress(document.getElementById('btn-next-ball'), drawNextHopperBall);
+      bindPress(document.getElementById('btn-reset-hopper'), resetHopper);
+      bindPress(document.getElementById('btn-generate'), () => generateTickets(5));
+      bindPress(document.getElementById('btn-scratch-reveal'), revealAllScratcher);
+      bindPress(document.getElementById('btn-scratch-new'), resetScratcher);
+      bindPress(document.getElementById('btn-scratch-again'), resetScratcher);
+    }
+
     // --- INITIALIZATION ---
     window.addEventListener('DOMContentLoaded', () => {
       checkDismissedAlert();
+      bindMobileControls();
       generate10YearDataset();
       initHopperChamber();
       generateTickets(5);

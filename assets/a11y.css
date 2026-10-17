@@ -43,7 +43,8 @@ button,
 select,
 input[type="text"],
 input[type="search"],
-input[type="email"] {
+input[type="email"],
+input[type="date"] {
   min-height: 48px;
   max-width: 100%;
 }
@@ -250,6 +251,12 @@ html.lm-contrast .scratch-chip {
   background-image: none !important;
   color: #ffffff !important;
   border-color: #ffffff !important;
+}
+
+html.lm-contrast .bingo-cell.is-called {
+  background: #ffd000 !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
 }
 
 html.lm-contrast .scratch-card .kicker,

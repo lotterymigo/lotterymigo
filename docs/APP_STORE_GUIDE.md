@@ -197,6 +197,10 @@ Read these yourself before you apply for real ads or production store access. Po
 
 Lottery and gambling apps are restricted. Many of them need a license, a country allow-list, and a separate Google certification. An entertainment-only frequency app that does not sell tickets can still be rejected because it discusses gambling or includes a scratch game. **Test ad units do not mean Google has approved this app.** If the current policy says this app is not eligible, remove `@capacitor-community/admob`, the manifest meta-data, and the Info.plist ad keys, then submit without ads. Do not try to disguise the lottery subject to pass review.
 
+## 7b. Google sign-in in the app
+
+The website can use Firebase Google sign-in after the owner fills `assets/site-config.js`. That popup is not used inside this Capacitor shell. The account button explains that the app needs a native plugin. Follow `docs/FIREBASE_SETUP.md` before adding `@capacitor-firebase/authentication`, `google-services.json`, and `GoogleService-Info.plist`. Do not ship a prize based on the Firestore point totals. They are written by the phone and are not tamper-proof.
+
 ## 8. Icons, notifications, and offline limits
 
 - The launcher icon is already the LotteryMigo mark. The source is `icons/logo.svg`, and `icons/icon-1024.png` was copied into the iOS app icon and the Android mipmaps. Replace the splash screens and the Android notification small icon before you submit. Those are still the Capacitor defaults.

@@ -802,20 +802,99 @@ main.wrap {
   cursor: crosshair;
 }
 
-.scratch-result {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
+/* After a reveal the coating stays, but it turns see-through. */
+.scratch-card.is-revealed canvas {
+  opacity: 0.28;
+  transition: opacity 0.45s ease;
+}
+
+.bingo-head,
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.bingo-head span,
+.bingo-cell {
+  min-height: 2.6rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-5);
-  text-align: center;
-  background: rgba(7, 17, 13, 0.94);
-  color: #f8fafc;
+  font-weight: 800;
 }
+
+.bingo-cell {
+  border-radius: 0.45rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.bingo-cell.is-called {
+  background: rgba(245, 197, 66, 0.45);
+  border-color: #f5c542;
+  color: #1a1404;
+}
+
+.reel-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.reel {
+  min-height: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.scratch-result {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
+  text-align: center;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  border: 2px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--text);
+}
+
+.disclaimer {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  border: 2px solid var(--gold);
+  background: color-mix(in srgb, var(--gold) 16%, var(--surface));
+  font-weight: 700;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+}
+
+.pick-box { min-width: min(100%, 16rem); }
+
+#winner-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 700;
+}
+
+.board { display: grid; gap: var(--space-2); margin: 0; padding-left: 1.2rem; }
+.board-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.avatar { width: 40px; height: 40px; border-radius: 999px; object-fit: cover; }
 
 /* --- Heatmap, chart, and history table --- */
 .legend { display: flex; flex-wrap: wrap; gap: var(--space-3); }

@@ -26,6 +26,10 @@
 
 ---
 
+## Accounts
+
+Sign-in, the virtual-points board, and saved picks stay off until real Firebase keys replace the `YOUR_` placeholders in `assets/site-config.js`. The steps, Firestore rules, and the native app note are in [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md). The rest of the site works without an account.
+
 ## Native app shell
 
 `package.json` and `capacitor.config.json` wrap this site with Capacitor (`com.lotterymigo.app`). The app is **not store-ready**. See [docs/APP_STORE_GUIDE.md](docs/APP_STORE_GUIDE.md) for the manual account, signing, policy, and submission steps that are still required.

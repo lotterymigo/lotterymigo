@@ -1,0 +1,108 @@
+rules_version = '2';
+// LotteryMigo virtual points and saved picks.
+// Client scores are not tamper-proof. These rules only slow casual edits.
+// A Cloud Function would be required before any real prize. This app has no cash prizes.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function nameOk(value) {
+      return value is string && value.size() <= 40;
+    }
+    function photoOk(value) {
+      return value is string
+        && value.size() <= 500
+        && (value == '' || value.matches('^https://.+'));
+    }
+    function identityOk(data) {
+      return data.showOnBoard == true
+        || (data.publicName == '' && data.publicPhoto == '');
+    }
+    function whitesOk(list) {
+      return list[0] is int && list[1] is int && list[2] is int && list[3] is int && list[4] is int
+        && list[0] >= 1 && list[0] <= 70
+        && list[1] >= 1 && list[1] <= 70
+        && list[2] >= 1 && list[2] <= 70
+        && list[3] >= 1 && list[3] <= 70
+        && list[4] >= 1 && list[4] <= 70;
+    }
+    function pointsOk(value) {
+      return value is int && value >= 0 && value <= 1000000;
+    }
+    function stampOk(value) {
+      return value is int && value > 0 && value <= request.time.toMillis() + 120000;
+    }
+    function profileOk(data) {
+      return nameOk(data.publicName)
+        && photoOk(data.publicPhoto)
+        && data.showOnBoard is bool
+        && identityOk(data)
+        && pointsOk(data.points)
+        && stampOk(data.lastAwardAt);
+    }
+    function bumpOk() {
+      let delta = request.resource.data.points - resource.data.points;
+      return delta >= 0
+        && delta <= 800
+        && (
+          delta == 0
+          || request.resource.data.lastAwardAt > resource.data.lastAwardAt + 2000
+        );
+    }
+
+    match /users/{uid} {
+      allow read: if true;
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'points', 'showOnBoard', 'publicName', 'publicPhoto', 'lastAwardAt'])
+        && profileOk(request.resource.data)
+        && request.resource.data.points <= 800;
+      allow update: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'points', 'showOnBoard', 'publicName', 'publicPhoto', 'lastAwardAt'])
+        && profileOk(request.resource.data)
+        && bumpOk();
+      allow delete: if isOwner(uid);
+
+      match /picks/{pickId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.game in ['POWERBALL', 'MEGAMILLIONS']
+          && request.resource.data.whites is list
+          && request.resource.data.whites.size() == 5
+          && whitesOk(request.resource.data.whites)
+          && request.resource.data.special is int
+          && request.resource.data.special > 0
+          && request.resource.data.special <= 70
+          && request.resource.data.drawDate is string
+          && request.resource.data.drawDate.matches('^\\d{4}-\\d{2}-\\d{2}$')
+          && request.resource.data.bought is bool
+          && request.resource.data.keys().hasOnly(['game', 'whites', 'special', 'drawDate', 'bought']);
+      }
+    }
+
+    match /dailyScores/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'points', 'showOnBoard', 'publicName', 'publicPhoto', 'lastAwardAt', 'day'])
+        && id == request.resource.data.day + '_' + request.auth.uid
+        && request.resource.data.day.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && profileOk(request.resource.data)
+        && request.resource.data.points <= 800;
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'points', 'showOnBoard', 'publicName', 'publicPhoto', 'lastAwardAt', 'day'])
+        && id == request.resource.data.day + '_' + request.auth.uid
+        && request.resource.data.day == resource.data.day
+        && profileOk(request.resource.data)
+        && bumpOk();
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+  }
+}

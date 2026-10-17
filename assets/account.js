@@ -419,9 +419,43 @@ function redirectWouldHideTheError(err) {
   return code === "auth/unauthorized-domain" || code === "auth/operation-not-allowed" || code === "auth/network-request-failed";
 }
 
-function popupClosedImmediately(err, startedAt) {
-  if (!err || err.code !== "auth/popup-closed-by-user") return false;
-  return Date.now() - startedAt < 1500;
+/* Firebase reports auth/popup-closed-by-user a few seconds after the window is already gone.
+   Watch the window itself. A close in the first 1.5s is the automatic close, not a person giving up. */
+function watchPopupWindow() {
+  const nativeOpen = window.open.bind(window);
+  const openedAt = Date.now();
+  let closedImmediately = false;
+  window.open = function () {
+    const popup = nativeOpen.apply(window, arguments);
+    window.open = nativeOpen;
+    if (!popup) return popup;
+    const markIfClosed = () => {
+      let closed = true;
+      try {
+        closed = !!popup.closed;
+      } catch (err) {
+        closed = true;
+      }
+      if (!closed) return false;
+      closedImmediately = Date.now() - openedAt < 1500;
+      return true;
+    };
+    if (!markIfClosed()) {
+      const watch = window.setInterval(() => {
+        if (markIfClosed()) window.clearInterval(watch);
+      }, 40);
+      window.setTimeout(() => window.clearInterval(watch), 5000);
+    }
+    return popup;
+  };
+  return {
+    restore() {
+      window.open = nativeOpen;
+    },
+    closedImmediately() {
+      return closedImmediately;
+    }
+  };
 }
 
 function beginRedirect(provider) {
@@ -430,13 +464,13 @@ function beginRedirect(provider) {
   authTools.signInWithRedirect(auth, provider).catch((err) => showSignInError(err));
 }
 
-function onPopupFailure(err, provider, startedAt) {
+function onPopupFailure(err, provider, closedImmediately) {
   const code = err && err.code;
   if (redirectWouldHideTheError(err)) {
     showSignInError(err);
     return;
   }
-  if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment" || popupClosedImmediately(err, startedAt)) {
+  if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment" || (code === "auth/popup-closed-by-user" && closedImmediately)) {
     console.error("Google popup did not stay open. Falling back to redirect.", code || err);
     beginRedirect(provider);
     return;
@@ -496,9 +530,20 @@ function bind() {
         beginRedirect(provider);
         return;
       }
-      const startedAt = Date.now();
-      /* Must run in this click turn. An await before signInWithPopup lets the browser block the window. */
-      authTools.signInWithPopup(auth, provider).catch((err) => onPopupFailure(err, provider, startedAt));
+      const popupWatch = watchPopupWindow();
+      let popupPromise;
+      try {
+        /* Must run in this click turn. An await before signInWithPopup lets the browser block the window. */
+        popupPromise = authTools.signInWithPopup(auth, provider);
+      } catch (err) {
+        popupWatch.restore();
+        onPopupFailure(err, provider, popupWatch.closedImmediately());
+        return;
+      }
+      popupPromise.then(() => popupWatch.restore(), (err) => {
+        popupWatch.restore();
+        onPopupFailure(err, provider, popupWatch.closedImmediately());
+      });
     });
   }
   const signOutBtn = $("btn-sign-out");

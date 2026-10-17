@@ -166,6 +166,8 @@ These are Google’s demo ids (also documented by `@capacitor-community/admob`).
 
 The shell does not show an interstitial or a rewarded ad. Do not add one on the scratch result. The result’s **Try again** button must stay clear of ad taps. The banner is removed while `#scratch-result` is visible and the page padding is cleared so the button is not sitting under a native banner.
 
+The public website loads Google AdSense in the page head, and `ads.txt` lives at the site root. `npm run build:web` strips that AdSense script from the HTML copied into `www/` and does not copy `ads.txt`. The app keeps using AdMob only.
+
 ### Consent (UMP)
 
 Before `AdMob.initialize`, the shell calls `AdMob.requestConsentInfo()`. If a form is required, it calls `AdMob.showConsentForm()`. If `canRequestAds` is false, no banner is shown.

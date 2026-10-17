@@ -201,7 +201,7 @@ Lottery and gambling apps are restricted. Many of them need a license, a country
 
 ## 7b. Google sign-in in the app
 
-The website can use Firebase Google sign-in after the owner fills `assets/site-config.js`. That popup is not used inside this Capacitor shell. The account button explains that the app needs a native plugin. Follow `docs/FIREBASE_SETUP.md` before adding `@capacitor-firebase/authentication`, `google-services.json`, and `GoogleService-Info.plist`. Do not ship a prize based on the Firestore point totals. They are written by the phone and are not tamper-proof.
+The website Firebase web config is in `assets/site-config.js`. A desktop browser signs in with a popup. The Capacitor shell uses a full-page redirect instead, because a popup is not supported there. That redirect may not come back into the app. Follow `docs/FIREBASE_SETUP.md` before adding `@capacitor-firebase/authentication`, `google-services.json`, and `GoogleService-Info.plist` if you want sign-in that returns to the app. Do not ship a prize based on the Firestore point totals. They are written by the phone and are not tamper-proof.
 
 ## 8. Icons, notifications, and offline limits
 

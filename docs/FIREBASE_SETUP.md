@@ -1,29 +1,36 @@
 # Firebase, leaderboard, and tips
 
-The website stays usable with the placeholder values in `assets/site-config.js`. Sign-in, the boards, and account picks turn on only after you paste real keys. Do not invent keys. Virtual points are not cash, and a score saved from the browser is not tamper-proof.
+The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The page does not load Firebase Analytics, even though `measurementId` is in that file. Virtual points are not cash, and a score saved from the browser is not tamper-proof.
 
-## 1. Create the Firebase project
+The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. Leave `paypalTipUrl` as the PayPal placeholder until the tip section below. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
 
-1. Open [Firebase console](https://console.firebase.google.com/) and create a project. You can leave Google Analytics off.
-2. Add a **Web** app. The name can be LotteryMigo.
-3. Firebase shows a `firebaseConfig` object. Copy each value into `assets/site-config.js`, replacing the matching `YOUR_...` text:
-   - `apiKey`
-   - `authDomain`
-   - `projectId`
-   - `storageBucket`
-   - `messagingSenderId`
-   - `appId`
-4. Leave `paypalTipUrl` alone until the tip section below. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
+## Remaining manual steps
 
-The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file.
+Do these three things in the [Firebase console](https://console.firebase.google.com/) for project `lotterymigo` before sign-in and the boards work on the live site:
 
-## 2. Turn on Google sign-in
+1. Open **Build → Authentication → Settings → Authorized domains**. Add `lotterymigo.com` and `www.lotterymigo.com`. `localhost` is already there for local tests. Add any Vercel preview hostname you actually use.
+2. Open **Build → Firestore Database** and create a database. Start in **production mode**.
+3. Open the **Rules** tab and replace the editor contents with the full text of `firestore.rules` from this repository. Publish.
+
+Also confirm **Authentication → Sign-in method** has **Google** enabled. A desktop browser uses a popup. A phone, and the Capacitor app, use a full-page redirect because a popup is not reliable there. If the popup is blocked, the desktop page falls back to that same redirect. Sign-in fails on a domain that is not in the authorized list.
+
+## 1. Web config already in the repo
+
+`assets/site-config.js` already has:
+
+- `apiKey`
+- `authDomain` `lotterymigo.firebaseapp.com`
+- `projectId` `lotterymigo`
+- `storageBucket` `lotterymigo.firebasestorage.app`
+- `messagingSenderId`
+- `appId`
+- `measurementId` (not used; Analytics stays off)
+
+## 2. Google sign-in
 
 1. In the Firebase project, open **Build → Authentication → Sign-in method**.
-2. Enable **Google**. Choose a support email.
-3. Open **Authentication → Settings → Authorized domains**.
-4. Add `lotterymigo.com` and `www.lotterymigo.com`. `localhost` is already there for local tests. Add any Vercel preview hostname you actually use, such as `your-project.vercel.app`.
-5. Google sign-in from the page uses a popup. It will fail on a domain that is not in that list.
+2. Enable **Google** if it is not already on. Choose a support email.
+3. Authorized domains are the first remaining step above.
 
 ## 3. Create Firestore and publish the rules
 
@@ -72,7 +79,7 @@ You can also delete the user in **Authentication → Users** and delete their Fi
 
 ## 8. Native app (Capacitor)
 
-The website button uses `signInWithPopup`. That popup is not reliable inside the Android or iOS WebView. The page detects the Capacitor shell and does not open the popup. It tells the person to use the website or to add the native plugin.
+On a desktop browser the button uses `signInWithPopup`. On a phone, and inside the Capacitor shell, it uses `signInWithRedirect` because a popup is not supported. If a desktop popup is blocked, the page uses that redirect too. A redirect from inside the Android or iOS WebView may not return to the app. The native plugin below is still the reliable app sign-in.
 
 When you are ready to sign in from the app:
 

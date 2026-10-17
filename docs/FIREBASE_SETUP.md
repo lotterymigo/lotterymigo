@@ -12,7 +12,11 @@ Do these three things in the [Firebase console](https://console.firebase.google.
 2. Open **Build → Firestore Database** and create a database. Start in **production mode**.
 3. Open the **Rules** tab and replace the editor contents with the full text of `firestore.rules` from this repository. Publish.
 
-Also confirm **Authentication → Sign-in method** has **Google** enabled. A desktop browser uses a popup. A phone, and the Capacitor app, use a full-page redirect because a popup is not reliable there. If the popup is blocked, the desktop page falls back to that same redirect. Sign-in fails on a domain that is not in the authorized list.
+Also confirm **Authentication → Sign-in method** has **Google** enabled. A desktop browser uses a popup. A phone, and the Capacitor app, use a full-page redirect because a popup is not reliable there. If the popup is blocked, or the window itself closes in the first moment, the desktop page falls back to that same redirect. Firebase may report that close a few seconds later, so the page watches the window rather than the clock on the error. A domain that is not on the authorized list does not redirect: the page says “This website address isn't approved in Firebase yet.” The same sentence appears when a full-page sign-in returns with `auth/unauthorized-domain`.
+
+`vercel.json` sends `Cross-Origin-Opener-Policy: same-origin-allow-popups`. A stricter `same-origin` policy makes the browser report the Google window as closed immediately, which is the popup that vanishes as soon as you click. There is no Content-Security-Policy header: a strict policy would block the Firebase, Chart.js, font, and AdSense scripts this page loads. `authDomain` stays `lotterymigo.firebaseapp.com`.
+
+Every visit to the home page registers `onAuthStateChanged` and calls `getRedirectResult`, including the return from a full-page sign-in. The Firebase app, Auth, and Firestore scripts are the same `11.6.0` build, and they share one Auth object. Sign-in is stored with `browserLocalPersistence`, so a refresh keeps the session. The Account card shows the Google display name, the photo when Google provides an `https` address, and **Sign out**, and it hides **Sign in with Google**. That card is drawn before any Firestore call. If Firestore is not created yet, or the rules are not published, the person still looks signed in and the page says the leaderboard is not set up yet.
 
 ## 1. Web config already in the repo
 
@@ -79,7 +83,7 @@ You can also delete the user in **Authentication → Users** and delete their Fi
 
 ## 8. Native app (Capacitor)
 
-On a desktop browser the button uses `signInWithPopup`. On a phone, and inside the Capacitor shell, it uses `signInWithRedirect` because a popup is not supported. If a desktop popup is blocked, the page uses that redirect too. A redirect from inside the Android or iOS WebView may not return to the app. The native plugin below is still the reliable app sign-in.
+On a desktop browser the button uses `signInWithPopup` in the click itself, with no wait before that call. On a phone, and inside the Capacitor shell, it uses `signInWithRedirect` because a popup is not supported. If a desktop popup is blocked or closes immediately, the page uses that redirect too. If Firebase says the domain is not approved, Google is disabled, or the network failed, the page shows that reason and stays put. A redirect from inside the Android or iOS WebView may not return to the app. The native plugin below is still the reliable app sign-in.
 
 When you are ready to sign in from the app:
 

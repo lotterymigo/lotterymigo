@@ -75,6 +75,10 @@ let currentUser = null;
 let profile = { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, lastAwardAt: 0 };
 let authTools = null;
 let fsTools = null;
+let signInMessage = "";
+let boardSetupMessage = "";
+let appliedUid = "";
+const LEADERBOARD_NOT_READY = "The leaderboard is not set up yet. You are still signed in. Create Firestore and publish firestore.rules, then reload.";
 
 function $(id) {
   return document.getElementById(id);
@@ -121,14 +125,23 @@ function renderAccount() {
     signIn.textContent = configured ? "Sign in with Google" : "Sign in with Google is not set up yet";
   }
 
-  if (!configured) {
-    setText("account-status", "You can use every tool on this page without an account.");
-    setText("account-note", "Sign in with Google is not set up yet. The owner still needs to paste Firebase keys into assets/site-config.js. Scratch cards, the generator, history, and favorites on this device keep working.");
-    return;
-  }
+  const avatar = $("account-avatar");
   if (!signedIn) {
+    show("account-identity", false);
+    if (avatar) {
+      avatar.removeAttribute("src");
+      avatar.classList.add("hidden");
+    }
+    setText("account-name", "");
+    if (!configured) {
+      setText("account-status", "You can use every tool on this page without an account.");
+      setText("account-note", "Sign in with Google is not set up yet. The owner still needs to paste Firebase keys into assets/site-config.js. Scratch cards, the generator, history, and favorites on this device keep working.");
+      return;
+    }
     setText("account-status", native ? "You can use every tool in the app without an account." : "You are not signed in. The games still work.");
-    if (native) {
+    if (signInMessage) {
+      setText("account-note", signInMessage);
+    } else if (native) {
       setText("account-note", "Sign in with Google opens a full-page sign-in, because this app cannot use a popup. If Google does not come back to the app, use the website or the native plugin in docs/FIREBASE_SETUP.md. Your name and photo stay off the board unless you opt in.");
     } else if (prefersRedirect()) {
       setText("account-note", "On a phone, Sign in with Google opens a full-page sign-in. Your Google name and photo stay off the board unless you opt in.");
@@ -137,8 +150,26 @@ function renderAccount() {
     }
     return;
   }
-  setText("account-status", "Signed in" + (profile.showOnBoard && profile.publicName ? " as " + profile.publicName : "") + ".");
-  setText("account-note", "Virtual points on your account: " + (profile.points || 0).toLocaleString() + ". They cannot be cashed out. Uncheck the box to show “Anonymous player” instead of your name and photo.");
+  signInMessage = "";
+  const name = String(currentUser.displayName || "").trim() || "Google account";
+  setText("account-status", "Signed in as " + name + ".");
+  setText("account-name", name);
+  show("account-identity", true);
+  const photo = safePhoto(currentUser.photoURL);
+  if (avatar) {
+    if (photo) {
+      avatar.src = photo;
+      avatar.classList.remove("hidden");
+    } else {
+      avatar.removeAttribute("src");
+      avatar.classList.add("hidden");
+    }
+  }
+  if (boardSetupMessage) {
+    setText("account-note", boardSetupMessage);
+  } else {
+    setText("account-note", "Virtual points on your account: " + (profile.points || 0).toLocaleString() + ". They cannot be cashed out. Your name and photo stay off the leaderboard unless you opt in.");
+  }
 }
 
 function boardRow(entry) {
@@ -205,7 +236,7 @@ async function loadBoards() {
     renderBoards(dailySnap.docs.map((item) => item.data()), allSnap.docs.map((item) => item.data()), "");
   } catch (err) {
     console.warn("Leaderboard read failed.", err);
-    renderBoards([], [], "The board could not load. If Firebase asks for an index, open the link in the browser console and create it. The steps are in docs/FIREBASE_SETUP.md.");
+    renderBoards([], [], "The leaderboard is not set up yet. If Firebase asks for an index, open the link in the browser console and create it. The steps are in docs/FIREBASE_SETUP.md.");
   }
 }
 
@@ -377,30 +408,182 @@ async function deleteAccount() {
   }
 }
 
-function signInFailureNote() {
-  return "Google sign-in did not finish. Add lotterymigo.com and www.lotterymigo.com under Authentication authorized domains, and make sure Google is enabled as a sign-in method.";
+function explainSignInError(err) {
+  const code = err && err.code ? String(err.code) : "";
+  console.error("Google sign-in failed.", code || "(no code)", err);
+  if (code === "auth/unauthorized-domain") {
+    return "This website address isn't approved in Firebase yet. Add lotterymigo.com and www.lotterymigo.com under Authentication → Settings → Authorized domains.";
+  }
+  if (code === "auth/popup-closed-by-user") {
+    return "The Google sign-in window closed before it finished. Try again.";
+  }
+  if (code === "auth/cancelled-popup-request") {
+    return "A Google sign-in window is already open. Use that window, or close it and try again.";
+  }
+  if (code === "auth/popup-blocked") {
+    return "The browser blocked the Google sign-in window. Allow popups for this site, or use the full-page sign-in.";
+  }
+  if (code === "auth/operation-not-allowed") {
+    return "Google sign-in is turned off in Firebase. Enable Google under Authentication → Sign-in method.";
+  }
+  if (code === "auth/network-request-failed") {
+    return "The sign-in could not reach Google. Check the connection and try again.";
+  }
+  if (code === "auth/web-storage-unsupported") {
+    return "This browser is blocking saved sign-in. Allow cookies and site data for this website, then try again.";
+  }
+  if (code === "auth/user-disabled") {
+    return "This Google sign-in is disabled in Firebase. The owner can turn it back on under Authentication → Users.";
+  }
+  if (code === "auth/too-many-requests") {
+    return "Google paused sign-in for a moment because there were too many tries. Wait a little, then try again.";
+  }
+  if (code === "auth/operation-not-supported-in-this-environment") {
+    return "This browser cannot open a Google sign-in window. The page will use a full-page sign-in.";
+  }
+  return "Google sign-in did not finish (" + (code || "unknown error") + "). Add lotterymigo.com and www.lotterymigo.com under Authentication authorized domains, and make sure Google is enabled as a sign-in method.";
 }
 
-async function startGoogleSignIn() {
-  if (!firebaseReady() || !auth || !authTools) {
-    setText("account-note", "Sign-in is still loading. Try the button again in a moment.");
-    return;
-  }
-  const provider = new authTools.GoogleAuthProvider();
-  if (prefersRedirect()) {
-    await authTools.signInWithRedirect(auth, provider);
-    return;
-  }
-  try {
-    await authTools.signInWithPopup(auth, provider);
-  } catch (err) {
-    const code = err && err.code;
-    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") return;
-    if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
-      await authTools.signInWithRedirect(auth, provider);
-      return;
+function showSignInError(err) {
+  signInMessage = explainSignInError(err);
+  if (!currentUser) setText("account-note", signInMessage);
+}
+
+/* Redirect cannot succeed on an unapproved domain, a disabled provider, or a dead network. */
+function redirectWouldHideTheError(err) {
+  const code = err && err.code;
+  return code === "auth/unauthorized-domain" || code === "auth/operation-not-allowed" || code === "auth/network-request-failed";
+}
+
+/* Firebase reports auth/popup-closed-by-user a few seconds after the window is already gone.
+   Watch the window itself. A close in the first 1.5s is the automatic close, not a person giving up. */
+function watchPopupWindow() {
+  const nativeOpen = window.open.bind(window);
+  const openedAt = Date.now();
+  let closedImmediately = false;
+  window.open = function () {
+    const popup = nativeOpen.apply(window, arguments);
+    window.open = nativeOpen;
+    if (!popup) return popup;
+    const markIfClosed = () => {
+      let closed = true;
+      try {
+        closed = !!popup.closed;
+      } catch (err) {
+        closed = true;
+      }
+      if (!closed) return false;
+      closedImmediately = Date.now() - openedAt < 1500;
+      return true;
+    };
+    if (!markIfClosed()) {
+      const watch = window.setInterval(() => {
+        if (markIfClosed()) window.clearInterval(watch);
+      }, 40);
+      window.setTimeout(() => window.clearInterval(watch), 5000);
     }
-    throw err;
+    return popup;
+  };
+  return {
+    restore() {
+      window.open = nativeOpen;
+    },
+    closedImmediately() {
+      return closedImmediately;
+    }
+  };
+}
+
+function beginRedirect(provider) {
+  signInMessage = "The sign-in window did not stay open. Opening the full-page Google sign-in.";
+  setText("account-note", signInMessage);
+  authTools.signInWithRedirect(auth, provider).catch((err) => showSignInError(err));
+}
+
+function onPopupFailure(err, provider, closedImmediately) {
+  if (auth && auth.currentUser) {
+    applyAuthUser(auth.currentUser);
+    return;
+  }
+  const code = err && err.code;
+  if (redirectWouldHideTheError(err)) {
+    showSignInError(err);
+    return;
+  }
+  if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment" || (code === "auth/popup-closed-by-user" && closedImmediately)) {
+    console.error("Google popup did not stay open. Falling back to redirect.", code || err);
+    beginRedirect(provider);
+    return;
+  }
+  showSignInError(err);
+}
+
+function emptyProfile() {
+  return { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, lastAwardAt: 0 };
+}
+
+function withTimeout(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(Object.assign(new Error("The leaderboard storage did not answer."), { code: "deadline-exceeded" }));
+    }, ms);
+    Promise.resolve(promise).then((value) => {
+      clearTimeout(timer);
+      resolve(value);
+    }, (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+/* Paint the Google session before any Firestore call. A missing database must not hide Sign out. */
+function applyAuthUser(user) {
+  const next = user || null;
+  const uid = next ? next.uid : "";
+  const firstSight = uid !== appliedUid;
+  currentUser = next;
+  appliedUid = uid;
+  if (!next) {
+    boardSetupMessage = "";
+    profile = emptyProfile();
+    renderAccount();
+    loadPicks().catch((err) => console.warn(err));
+    return;
+  }
+  renderAccount();
+  if (firstSight) loadSignedInData(uid);
+}
+
+async function loadSignedInData(uid) {
+  try {
+    const snap = await withTimeout(fsTools.getDoc(fsTools.doc(db, "users", uid)), 8000);
+    if (appliedUid !== uid) return;
+    profile = emptyProfile();
+    if (snap.exists()) profile = Object.assign(profile, snap.data());
+    else {
+      profile.lastAwardAt = Date.now();
+      await withTimeout(
+        fsTools.setDoc(fsTools.doc(db, "users", uid), Object.assign({ points: 0 }, publicFields())),
+        8000
+      );
+    }
+    if (appliedUid !== uid) return;
+    boardSetupMessage = "";
+    renderAccount();
+    try {
+      await loadPicks();
+    } catch (err) {
+      console.error("Saved picks could not be loaded.", err);
+    }
+    await loadBoards();
+  } catch (err) {
+    if (appliedUid !== uid) return;
+    console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
+    boardSetupMessage = LEADERBOARD_NOT_READY;
+    renderAccount();
+    renderPicks([], "Saved picks need the leaderboard storage. Favorites on this device still work.");
+    renderBoards([], [], LEADERBOARD_NOT_READY);
   }
 }
 
@@ -410,45 +593,57 @@ async function connectFirebase() {
   const appMod = await import(base + "/firebase-app.js");
   authTools = await import(base + "/firebase-auth.js");
   fsTools = await import(base + "/firebase-firestore.js");
-  const app = appMod.initializeApp(firebaseConfig);
+  const app = appMod.getApps().length ? appMod.getApp() : appMod.initializeApp(firebaseConfig);
   auth = authTools.getAuth(app);
-  db = fsTools.getFirestore(app);
   try {
-    await authTools.getRedirectResult(auth);
+    await authTools.setPersistence(auth, authTools.browserLocalPersistence);
   } catch (err) {
-    console.warn("Google redirect sign-in did not finish.", err);
-    setText("account-note", signInFailureNote());
+    console.error("Google sign-in could not use saved browser storage.", err && err.code ? err.code : err, err);
   }
-  authTools.onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-    profile = { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, lastAwardAt: 0 };
-    try {
-      if (user) {
-        const snap = await fsTools.getDoc(fsTools.doc(db, "users", user.uid));
-        if (snap.exists()) profile = Object.assign(profile, snap.data());
-        else {
-          profile.lastAwardAt = Date.now();
-          await fsTools.setDoc(fsTools.doc(db, "users", user.uid), Object.assign({ points: 0 }, publicFields()));
-        }
-      }
-      renderAccount();
-      await loadPicks();
-      await loadBoards();
-    } catch (err) {
-      console.warn("The account record could not be loaded.", err);
-      renderAccount();
-      setText("account-note", "You are signed in, but scores and picks could not be loaded. Create Firestore and publish firestore.rules, then reload.");
-    }
+  db = fsTools.getFirestore(app);
+  authTools.onAuthStateChanged(auth, (user) => {
+    applyAuthUser(user);
+  }, (err) => {
+    showSignInError(err);
+  });
+  authTools.getRedirectResult(auth).then((result) => {
+    if (result && result.user) applyAuthUser(result.user);
+  }).catch((err) => {
+    showSignInError(err);
   });
 }
 
 function bind() {
   const signIn = $("btn-sign-in");
   if (signIn) {
-    signIn.addEventListener("click", () => {
-      startGoogleSignIn().catch((err) => {
-        console.warn("Google sign-in failed.", err);
-        setText("account-note", signInFailureNote());
+    signIn.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (!firebaseReady() || !auth || !authTools) {
+        signInMessage = "Sign-in is still loading. Try the button again in a moment.";
+        setText("account-note", signInMessage);
+        return;
+      }
+      const provider = new authTools.GoogleAuthProvider();
+      if (prefersRedirect()) {
+        beginRedirect(provider);
+        return;
+      }
+      const popupWatch = watchPopupWindow();
+      let popupPromise;
+      try {
+        /* Must run in this click turn. An await before signInWithPopup lets the browser block the window. */
+        popupPromise = authTools.signInWithPopup(auth, provider);
+      } catch (err) {
+        popupWatch.restore();
+        onPopupFailure(err, provider, popupWatch.closedImmediately());
+        return;
+      }
+      popupPromise.then((result) => {
+        popupWatch.restore();
+        if (result && result.user) applyAuthUser(result.user);
+      }, (err) => {
+        popupWatch.restore();
+        onPopupFailure(err, provider, popupWatch.closedImmediately());
       });
     });
   }
@@ -462,7 +657,11 @@ function bind() {
     setText("account-note", "The account could not be deleted. Email info@lotterymigo.com and we will remove the stored data.");
   }));
   const opt = $("account-opt-in");
-  if (opt) opt.addEventListener("change", () => saveProfile(opt.checked).catch((err) => console.warn(err)));
+  if (opt) opt.addEventListener("change", () => saveProfile(opt.checked).catch((err) => {
+    console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
+    boardSetupMessage = LEADERBOARD_NOT_READY;
+    renderAccount();
+  }));
   const picks = $("saved-picks-list");
   if (picks) {
     picks.addEventListener("click", (event) => {

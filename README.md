@@ -18,9 +18,9 @@
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** Semantic HTML5, Tailwind CSS (via CDN)
-- **Visuals & Charts:** Chart.js and HTML5 Canvas 2D physics. Text size, high contrast, and motion choices are stored in the browser.
-- **Icons:** Lucide Icons
+- **Frontend:** Semantic HTML and `assets/design.css` (CSS variables, Inter with a system-font fallback). Text size, high contrast, and motion choices are stored in the browser.
+- **Visuals & Charts:** Chart.js and HTML5 Canvas 2D physics.
+- **Brand icon:** `icons/logo.svg`, with favicon, Apple touch icon, and the Capacitor launcher images exported from the same mark.
 - **Deployment & Hosting:** Vercel / GitHub Continuous Deployment
 - **DNS / Domain:** GoDaddy (`lotterymigo.com`)
 

@@ -76,6 +76,9 @@ let profile = { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, 
 let authTools = null;
 let fsTools = null;
 let signInMessage = "";
+let boardSetupMessage = "";
+let appliedUid = "";
+const LEADERBOARD_NOT_READY = "The leaderboard is not set up yet. You are still signed in. Create Firestore and publish firestore.rules, then reload.";
 
 function $(id) {
   return document.getElementById(id);
@@ -122,12 +125,19 @@ function renderAccount() {
     signIn.textContent = configured ? "Sign in with Google" : "Sign in with Google is not set up yet";
   }
 
-  if (!configured) {
-    setText("account-status", "You can use every tool on this page without an account.");
-    setText("account-note", "Sign in with Google is not set up yet. The owner still needs to paste Firebase keys into assets/site-config.js. Scratch cards, the generator, history, and favorites on this device keep working.");
-    return;
-  }
+  const avatar = $("account-avatar");
   if (!signedIn) {
+    show("account-identity", false);
+    if (avatar) {
+      avatar.removeAttribute("src");
+      avatar.classList.add("hidden");
+    }
+    setText("account-name", "");
+    if (!configured) {
+      setText("account-status", "You can use every tool on this page without an account.");
+      setText("account-note", "Sign in with Google is not set up yet. The owner still needs to paste Firebase keys into assets/site-config.js. Scratch cards, the generator, history, and favorites on this device keep working.");
+      return;
+    }
     setText("account-status", native ? "You can use every tool in the app without an account." : "You are not signed in. The games still work.");
     if (signInMessage) {
       setText("account-note", signInMessage);
@@ -141,8 +151,25 @@ function renderAccount() {
     return;
   }
   signInMessage = "";
-  setText("account-status", "Signed in" + (profile.showOnBoard && profile.publicName ? " as " + profile.publicName : "") + ".");
-  setText("account-note", "Virtual points on your account: " + (profile.points || 0).toLocaleString() + ". They cannot be cashed out. Uncheck the box to show “Anonymous player” instead of your name and photo.");
+  const name = String(currentUser.displayName || "").trim() || "Google account";
+  setText("account-status", "Signed in as " + name + ".");
+  setText("account-name", name);
+  show("account-identity", true);
+  const photo = safePhoto(currentUser.photoURL);
+  if (avatar) {
+    if (photo) {
+      avatar.src = photo;
+      avatar.classList.remove("hidden");
+    } else {
+      avatar.removeAttribute("src");
+      avatar.classList.add("hidden");
+    }
+  }
+  if (boardSetupMessage) {
+    setText("account-note", boardSetupMessage);
+  } else {
+    setText("account-note", "Virtual points on your account: " + (profile.points || 0).toLocaleString() + ". They cannot be cashed out. Your name and photo stay off the leaderboard unless you opt in.");
+  }
 }
 
 function boardRow(entry) {
@@ -209,7 +236,7 @@ async function loadBoards() {
     renderBoards(dailySnap.docs.map((item) => item.data()), allSnap.docs.map((item) => item.data()), "");
   } catch (err) {
     console.warn("Leaderboard read failed.", err);
-    renderBoards([], [], "The board could not load. If Firebase asks for an index, open the link in the browser console and create it. The steps are in docs/FIREBASE_SETUP.md.");
+    renderBoards([], [], "The leaderboard is not set up yet. If Firebase asks for an index, open the link in the browser console and create it. The steps are in docs/FIREBASE_SETUP.md.");
   }
 }
 
@@ -402,6 +429,15 @@ function explainSignInError(err) {
   if (code === "auth/network-request-failed") {
     return "The sign-in could not reach Google. Check the connection and try again.";
   }
+  if (code === "auth/web-storage-unsupported") {
+    return "This browser is blocking saved sign-in. Allow cookies and site data for this website, then try again.";
+  }
+  if (code === "auth/user-disabled") {
+    return "This Google sign-in is disabled in Firebase. The owner can turn it back on under Authentication → Users.";
+  }
+  if (code === "auth/too-many-requests") {
+    return "Google paused sign-in for a moment because there were too many tries. Wait a little, then try again.";
+  }
   if (code === "auth/operation-not-supported-in-this-environment") {
     return "This browser cannot open a Google sign-in window. The page will use a full-page sign-in.";
   }
@@ -410,7 +446,7 @@ function explainSignInError(err) {
 
 function showSignInError(err) {
   signInMessage = explainSignInError(err);
-  setText("account-note", signInMessage);
+  if (!currentUser) setText("account-note", signInMessage);
 }
 
 /* Redirect cannot succeed on an unapproved domain, a disabled provider, or a dead network. */
@@ -465,6 +501,10 @@ function beginRedirect(provider) {
 }
 
 function onPopupFailure(err, provider, closedImmediately) {
+  if (auth && auth.currentUser) {
+    applyAuthUser(auth.currentUser);
+    return;
+  }
   const code = err && err.code;
   if (redirectWouldHideTheError(err)) {
     showSignInError(err);
@@ -478,40 +518,98 @@ function onPopupFailure(err, provider, closedImmediately) {
   showSignInError(err);
 }
 
+function emptyProfile() {
+  return { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, lastAwardAt: 0 };
+}
+
+function withTimeout(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(Object.assign(new Error("The leaderboard storage did not answer."), { code: "deadline-exceeded" }));
+    }, ms);
+    Promise.resolve(promise).then((value) => {
+      clearTimeout(timer);
+      resolve(value);
+    }, (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+/* Paint the Google session before any Firestore call. A missing database must not hide Sign out. */
+function applyAuthUser(user) {
+  const next = user || null;
+  const uid = next ? next.uid : "";
+  const firstSight = uid !== appliedUid;
+  currentUser = next;
+  appliedUid = uid;
+  if (!next) {
+    boardSetupMessage = "";
+    profile = emptyProfile();
+    renderAccount();
+    loadPicks().catch((err) => console.warn(err));
+    return;
+  }
+  renderAccount();
+  if (firstSight) loadSignedInData(uid);
+}
+
+async function loadSignedInData(uid) {
+  try {
+    const snap = await withTimeout(fsTools.getDoc(fsTools.doc(db, "users", uid)), 8000);
+    if (appliedUid !== uid) return;
+    profile = emptyProfile();
+    if (snap.exists()) profile = Object.assign(profile, snap.data());
+    else {
+      profile.lastAwardAt = Date.now();
+      await withTimeout(
+        fsTools.setDoc(fsTools.doc(db, "users", uid), Object.assign({ points: 0 }, publicFields())),
+        8000
+      );
+    }
+    if (appliedUid !== uid) return;
+    boardSetupMessage = "";
+    renderAccount();
+    try {
+      await loadPicks();
+    } catch (err) {
+      console.error("Saved picks could not be loaded.", err);
+    }
+    await loadBoards();
+  } catch (err) {
+    if (appliedUid !== uid) return;
+    console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
+    boardSetupMessage = LEADERBOARD_NOT_READY;
+    renderAccount();
+    renderPicks([], "Saved picks need the leaderboard storage. Favorites on this device still work.");
+    renderBoards([], [], LEADERBOARD_NOT_READY);
+  }
+}
+
 async function connectFirebase() {
   if (!firebaseReady()) return;
   const base = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
   const appMod = await import(base + "/firebase-app.js");
   authTools = await import(base + "/firebase-auth.js");
   fsTools = await import(base + "/firebase-firestore.js");
-  const app = appMod.initializeApp(firebaseConfig);
+  const app = appMod.getApps().length ? appMod.getApp() : appMod.initializeApp(firebaseConfig);
   auth = authTools.getAuth(app);
-  db = fsTools.getFirestore(app);
   try {
-    await authTools.getRedirectResult(auth);
+    await authTools.setPersistence(auth, authTools.browserLocalPersistence);
   } catch (err) {
-    showSignInError(err);
+    console.error("Google sign-in could not use saved browser storage.", err && err.code ? err.code : err, err);
   }
-  authTools.onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-    profile = { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, lastAwardAt: 0 };
-    try {
-      if (user) {
-        const snap = await fsTools.getDoc(fsTools.doc(db, "users", user.uid));
-        if (snap.exists()) profile = Object.assign(profile, snap.data());
-        else {
-          profile.lastAwardAt = Date.now();
-          await fsTools.setDoc(fsTools.doc(db, "users", user.uid), Object.assign({ points: 0 }, publicFields()));
-        }
-      }
-      renderAccount();
-      await loadPicks();
-      await loadBoards();
-    } catch (err) {
-      console.warn("The account record could not be loaded.", err);
-      renderAccount();
-      setText("account-note", "You are signed in, but scores and picks could not be loaded. Create Firestore and publish firestore.rules, then reload.");
-    }
+  db = fsTools.getFirestore(app);
+  authTools.onAuthStateChanged(auth, (user) => {
+    applyAuthUser(user);
+  }, (err) => {
+    showSignInError(err);
+  });
+  authTools.getRedirectResult(auth).then((result) => {
+    if (result && result.user) applyAuthUser(result.user);
+  }).catch((err) => {
+    showSignInError(err);
   });
 }
 
@@ -540,7 +638,10 @@ function bind() {
         onPopupFailure(err, provider, popupWatch.closedImmediately());
         return;
       }
-      popupPromise.then(() => popupWatch.restore(), (err) => {
+      popupPromise.then((result) => {
+        popupWatch.restore();
+        if (result && result.user) applyAuthUser(result.user);
+      }, (err) => {
         popupWatch.restore();
         onPopupFailure(err, provider, popupWatch.closedImmediately());
       });
@@ -556,7 +657,11 @@ function bind() {
     setText("account-note", "The account could not be deleted. Email info@lotterymigo.com and we will remove the stored data.");
   }));
   const opt = $("account-opt-in");
-  if (opt) opt.addEventListener("change", () => saveProfile(opt.checked).catch((err) => console.warn(err)));
+  if (opt) opt.addEventListener("change", () => saveProfile(opt.checked).catch((err) => {
+    console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
+    boardSetupMessage = LEADERBOARD_NOT_READY;
+    renderAccount();
+  }));
   const picks = $("saved-picks-list");
   if (picks) {
     picks.addEventListener("click", (event) => {

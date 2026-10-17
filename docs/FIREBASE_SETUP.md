@@ -16,6 +16,8 @@ Also confirm **Authentication → Sign-in method** has **Google** enabled. A des
 
 `vercel.json` sends `Cross-Origin-Opener-Policy: same-origin-allow-popups`. A stricter `same-origin` policy makes the browser report the Google window as closed immediately, which is the popup that vanishes as soon as you click. There is no Content-Security-Policy header: a strict policy would block the Firebase, Chart.js, font, and AdSense scripts this page loads. `authDomain` stays `lotterymigo.firebaseapp.com`.
 
+Every visit to the home page registers `onAuthStateChanged` and calls `getRedirectResult`, including the return from a full-page sign-in. The Firebase app, Auth, and Firestore scripts are the same `11.6.0` build, and they share one Auth object. Sign-in is stored with `browserLocalPersistence`, so a refresh keeps the session. The Account card shows the Google display name, the photo when Google provides an `https` address, and **Sign out**, and it hides **Sign in with Google**. That card is drawn before any Firestore call. If Firestore is not created yet, or the rules are not published, the person still looks signed in and the page says the leaderboard is not set up yet.
+
 ## 1. Web config already in the repo
 
 `assets/site-config.js` already has:

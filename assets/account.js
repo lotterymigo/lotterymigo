@@ -51,6 +51,16 @@ function isNativeApp() {
   return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 }
 
+/* A desktop browser can use a popup. Phones and the Capacitor shell cannot. */
+function prefersRedirect() {
+  if (isNativeApp()) return true;
+  try {
+    return window.matchMedia("(pointer: coarse)").matches;
+  } catch (err) {
+    return false;
+  }
+}
+
 function escapeHtml(value) {
   return String(value == null ? "" : value)
     .replace(/&/g, "&amp;")
@@ -95,7 +105,7 @@ function renderTip() {
 function renderAccount() {
   const configured = firebaseReady();
   const native = isNativeApp();
-  const signedIn = !!(currentUser && configured && !native);
+  const signedIn = !!(currentUser && configured);
   setText("account-points", "Virtual points on this device: " + readLocalPoints().toLocaleString() + ". These points have no cash value.");
   show("btn-sign-out", signedIn);
   show("btn-delete-account", signedIn);
@@ -106,11 +116,9 @@ function renderAccount() {
 
   const signIn = $("btn-sign-in");
   if (signIn) {
-    signIn.disabled = !configured || native || signedIn;
+    signIn.disabled = !configured || signedIn;
     signIn.classList.toggle("hidden", signedIn);
-    if (!configured) signIn.textContent = "Sign in with Google is not set up yet";
-    else if (native) signIn.textContent = "App sign-in needs the native plugin";
-    else signIn.textContent = "Sign in with Google";
+    signIn.textContent = configured ? "Sign in with Google" : "Sign in with Google is not set up yet";
   }
 
   if (!configured) {
@@ -118,14 +126,15 @@ function renderAccount() {
     setText("account-note", "Sign in with Google is not set up yet. The owner still needs to paste Firebase keys into assets/site-config.js. Scratch cards, the generator, history, and favorites on this device keep working.");
     return;
   }
-  if (native) {
-    setText("account-status", "You can use every tool in the app without an account.");
-    setText("account-note", "Google sign-in inside the Android or iOS app needs the native plugin in docs/FIREBASE_SETUP.md. A normal browser can use the website sign-in after the keys are in place. Nothing here is a cash prize.");
-    return;
-  }
   if (!signedIn) {
-    setText("account-status", "You are not signed in. The games still work.");
-    setText("account-note", "Sign in to put virtual points on the board and to save picks with a draw date. Your Google name and photo stay off the board unless you opt in.");
+    setText("account-status", native ? "You can use every tool in the app without an account." : "You are not signed in. The games still work.");
+    if (native) {
+      setText("account-note", "Sign in with Google opens a full-page sign-in, because this app cannot use a popup. If Google does not come back to the app, use the website or the native plugin in docs/FIREBASE_SETUP.md. Your name and photo stay off the board unless you opt in.");
+    } else if (prefersRedirect()) {
+      setText("account-note", "On a phone, Sign in with Google opens a full-page sign-in. Your Google name and photo stay off the board unless you opt in.");
+    } else {
+      setText("account-note", "Sign in to put virtual points on the board and to save picks with a draw date. Your Google name and photo stay off the board unless you opt in.");
+    }
     return;
   }
   setText("account-status", "Signed in" + (profile.showOnBoard && profile.publicName ? " as " + profile.publicName : "") + ".");
@@ -240,9 +249,7 @@ async function loadPicks(message) {
   if (!currentUser || !db || !fsTools) {
     const note = !firebaseReady()
       ? "Saving picks to an account needs Firebase. Favorite numbers on this device still work, and they do not guarantee a win."
-      : isNativeApp()
-        ? "Account picks need website sign-in or the native plugin in the setup guide. Favorites on this device still work."
-        : "Sign in to save a pick with a draw date. Favorites on this device still work without an account.";
+      : "Sign in to save a pick with a draw date. Favorites on this device still work without an account.";
     renderPicks([], message || note);
     return;
   }
@@ -291,7 +298,7 @@ async function awardPoints(amount) {
   if (!add) return;
   writeLocalPoints(readLocalPoints() + add);
   renderAccount();
-  if (!currentUser || !db || !fsTools || isNativeApp()) return;
+  if (!currentUser || !db || !fsTools) return;
   const day = easternDay();
   const userRef = fsTools.doc(db, "users", currentUser.uid);
   const dailyRef = fsTools.doc(db, "dailyScores", day + "_" + currentUser.uid);
@@ -321,8 +328,8 @@ async function savePick(pick) {
     await loadPicks("Saving picks to an account needs Firebase. The sign-in button explains that it is not configured yet.");
     return;
   }
-  if (isNativeApp() || !currentUser || !db || !fsTools) {
-    await loadPicks("Sign in on the website to save this pick. The line is not stored in an account yet.");
+  if (!currentUser || !db || !fsTools) {
+    await loadPicks("Sign in with Google to save this pick. The line is not stored in an account yet.");
     return;
   }
   if (!pick || !/^\d{4}-\d{2}-\d{2}$/.test(pick.drawDate || "")) {
@@ -370,8 +377,35 @@ async function deleteAccount() {
   }
 }
 
+function signInFailureNote() {
+  return "Google sign-in did not finish. Add lotterymigo.com and www.lotterymigo.com under Authentication authorized domains, and make sure Google is enabled as a sign-in method.";
+}
+
+async function startGoogleSignIn() {
+  if (!firebaseReady() || !auth || !authTools) {
+    setText("account-note", "Sign-in is still loading. Try the button again in a moment.");
+    return;
+  }
+  const provider = new authTools.GoogleAuthProvider();
+  if (prefersRedirect()) {
+    await authTools.signInWithRedirect(auth, provider);
+    return;
+  }
+  try {
+    await authTools.signInWithPopup(auth, provider);
+  } catch (err) {
+    const code = err && err.code;
+    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") return;
+    if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
+      await authTools.signInWithRedirect(auth, provider);
+      return;
+    }
+    throw err;
+  }
+}
+
 async function connectFirebase() {
-  if (!firebaseReady() || isNativeApp()) return;
+  if (!firebaseReady()) return;
   const base = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
   const appMod = await import(base + "/firebase-app.js");
   authTools = await import(base + "/firebase-auth.js");
@@ -379,35 +413,43 @@ async function connectFirebase() {
   const app = appMod.initializeApp(firebaseConfig);
   auth = authTools.getAuth(app);
   db = fsTools.getFirestore(app);
+  try {
+    await authTools.getRedirectResult(auth);
+  } catch (err) {
+    console.warn("Google redirect sign-in did not finish.", err);
+    setText("account-note", signInFailureNote());
+  }
   authTools.onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     profile = { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, lastAwardAt: 0 };
-    if (user) {
-      const snap = await fsTools.getDoc(fsTools.doc(db, "users", user.uid));
-      if (snap.exists()) profile = Object.assign(profile, snap.data());
-      else {
-        profile.lastAwardAt = Date.now();
-        await fsTools.setDoc(fsTools.doc(db, "users", user.uid), Object.assign({ points: 0 }, publicFields()));
+    try {
+      if (user) {
+        const snap = await fsTools.getDoc(fsTools.doc(db, "users", user.uid));
+        if (snap.exists()) profile = Object.assign(profile, snap.data());
+        else {
+          profile.lastAwardAt = Date.now();
+          await fsTools.setDoc(fsTools.doc(db, "users", user.uid), Object.assign({ points: 0 }, publicFields()));
+        }
       }
+      renderAccount();
+      await loadPicks();
+      await loadBoards();
+    } catch (err) {
+      console.warn("The account record could not be loaded.", err);
+      renderAccount();
+      setText("account-note", "You are signed in, but scores and picks could not be loaded. Create Firestore and publish firestore.rules, then reload.");
     }
-    renderAccount();
-    await loadPicks();
-    await loadBoards();
   });
 }
 
 function bind() {
   const signIn = $("btn-sign-in");
   if (signIn) {
-    signIn.addEventListener("click", async () => {
-      if (!firebaseReady() || isNativeApp() || !auth || !authTools) return;
-      const provider = new authTools.GoogleAuthProvider();
-      try {
-        await authTools.signInWithPopup(auth, provider);
-      } catch (err) {
+    signIn.addEventListener("click", () => {
+      startGoogleSignIn().catch((err) => {
         console.warn("Google sign-in failed.", err);
-        setText("account-note", "Google sign-in did not finish. Check that this domain is authorized in Firebase and that Google is enabled as a sign-in method.");
-      }
+        setText("account-note", signInFailureNote());
+      });
     });
   }
   const signOutBtn = $("btn-sign-out");

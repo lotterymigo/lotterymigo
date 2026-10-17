@@ -28,7 +28,7 @@
 
 ## Accounts
 
-Sign-in, the virtual-points board, and saved picks stay off until real Firebase keys replace the `YOUR_` placeholders in `assets/site-config.js`. The steps, Firestore rules, and the native app note are in [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md). The rest of the site works without an account.
+The Firebase web config for project `lotterymigo` is in `assets/site-config.js`. Sign-in and the boards still need the authorized domains, a Firestore database, and the published rules in [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md). The rest of the site works without an account. Analytics is not loaded.
 
 ## Native app shell
 

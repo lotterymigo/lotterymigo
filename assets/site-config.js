@@ -1,21 +1,21 @@
 /* ============================================================
    LotteryMigo site config — the only place for these keys
    ------------------------------------------------------------
-   Replace each YOUR_... value with the real one from your
-   Firebase and PayPal accounts. Do not invent keys.
-   Leave the YOUR_ text in place until you have the real value.
-   The site keeps working, and the sign-in button says the
-   account tools are not connected yet.
-   Setup steps: docs/FIREBASE_SETUP.md
+   The Firebase block is the public web config for project
+   lotterymigo. measurementId is listed so it matches the
+   Firebase console. This site does not load Firebase Analytics.
+   The PayPal link stays a placeholder until you replace it.
+   Setup that is still manual: docs/FIREBASE_SETUP.md
    ============================================================ */
 window.LOTTERYMIGO_CONFIG = {
   firebase: {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCDN-fah5nGUr-GDoOMzrcVuoUst4-W_A0",
+    authDomain: "lotterymigo.firebaseapp.com",
+    projectId: "lotterymigo",
+    storageBucket: "lotterymigo.firebasestorage.app",
+    messagingSenderId: "349957688958",
+    appId: "1:349957688958:web:0b4e7d2c93691f9cac922f",
+    measurementId: "G-YN21YZ62BC"
   },
   /* Voluntary tip. Not a payment for points, tickets, or wins. */
   paypalTipUrl: "https://paypal.me/YOUR_PAYPAL_NAME",

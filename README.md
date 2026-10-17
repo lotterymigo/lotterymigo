@@ -18,13 +18,19 @@
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** Semantic HTML5, Tailwind CSS (via CDN)
-- **Visuals & Charts:** Chart.js and HTML5 Canvas 2D physics. Text size, high contrast, and motion choices are stored in the browser.
-- **Icons:** Lucide Icons
+- **Frontend:** Semantic HTML and `assets/design.css` (CSS variables, Inter with a system-font fallback). Text size, high contrast, and motion choices are stored in the browser.
+- **Visuals & Charts:** Chart.js and HTML5 Canvas 2D physics.
+- **Brand icon:** `icons/logo.svg`, with favicon, Apple touch icon, and the Capacitor launcher images exported from the same mark.
 - **Deployment & Hosting:** Vercel / GitHub Continuous Deployment
 - **DNS / Domain:** GoDaddy (`lotterymigo.com`)
 
 ---
+
+## Native app shell
+
+`package.json` and `capacitor.config.json` wrap this site with Capacitor (`com.lotterymigo.app`). The app is **not store-ready**. See [docs/APP_STORE_GUIDE.md](docs/APP_STORE_GUIDE.md) for the manual account, signing, policy, and submission steps that are still required.
+
+`npm run build:web` copies the pages, `assets/`, and `data/draws.json` into `www/` so the app can open the draw list without a network. On a phone it still tries the hosted file and keeps the newer copy.
 
 ## 💻 Running Locally on Windows
 

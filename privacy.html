@@ -4,56 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="LotteryMigo privacy policy, including browser storage and a disclosure for possible future advertising cookies." />
+  <meta name="theme-color" content="#0B7A4B" />
   <link rel="canonical" href="https://lotterymigo.com/privacy.html" />
   <title>Privacy Policy | LotteryMigo</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="icons/favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/design.css" />
   <link rel="stylesheet" href="assets/a11y.css" />
   <script src="assets/a11y.js"></script>
-  <style>a, button { touch-action: manipulation; }</style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
-  <div class="bg-amber-500/10 border-b border-amber-500/20 py-2 px-3 text-[11px] sm:text-xs font-medium text-center text-amber-300">
-    <span class="inline-flex items-center font-bold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded text-[10px] mr-1">18+ / 21+</span>
-    Entertainment only. No real-money gambling. Problem gambling help: <strong>1-800-GAMBLER</strong>
+<body class="page page-narrow">
+  <div class="compliance">
+    <span class="pill">18+ / 21+</span>
+    <span>Entertainment only. No real-money gambling. Problem gambling help: <a href="tel:18004262537">1-800-GAMBLER</a></span>
   </div>
-  <header class="border-b border-slate-800 bg-slate-900/95">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
-      <a href="index.html" class="flex items-center gap-2.5 min-h-11">
-        <span class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center font-black text-white">LM</span>
-        <span class="font-extrabold text-lg">LotteryMigo</span>
+  <header class="site-header">
+    <div class="wrap header-bar">
+      <a class="brand" href="index.html">
+        <img src="icons/logo.svg" width="44" height="44" alt="" />
+        <span class="brand-name">LotteryMigo</span>
       </a>
-      <nav class="flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-slate-300">
-        <a href="index.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Home</a>
-        <a href="about.html" class="inline-flex items-center min-h-11 hover:text-amber-400">About</a>
-        <a href="privacy.html" class="inline-flex items-center min-h-11 text-amber-400" aria-current="page">Privacy</a>
-        <a href="terms.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Terms</a>
-        <a href="contact.html" class="inline-flex items-center min-h-11 hover:text-amber-400">Contact</a>
+      <nav class="nav" aria-label="Site pages">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="privacy.html" aria-current="page">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="contact.html">Contact</a>
       </nav>
     </div>
   </header>
-  <main class="flex-grow max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6 w-full">
-    <div>
-      <p class="text-xs font-bold text-amber-400 uppercase tracking-widest">Privacy</p>
-      <h1 class="text-3xl sm:text-4xl font-black text-white mt-1">Privacy Policy</h1>
-      <p class="text-xs text-slate-500 mt-2">Last updated October 16, 2026</p>
+  <main id="main" class="wrap stack" tabindex="-1">
+    <div class="stack">
+      <p class="kicker">Privacy</p>
+      <h1>Privacy Policy</h1>
+      <p class="muted">Last updated October 16, 2026</p>
     </div>
-    <article class="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 space-y-4 text-sm text-slate-300 leading-relaxed">
+    <article class="card prose">
       <p>LotteryMigo does not ask you to create an account. Number tools, the draw simulator, and the scratch game run in your browser. The draw archive is a public JSON file of winning numbers from NY Open Data. We do not sell personal information.</p>
-      <h2 class="text-lg font-bold text-white pt-2">What is stored on your device</h2>
-      <p>If you dismiss the notice at the top of the home page, the site saves that choice in your browser’s local storage under the key <span class="text-slate-200">lotterymigo_alert_dismissed</span>. Text size is saved as <span class="text-slate-200">lotterymigo_font_px</span>. High contrast is saved as <span class="text-slate-200">lotterymigo_contrast</span>. Ball motion is saved as <span class="text-slate-200">lotterymigo_motion</span>. Those values stay on your device. Clearing site data removes them.</p>
-      <h2 class="text-lg font-bold text-white pt-2">Advertising and cookies</h2>
-      <p>The site may later show ads from an advertising network. If that happens, the network may set or read cookies, mobile identifiers, or similar technologies to measure views, limit how often an ad appears, and help decide which ad to show. Those technologies are not required to use the frequency tools, generator, simulator, or free scratch game.</p>
-      <p>We do not name a specific ad network here, because none is connected yet. If ads are added, this page will be updated. You can block or delete cookies in your browser settings. Blocking them should not stop the draw archive or the free games from loading.</p>
-      <h2 class="text-lg font-bold text-white pt-2">Logs</h2>
+      <h2>What is stored on your device</h2>
+      <p>If you dismiss the notice at the top of the home page, the site saves that choice in your browser’s local storage under the key lotterymigo_alert_dismissed. Text size is saved as lotterymigo_font_px. High contrast is saved as lotterymigo_contrast. Ball motion is saved as lotterymigo_motion. Favorite numbers are saved as lotterymigo_favorites. In the Android or iOS app, the draw-alert choice is saved as lotterymigo_draw_alerts and the last alert date as lotterymigo_last_notified. Those values stay on your device. Clearing site data removes them.</p>
+      <h2>Advertising and cookies</h2>
+      <p>The website does not show ads today. The Android and iOS app project includes Google AdMob scaffolding that uses Google’s public test ad units only. A test ad does not mean a production ad account is connected. Before any ad request, the app asks Google’s User Messaging Platform (UMP) for consent. If consent does not allow ads, no banner is shown. Banners are hidden while a scratch-card result is on screen so they do not cover Try again.</p>
+      <p>If real AdMob units are turned on later, Google may set or read an advertising identifier and similar technologies to measure and choose ads. Those technologies are not required to use the frequency tools, generator, simulator, or free scratch game. This page must be updated before real ad units ship. You can block or delete cookies in a browser. Blocking them should not stop the draw archive or the free games from loading.</p>
+      <h2>App notifications</h2>
+      <p>The website does not send notifications. The Android and iOS app can ask for permission to show a local notification when a newer drawing date is in the list. That notice stays on the device. It is not a prediction and it is not a remote push message. Alerts stay off until you turn them on.</p>
+      <h2>Logs</h2>
       <p>The host that serves the site may keep standard server logs, such as IP address, browser type, and the page requested, for security and operations. Those logs are not used to build a lottery-player profile.</p>
-      <h2 class="text-lg font-bold text-white pt-2">Contact</h2>
-      <p>Privacy questions: <a class="text-amber-400 hover:underline" href="mailto:info@lotterymigo.com">info@lotterymigo.com</a>.</p>
+      <h2>Contact</h2>
+      <p>Privacy questions: <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a>.</p>
     </article>
   </main>
-  <footer class="border-t border-slate-800 py-6 text-[11px] text-slate-500">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 space-y-2">
+  <footer class="site-footer">
+    <div class="wrap stack">
       <p>Entertainment only. Not gambling advice. No win is guaranteed. © 2026 LotteryMigo.com</p>
-      <p>Contact <a class="text-amber-400 hover:underline" href="mailto:info@lotterymigo.com">info@lotterymigo.com</a></p>
+      <p>Contact <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a></p>
     </div>
   </footer>
 </body>

@@ -1,0 +1,19 @@
+{
+  "appId": "com.lotterymigo.app",
+  "appName": "LotteryMigo",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "automatic"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#ffd000"
+    }
+  }
+}

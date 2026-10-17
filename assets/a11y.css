@@ -142,6 +142,7 @@ html.lm-contrast {
   --primary-ink: #000000;
   --pb-text: #ffffff;
   --mm-text: #ffffff;
+  --heading: #ffffff;
   --focus: #ffffff;
   --heat-high: #ffffff;
   --heat-high-ink: #000000;
@@ -216,13 +217,23 @@ html.lm-contrast .lm-a11y-bar a {
 }
 
 html.lm-contrast .ball,
-html.lm-contrast .history-ball,
-html.lm-contrast .ball-pb,
-html.lm-contrast .ball-mm {
+html.lm-contrast .history-ball {
   background: #ffffff !important;
   color: #000000 !important;
   border-color: #000000 !important;
   box-shadow: none !important;
+}
+
+html.lm-contrast .ball-pb {
+  background: #e10600 !important;
+  color: #ffffff !important;
+  border: 3px solid #ffffff !important;
+}
+
+html.lm-contrast .ball-mm {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 3px solid #ffffff !important;
 }
 
 html.lm-contrast .heat-high,

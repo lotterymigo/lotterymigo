@@ -27,34 +27,36 @@
   --radius-lg: 1.5rem;
   --shadow: 0 12px 32px rgba(12, 40, 28, 0.08);
 
-  --bg: #f4f7f5;
+  --bg: #eef8f2;
   --surface: #ffffff;
-  --surface-2: #eef4f1;
+  --surface-2: #e3f7ec;
   --text: #12211a;
   --muted: #3d5248;
-  --line: #d3e2da;
-  --link: #0b6b42;
+  --line: #b7e0c8;
+  --card-line: #14915a;
+  --link: #067a38;
 
-  --primary: #0b7a4b;
-  --primary-2: #087070;
-  --primary-ink: #ffffff;
-  --gold: #e6b325;
+  --heading: #067a38;
+  --primary: #00c853;
+  --primary-2: #00c2a8;
+  --primary-ink: #042014;
+  --gold: #ffc107;
   --gold-ink: #1a1404;
-  --gold-text: #8a5a00;
-  --success: #0b7a4b;
-  --warn: #b45309;
-  --danger: #b42318;
-  --pb: #9f1239;
-  --mm: #1e3a8a;
-  --pb-text: #9f1239;
-  --mm-text: #1e3a8a;
-  --focus: #ffbf00;
+  --gold-text: #9a4d00;
+  --success: #067a38;
+  --warn: #c2410c;
+  --danger: #c81e3a;
+  --pb: #c81e3a;
+  --mm: #7c3aed;
+  --pb-text: #c81e3a;
+  --mm-text: #6d28d9;
+  --focus: #067a38;
 
-  --heat-high: #0b7a4b;
+  --heat-high: #067a38;
   --heat-high-ink: #ffffff;
-  --heat-mid: #e6b325;
+  --heat-mid: #ffc107;
   --heat-mid-ink: #1a1404;
-  --heat-low: #e4eee8;
+  --heat-low: #b7e4c7;
   --heat-low-ink: #12211a;
 }
 
@@ -66,20 +68,26 @@
     --surface-2: #173126;
     --text: #f4faf6;
     --muted: #d5e6dc;
-    --line: #2c4a3c;
-    --link: #8ee0b8;
-    --gold: #f5c542;
-    --gold-text: #fde68a;
-    --success: #34d399;
-    --warn: #fbbf24;
-    --danger: #fb7185;
-    --pb-text: #fecdd3;
-    --mm-text: #bfdbfe;
-    --heat-high: #34d399;
-    --heat-high-ink: #06281a;
-    --heat-mid: #f5c542;
+    --line: #3d6b52;
+    --card-line: #3dff9a;
+    --link: #3dff9a;
+    --heading: #3dff9a;
+    --primary: #3dff9a;
+    --primary-2: #2ee0c8;
+    --primary-ink: #042014;
+    --gold: #ffc107;
+    --gold-text: #ffd54a;
+    --success: #3dff9a;
+    --warn: #ffb020;
+    --danger: #ff6b81;
+    --pb-text: #ffc1cc;
+    --mm-text: #ddd6fe;
+    --focus: #ffc107;
+    --heat-high: #3dff9a;
+    --heat-high-ink: #042014;
+    --heat-mid: #ffc107;
     --heat-mid-ink: #1a1404;
-    --heat-low: #1c3329;
+    --heat-low: #145c3a;
     --heat-low-ink: #f4faf6;
   }
 }
@@ -133,6 +141,14 @@ p {
   margin: 0;
 }
 
+h1,
+h2,
+h3,
+.brand-name,
+.kicker {
+  color: var(--heading);
+}
+
 h1 {
   font-size: clamp(1.85rem, 4vw, 2.75rem);
   line-height: 1.2;
@@ -174,7 +190,7 @@ main.wrap {
 .block { display: block; }
 .banner { margin-top: var(--space-4); }
 .center { text-align: center; }
-.kicker { font-weight: 700; color: var(--primary); }
+.kicker { font-weight: 700; }
 
 .tone-gold { color: var(--gold-text); }
 .tone-success { color: var(--success); }
@@ -367,7 +383,7 @@ main.wrap {
 /* --- Cards, clusters, and stats --- */
 .card {
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 2px solid var(--card-line);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   box-shadow: var(--shadow);
@@ -430,7 +446,7 @@ main.wrap {
 .hero {
   padding: var(--space-6) 0 var(--space-7);
   border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, var(--surface), var(--bg));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 16%, var(--surface)), var(--bg));
 }
 
 .hero-inner {
@@ -576,8 +592,8 @@ main.wrap {
 }
 
 .ball-mm {
-  color: #1a1404;
-  background: radial-gradient(circle at 35% 32%, #fef9c3 0%, #eab308 52%, #854d0e 100%);
+  color: #ffffff;
+  background: radial-gradient(circle at 35% 32%, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%);
 }
 
 .ball-pop {

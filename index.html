@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Entertainment-only Powerball and Mega Millions frequency stats, longest-gap counts, and number tools. Past draws do not predict future results." />
-  <meta name="theme-color" content="#0B7A4B" />
+  <meta name="theme-color" content="#067A38" />
   <link rel="canonical" href="https://lotterymigo.com/" />
   <title>LotteryMigo | Powerball & Mega Millions Analytics, Games & Generator</title>
 
@@ -1464,9 +1464,9 @@
         const token = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
         const colors = highContrast
           ? [...Array(10).fill('#ffd000'), ...Array(10).fill('#ffffff')]
-          : [...Array(10).fill(token('--success', '#0B7A4B')), ...Array(10).fill(token('--warn', '#b45309'))];
+          : [...Array(10).fill(token('--success', '#067a38')), ...Array(10).fill(token('--warn', '#c2410c'))];
         const tickColor = highContrast ? '#ffffff' : token('--text', '#12211a');
-        const gridColor = highContrast ? '#ffffff' : token('--line', '#d3e2da');
+        const gridColor = highContrast ? '#ffffff' : token('--line', '#b7e0c8');
         const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 18;
         const tickSize = Math.max(16, Math.round(rootPx * 0.85));
         const summary = document.getElementById('chart-summary');

@@ -75,6 +75,7 @@ let currentUser = null;
 let profile = { showOnBoard: false, publicName: "", publicPhoto: "", points: 0, lastAwardAt: 0 };
 let authTools = null;
 let fsTools = null;
+let signInMessage = "";
 
 function $(id) {
   return document.getElementById(id);
@@ -128,7 +129,9 @@ function renderAccount() {
   }
   if (!signedIn) {
     setText("account-status", native ? "You can use every tool in the app without an account." : "You are not signed in. The games still work.");
-    if (native) {
+    if (signInMessage) {
+      setText("account-note", signInMessage);
+    } else if (native) {
       setText("account-note", "Sign in with Google opens a full-page sign-in, because this app cannot use a popup. If Google does not come back to the app, use the website or the native plugin in docs/FIREBASE_SETUP.md. Your name and photo stay off the board unless you opt in.");
     } else if (prefersRedirect()) {
       setText("account-note", "On a phone, Sign in with Google opens a full-page sign-in. Your Google name and photo stay off the board unless you opt in.");
@@ -137,6 +140,7 @@ function renderAccount() {
     }
     return;
   }
+  signInMessage = "";
   setText("account-status", "Signed in" + (profile.showOnBoard && profile.publicName ? " as " + profile.publicName : "") + ".");
   setText("account-note", "Virtual points on your account: " + (profile.points || 0).toLocaleString() + ". They cannot be cashed out. Uncheck the box to show “Anonymous player” instead of your name and photo.");
 }
@@ -377,31 +381,67 @@ async function deleteAccount() {
   }
 }
 
-function signInFailureNote() {
-  return "Google sign-in did not finish. Add lotterymigo.com and www.lotterymigo.com under Authentication authorized domains, and make sure Google is enabled as a sign-in method.";
+function explainSignInError(err) {
+  const code = err && err.code ? String(err.code) : "";
+  console.error("Google sign-in failed.", code || "(no code)", err);
+  if (code === "auth/unauthorized-domain") {
+    return "This website address isn't approved in Firebase yet. Add lotterymigo.com and www.lotterymigo.com under Authentication → Settings → Authorized domains.";
+  }
+  if (code === "auth/popup-closed-by-user") {
+    return "The Google sign-in window closed before it finished. Try again.";
+  }
+  if (code === "auth/cancelled-popup-request") {
+    return "A Google sign-in window is already open. Use that window, or close it and try again.";
+  }
+  if (code === "auth/popup-blocked") {
+    return "The browser blocked the Google sign-in window. Allow popups for this site, or use the full-page sign-in.";
+  }
+  if (code === "auth/operation-not-allowed") {
+    return "Google sign-in is turned off in Firebase. Enable Google under Authentication → Sign-in method.";
+  }
+  if (code === "auth/network-request-failed") {
+    return "The sign-in could not reach Google. Check the connection and try again.";
+  }
+  if (code === "auth/operation-not-supported-in-this-environment") {
+    return "This browser cannot open a Google sign-in window. The page will use a full-page sign-in.";
+  }
+  return "Google sign-in did not finish (" + (code || "unknown error") + "). Add lotterymigo.com and www.lotterymigo.com under Authentication authorized domains, and make sure Google is enabled as a sign-in method.";
 }
 
-async function startGoogleSignIn() {
-  if (!firebaseReady() || !auth || !authTools) {
-    setText("account-note", "Sign-in is still loading. Try the button again in a moment.");
+function showSignInError(err) {
+  signInMessage = explainSignInError(err);
+  setText("account-note", signInMessage);
+}
+
+/* Redirect cannot succeed on an unapproved domain, a disabled provider, or a dead network. */
+function redirectWouldHideTheError(err) {
+  const code = err && err.code;
+  return code === "auth/unauthorized-domain" || code === "auth/operation-not-allowed" || code === "auth/network-request-failed";
+}
+
+function popupClosedImmediately(err, startedAt) {
+  if (!err || err.code !== "auth/popup-closed-by-user") return false;
+  return Date.now() - startedAt < 1500;
+}
+
+function beginRedirect(provider) {
+  signInMessage = "The sign-in window did not stay open. Opening the full-page Google sign-in.";
+  setText("account-note", signInMessage);
+  authTools.signInWithRedirect(auth, provider).catch((err) => showSignInError(err));
+}
+
+function onPopupFailure(err, provider, startedAt) {
+  const code = err && err.code;
+  if (redirectWouldHideTheError(err)) {
+    showSignInError(err);
     return;
   }
-  const provider = new authTools.GoogleAuthProvider();
-  if (prefersRedirect()) {
-    await authTools.signInWithRedirect(auth, provider);
+  if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment" || popupClosedImmediately(err, startedAt)) {
+    console.error("Google popup did not stay open. Falling back to redirect.", code || err);
+    beginRedirect(provider);
     return;
   }
-  try {
-    await authTools.signInWithPopup(auth, provider);
-  } catch (err) {
-    const code = err && err.code;
-    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") return;
-    if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
-      await authTools.signInWithRedirect(auth, provider);
-      return;
-    }
-    throw err;
-  }
+  showSignInError(err);
 }
 
 async function connectFirebase() {
@@ -416,8 +456,7 @@ async function connectFirebase() {
   try {
     await authTools.getRedirectResult(auth);
   } catch (err) {
-    console.warn("Google redirect sign-in did not finish.", err);
-    setText("account-note", signInFailureNote());
+    showSignInError(err);
   }
   authTools.onAuthStateChanged(auth, async (user) => {
     currentUser = user;
@@ -445,11 +484,21 @@ async function connectFirebase() {
 function bind() {
   const signIn = $("btn-sign-in");
   if (signIn) {
-    signIn.addEventListener("click", () => {
-      startGoogleSignIn().catch((err) => {
-        console.warn("Google sign-in failed.", err);
-        setText("account-note", signInFailureNote());
-      });
+    signIn.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (!firebaseReady() || !auth || !authTools) {
+        signInMessage = "Sign-in is still loading. Try the button again in a moment.";
+        setText("account-note", signInMessage);
+        return;
+      }
+      const provider = new authTools.GoogleAuthProvider();
+      if (prefersRedirect()) {
+        beginRedirect(provider);
+        return;
+      }
+      const startedAt = Date.now();
+      /* Must run in this click turn. An await before signInWithPopup lets the browser block the window. */
+      authTools.signInWithPopup(auth, provider).catch((err) => onPopupFailure(err, provider, startedAt));
     });
   }
   const signOutBtn = $("btn-sign-out");

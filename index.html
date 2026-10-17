@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Entertainment-only Powerball and Mega Millions frequency stats, longest-gap counts, and number tools. Past draws do not predict future results." />
-  <meta name="theme-color" content="#0B7A4B" />
+  <meta name="theme-color" content="#067A38" />
   <link rel="canonical" href="https://lotterymigo.com/" />
   <title>LotteryMigo | Powerball & Mega Millions Analytics, Games & Generator</title>
 
@@ -58,6 +58,7 @@
         <a href="#section-generator">Number ideas</a>
         <a href="#section-scratcher">Scratch cards</a>
         <a href="#section-stats">How often</a>
+        <a href="#section-account">Account</a>
         <a href="#section-about">About</a>
       </nav>
     </div>
@@ -67,6 +68,7 @@
       <a href="#section-scratcher">Scratch cards</a>
       <a href="#section-stats">How often</a>
       <a href="#section-history">Past draws</a>
+      <a href="#section-account">Account</a>
       <a href="#section-about">About</a>
     </nav>
   </header>
@@ -188,6 +190,13 @@
         <p>These stay on this device only. Saving a line does not make it more likely to win.</p>
         <div id="favorites-list" class="stack"></div>
       </div>
+      <div id="saved-picks-panel" class="stack rule">
+        <h3>Picks saved to an account</h3>
+        <p>Sign in to keep a line with the draw date you intend to play. You can mark “I bought this ticket.” After that date is in the draw list, the page counts matches. That count is informational only.</p>
+        <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
+        <p id="pick-status" class="lm-help"></p>
+        <div id="saved-picks-list" class="stack"></div>
+      </div>
     </section>
 
     <!-- Scratch cards -->
@@ -196,7 +205,7 @@
         <div class="stack">
           <p class="badge">Free mini-game · No real-money value</p>
           <h2>Scratch cards</h2>
-          <p>Rub the gray coating with a finger or mouse, or press Quick Reveal. About 1 in 4 cards wins virtual points only. Points cannot be cashed out.</p>
+          <p>Rub the coating with a finger or mouse, or press Quick Reveal. Lucky Numbers, Starlight, Gold Rush, Clover Patch, Gem Match, Bingo Line, and 777 are all free. About 1 in 4 cards wins virtual points only. Points cannot be cashed out. After a reveal, the coating fades so you can still read the card.</p>
         </div>
         <div class="row">
           <button type="button" id="btn-scratch-reveal" class="btn btn-quiet">Quick Reveal</button>
@@ -216,13 +225,41 @@
           </div>
         </div>
         <canvas id="scratch-canvas" role="img" aria-label="Scratch coating. Rub to reveal the card, or use the Quick Reveal button."></canvas>
-        <div id="scratch-result" class="scratch-result hidden" aria-live="polite">
-          <p id="scratch-result-title"></p>
-          <p id="scratch-result-detail"></p>
-          <button type="button" id="btn-scratch-again" class="btn btn-gold">Try Again</button>
-        </div>
       </div>
+      <div id="scratch-result" class="scratch-result hidden" aria-live="polite">
+        <p id="scratch-result-title"></p>
+        <p id="scratch-result-detail"></p>
+        <button type="button" id="btn-scratch-again" class="btn btn-gold">Try Again</button>
+      </div>
+      <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
       <p class="center muted">Free game only. Virtual points have no cash value and cannot be redeemed.</p>
+    </section>
+
+    <!-- Account and boards -->
+    <section id="section-account" class="card stack">
+      <h2>Account</h2>
+      <p id="account-status">You can use every tool on this page without an account.</p>
+      <div class="row">
+        <button type="button" id="btn-sign-in" class="btn btn-primary">Sign in with Google</button>
+        <button type="button" id="btn-sign-out" class="btn btn-quiet hidden">Sign out</button>
+        <button type="button" id="btn-delete-account" class="btn btn-quiet hidden">Delete my account and data</button>
+      </div>
+      <p id="delete-confirm" class="panel hidden">This removes your virtual points, leaderboard row, and saved picks from LotteryMigo. It does not buy or cancel a lottery ticket. <button type="button" id="btn-delete-confirm" class="btn btn-gold">Yes, delete my LotteryMigo data</button></p>
+      <p id="account-note" class="lm-help"></p>
+      <label id="account-opt-in-wrap" class="check-row hidden"><input id="account-opt-in" type="checkbox" /> Show my name and photo on the leaderboard</label>
+      <p id="account-points">Virtual points on this device: 0. These points have no cash value.</p>
+    </section>
+
+    <section id="section-board" class="card stack">
+      <h2>Virtual points board</h2>
+      <p>The daily board uses US Eastern Time (America/New_York) and starts over at midnight Eastern. The all-time board keeps the running total. Names and photos appear only when a player opts in. Otherwise the row says Anonymous player.</p>
+      <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
+      <p class="lm-help">Scores are saved from the browser. They are not tamper-proof, and they are not a cash prize. A server-side check would be required before any real prize.</p>
+      <div id="winner-banner" class="panel">Winner of the day appears here after Firebase is connected. Virtual points only. No cash prize.</div>
+      <h3>Today</h3>
+      <ol id="board-daily" class="board"></ol>
+      <h3>All time</h3>
+      <ol id="board-all" class="board"></ol>
     </section>
 
     <!-- How often -->
@@ -357,6 +394,7 @@
           <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a>
         </nav>
       </div>
+      <div id="tip-wrap" class="stack"></div>
       <p><strong>DISCLAIMER:</strong> LotteryMigo does not guarantee any lottery win or prize outcome. Powerball® and Mega Millions® are registered trademarks of their respective consortiums. LotteryMigo is not sponsored by or affiliated with any state or national lottery agency. © 2026 LotteryMigo.com. All rights reserved.</p>
     </div>
   </footer>
@@ -472,6 +510,12 @@
 
     window.lmReloadDraws = function () {
       return loadOfficialDraws();
+    };
+
+    window.lmLookupDraw = function (game, date) {
+      const draws = drawData && drawData.games && drawData.games[game] && drawData.games[game].draws;
+      if (!draws || !date) return null;
+      return draws.find(draw => draw.date === date) || null;
     };
 
     window.lmGetDrawAlertSnapshot = function () {
@@ -931,6 +975,7 @@
           let specialClass = isPB ? 'ball ball-pb' : 'ball ball-mm';
           let oddsCount = line.whites.filter(x => x % 2 !== 0).length;
           let sum = line.whites.reduce((a,b)=>a+b, 0);
+          const suggestedDate = (drawsArchive[0] && drawsArchive[0].date) || '';
 
           lineDiv.innerHTML = `
             <div class="row">
@@ -944,6 +989,12 @@
               <div><span class="muted">Odd and even:</span> <strong>${oddsCount} odd, ${5 - oddsCount} even</strong></div>
               <div><span class="muted">Sum:</span> <strong>${sum}</strong></div>
               <button type="button" class="btn btn-quiet" data-save-favorite data-whites="${line.whites.join(',')}" data-special="${line.special}">Save these numbers</button>
+            </div>
+            <div class="pick-box stack">
+              <label for="pick-date-${i}">Draw date you intend to play</label>
+              <input id="pick-date-${i}" class="field" type="date" data-pick-date value="${suggestedDate}" />
+              <label class="check-row"><input type="checkbox" data-pick-bought /> I bought this ticket</label>
+              <button type="button" class="btn btn-quiet" data-save-pick data-whites="${line.whites.join(',')}" data-special="${line.special}">Save this pick</button>
             </div>
           `;
           container.appendChild(lineDiv);
@@ -1023,11 +1074,11 @@
     }
 
     // --- 3. SCRATCHER CARD ---
-    const SCRATCH_WIN_ODDS = 0.25;
     const SCRATCH_THEMES = [
       {
         id: 'numbers',
         name: 'Lucky Numbers',
+        kind: 'match',
         eyebrow: 'Winning Numbers',
         playerLabel: 'Your Numbers',
         coating: '#64748b',
@@ -1040,6 +1091,7 @@
       {
         id: 'stars',
         name: 'Starlight',
+        kind: 'match',
         eyebrow: 'Lucky Stars',
         playerLabel: 'Your Stars',
         coating: '#312e81',
@@ -1052,6 +1104,7 @@
       {
         id: 'gold',
         name: 'Gold Rush',
+        kind: 'match',
         eyebrow: 'Target Bars',
         playerLabel: 'Your Bars',
         coating: '#854d0e',
@@ -1064,6 +1117,7 @@
       {
         id: 'clover',
         name: 'Clover Patch',
+        kind: 'match',
         eyebrow: 'Lucky Marks',
         playerLabel: 'Your Patch',
         coating: '#14532d',
@@ -1076,6 +1130,7 @@
       {
         id: 'gems',
         name: 'Gem Match',
+        kind: 'match',
         eyebrow: 'Target Gems',
         playerLabel: 'Your Gems',
         coating: '#9f1239',
@@ -1084,6 +1139,24 @@
         accent: 'tone-rose',
         pool: ['Ruby', 'Jade', 'Opal', 'Onyx', 'Pearl', 'Topaz', 'Amber', 'Garnet', 'Quartz', 'Agate', 'Coral', 'Flint'],
         prizes: ['12 PTS', '24 PTS', '48 PTS', '96 PTS', '180 PTS', '360 PTS']
+      },
+      {
+        id: 'bingo',
+        name: 'Bingo Line',
+        kind: 'bingo',
+        coating: '#14532d',
+        ink: '#dcfce7',
+        cardClass: 'theme-clover',
+        accent: 'tone-green'
+      },
+      {
+        id: 'slots',
+        name: '777',
+        kind: 'slots',
+        coating: '#854d0e',
+        ink: '#fef3c7',
+        cardClass: 'theme-gold',
+        accent: 'tone-gold'
       }
     ];
 
@@ -1137,49 +1210,45 @@
 
     function dealScratchCard() {
       const theme = currentScratchTheme();
-      const won = Math.random() < SCRATCH_WIN_ODDS;
-      const winning = pickDistinct(theme.pool, 2);
-      const player = pickDistinct(theme.pool, 6, winning);
-      let prize = '';
-      if (won && player.length) {
-        const matchAt = Math.floor(Math.random() * player.length);
-        player[matchAt] = winning[Math.floor(Math.random() * winning.length)];
-        prize = theme.prizes[matchAt] || theme.prizes[0];
-      }
-      scratchOutcome = { won, prize, winning, player };
+      scratchOutcome = typeof window.lmDealScratch === 'function'
+        ? window.lmDealScratch(theme)
+        : { won: false, prize: '', prizePoints: 0, kind: theme.kind || 'match', winning: [], player: [], cells: [], reels: [] };
       return scratchOutcome;
     }
 
     function paintScratchCard() {
       const theme = currentScratchTheme();
       const card = document.getElementById('scratch-card');
-      if (card) {
-        card.className = 'scratch-card ' + theme.cardClass;
-      }
-      const winLabel = document.getElementById('scratch-win-label');
-      const playerLabel = document.getElementById('scratch-player-label');
-      if (winLabel) {
-        winLabel.textContent = theme.eyebrow;
-        winLabel.className = 'kicker ' + theme.accent;
-      }
-      if (playerLabel) playerLabel.textContent = theme.playerLabel;
-
+      const under = document.getElementById('scratch-underlayer');
+      if (card) card.className = 'scratch-card ' + theme.cardClass;
+      if (!under) return;
       const outcome = scratchOutcome || dealScratchCard();
-      const winNums = document.getElementById('scratch-winning-nums');
-      if (winNums) {
-        winNums.innerHTML = outcome.winning.map(value =>
+      if (outcome.kind === 'bingo') {
+        const letters = ['B', 'I', 'N', 'G', 'O'];
+        under.innerHTML = '<div class="scratch-block"><span class="kicker ' + theme.accent + '">Bingo line</span>' +
+          '<p>A gold square was called. A full row, column, or diagonal wins virtual points.</p>' +
+          '<div class="bingo-head">' + letters.map(letter => '<span>' + letter + '</span>').join('') + '</div>' +
+          '<div class="bingo-grid">' + outcome.cells.map(cell =>
+            '<div class="bingo-cell' + (cell.called ? ' is-called' : '') + '"><span>' + cell.label + '</span></div>'
+          ).join('') + '</div></div>';
+        return;
+      }
+      if (outcome.kind === 'slots') {
+        under.innerHTML = '<div class="scratch-block"><span class="kicker ' + theme.accent + '">777</span>' +
+          '<p>Three matching 7s wins 777 virtual points. Any other spin loses.</p>' +
+          '<div class="reel-row">' + outcome.reels.map(symbol =>
+            '<div class="reel">' + symbol + '</div>'
+          ).join('') + '</div></div>';
+        return;
+      }
+      under.innerHTML = '<div class="scratch-block"><span class="kicker ' + theme.accent + '">' + theme.eyebrow + '</span>' +
+        '<div class="scratch-targets">' + (outcome.winning || []).map(value =>
           '<span class="scratch-chip ' + theme.accent + '">' + value + '</span>'
-        ).join('');
-      }
-      const grid = document.getElementById('scratch-player-nums');
-      if (grid) {
-        grid.innerHTML = outcome.player.map((value, index) =>
-          '<div class="scratch-cell">' +
-            '<span class="scratch-value">' + value + '</span>' +
-            '<span class="' + theme.accent + '">' + theme.prizes[index] + '</span>' +
-          '</div>'
-        ).join('');
-      }
+        ).join('') + '</div></div>' +
+        '<div class="scratch-block"><span class="kicker ' + theme.accent + '">' + theme.playerLabel + '</span>' +
+        '<div class="scratch-grid">' + (outcome.player || []).map((value, index) =>
+          '<div class="scratch-cell"><span class="scratch-value">' + value + '</span><span class="' + theme.accent + '">' + theme.prizes[index] + '</span></div>'
+        ).join('') + '</div></div>';
     }
 
     function initScratchCard() {
@@ -1303,21 +1372,20 @@
       if (scratchRevealed) return;
       scratchRevealed = true;
       isScratching = false;
-      if (sCtx && scratchCanvas) {
-        sCtx.globalCompositeOperation = 'source-over';
-        sCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-      }
+      const card = document.getElementById('scratch-card');
+      if (card) card.classList.add('is-revealed');
       if (scratchCanvas) scratchCanvas.style.pointerEvents = 'none';
-      const outcome = scratchOutcome || { won: false, prize: '' };
+      const outcome = scratchOutcome || { won: false, prize: '', prizePoints: 0 };
       const title = document.getElementById('scratch-result-title');
       const detail = document.getElementById('scratch-result-detail');
       const result = document.getElementById('scratch-result');
       if (outcome.won) {
         if (title) title.textContent = 'You won ' + outcome.prize + ' in virtual points!';
-        if (detail) detail.textContent = 'Free game only. These points have no cash value and cannot be redeemed.';
+        if (detail) detail.textContent = 'Free game only. These points have no cash value and cannot be redeemed. The card stays visible under the faded coating.';
+        if (typeof window.lmAwardPoints === 'function') window.lmAwardPoints(outcome.prizePoints || 0);
       } else {
         if (title) title.textContent = "Sorry, you're not a winner. Try again!";
-        if (detail) detail.textContent = 'Most cards do not win. This is a free game with no real-money prizes.';
+        if (detail) detail.textContent = 'Most cards do not win. This is a free game with no real-money prizes. You can still read the card under the faded coating.';
       }
       if (result) result.classList.remove('hidden');
     }
@@ -1337,7 +1405,12 @@
         paintScratchCard();
         const result = document.getElementById('scratch-result');
         if (result) result.classList.add('hidden');
-        if (scratchCanvas) scratchCanvas.style.pointerEvents = '';
+        const card = document.getElementById('scratch-card');
+        if (card) card.classList.remove('is-revealed');
+        if (scratchCanvas) {
+          scratchCanvas.style.pointerEvents = '';
+          scratchCanvas.style.opacity = '';
+        }
         requestAnimationFrame(initScratchCard);
       } catch (err) {
         console.error('Scratcher reset error:', err);
@@ -1391,9 +1464,9 @@
         const token = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
         const colors = highContrast
           ? [...Array(10).fill('#ffd000'), ...Array(10).fill('#ffffff')]
-          : [...Array(10).fill(token('--success', '#0B7A4B')), ...Array(10).fill(token('--warn', '#b45309'))];
+          : [...Array(10).fill(token('--success', '#067a38')), ...Array(10).fill(token('--warn', '#c2410c'))];
         const tickColor = highContrast ? '#ffffff' : token('--text', '#12211a');
-        const gridColor = highContrast ? '#ffffff' : token('--line', '#d3e2da');
+        const gridColor = highContrast ? '#ffffff' : token('--line', '#b7e0c8');
         const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 18;
         const tickSize = Math.max(16, Math.round(rootPx * 0.85));
         const summary = document.getElementById('chart-summary');
@@ -1563,6 +1636,19 @@
         lines.addEventListener('click', (event) => {
           const button = event.target.closest('[data-save-favorite]');
           if (button) saveFavoriteFromButton(button);
+          const pickButton = event.target.closest('[data-save-pick]');
+          if (pickButton && typeof window.lmSavePick === 'function') {
+            const card = pickButton.closest('.line-card');
+            const dateInput = card ? card.querySelector('[data-pick-date]') : null;
+            const boughtInput = card ? card.querySelector('[data-pick-bought]') : null;
+            window.lmSavePick({
+              game: currentGame,
+              whites: pickButton.getAttribute('data-whites'),
+              special: pickButton.getAttribute('data-special'),
+              drawDate: dateInput ? dateInput.value : '',
+              bought: !!(boughtInput && boughtInput.checked)
+            });
+          }
         });
       }
       const favorites = document.getElementById('favorites-list');
@@ -1603,6 +1689,9 @@
       });
     });
   </script>
+  <script src="assets/site-config.js"></script>
+  <script type="module" src="assets/scratch-bridge.js"></script>
+  <script type="module" src="assets/account.js"></script>
   <script type="module" src="assets/native-shell.js"></script>
 </body>
 </html>

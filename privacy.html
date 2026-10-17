@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="LotteryMigo privacy policy, including browser storage and a disclosure for possible future advertising cookies." />
-  <meta name="theme-color" content="#0B7A4B" />
+  <meta name="theme-color" content="#067A38" />
   <link rel="canonical" href="https://lotterymigo.com/privacy.html" />
   <title>Privacy Policy | LotteryMigo</title>
   <link rel="icon" href="icons/favicon.ico" sizes="any" />
@@ -42,12 +42,18 @@
     <div class="stack">
       <p class="kicker">Privacy</p>
       <h1>Privacy Policy</h1>
-      <p class="muted">Last updated October 16, 2026</p>
+      <p class="muted">Last updated October 17, 2026</p>
     </div>
     <article class="card prose">
-      <p>LotteryMigo does not ask you to create an account. Number tools, the draw simulator, and the scratch game run in your browser. The draw archive is a public JSON file of winning numbers from NY Open Data. We do not sell personal information.</p>
+      <p>You can use the number tools, the draw simulator, and the scratch game without an account. Sign-in is optional. The draw archive is a public JSON file of winning numbers from NY Open Data. We do not sell personal information. Virtual points and saved picks are not cash and do not buy a ticket.</p>
       <h2>What is stored on your device</h2>
-      <p>If you dismiss the notice at the top of the home page, the site saves that choice in your browser’s local storage under the key lotterymigo_alert_dismissed. Text size is saved as lotterymigo_font_px. High contrast is saved as lotterymigo_contrast. Ball motion is saved as lotterymigo_motion. Favorite numbers are saved as lotterymigo_favorites. In the Android or iOS app, the draw-alert choice is saved as lotterymigo_draw_alerts and the last alert date as lotterymigo_last_notified. Those values stay on your device. Clearing site data removes them.</p>
+      <p>If you dismiss the notice at the top of the home page, the site saves that choice in your browser’s local storage under the key lotterymigo_alert_dismissed. Text size is saved as lotterymigo_font_px. High contrast is saved as lotterymigo_contrast. Ball motion is saved as lotterymigo_motion. Favorite numbers are saved as lotterymigo_favorites. Scratch points earned on this device are saved as lotterymigo_local_points. Those points have no cash value. In the Android or iOS app, the draw-alert choice is saved as lotterymigo_draw_alerts and the last alert date as lotterymigo_last_notified. Those values stay on your device. Clearing site data removes them.</p>
+      <h2>Google sign-in and stored account data</h2>
+      <p>If the owner has connected Firebase, you can sign in with Google. Firebase Authentication receives the Google account id, name, email, and photo from Google. LotteryMigo does not copy that email into its own database. The setup steps and the security rules are in the project file docs/FIREBASE_SETUP.md.</p>
+      <p>When you are signed in, Firestore can store: your virtual-point total, the day those points were earned in US Eastern Time, whether you opted in to the leaderboard, and picks you save (game, five numbers, bonus number, the draw date you intend to play, and whether you checked “I bought this ticket”). Your display name and photo are written only if you check “Show my name and photo on the leaderboard.” Otherwise the board shows “Anonymous player” and no photo. Point totals on the board are visible to anyone. Saved picks are visible only to you.</p>
+      <p>Press Delete my account and data, then confirm, to remove those Firestore documents and ask Google to delete the app sign-in. If Google asks you to sign in again first, do that and press delete once more. You can also email <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a> and ask us to delete the data.</p>
+      <h2>Tips</h2>
+      <p>A Tip us link, when the owner has added a PayPal.me address, opens PayPal. A tip is voluntary. It does not buy virtual points, tickets, or a better chance of winning. PayPal’s own policy covers that payment. Until a real link is configured, the page does not send you to PayPal.</p>
       <h2>Advertising and cookies</h2>
       <p>The website does not show ads today. The Android and iOS app project includes Google AdMob scaffolding that uses Google’s public test ad units only. A test ad does not mean a production ad account is connected. Before any ad request, the app asks Google’s User Messaging Platform (UMP) for consent. If consent does not allow ads, no banner is shown. Banners are hidden while a scratch-card result is on screen so they do not cover Try again.</p>
       <p>If real AdMob units are turned on later, Google may set or read an advertising identifier and similar technologies to measure and choose ads. Those technologies are not required to use the frequency tools, generator, simulator, or free scratch game. This page must be updated before real ad units ship. You can block or delete cookies in a browser. Blocking them should not stop the draw archive or the free games from loading.</p>

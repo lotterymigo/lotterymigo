@@ -518,6 +518,14 @@ main.wrap {
 
 .btn-gold:hover { filter: brightness(1.05); }
 
+.tip-link { gap: 0.45rem; }
+
+.tip-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
 .btn-quiet {
   background: var(--surface);
   color: var(--text);

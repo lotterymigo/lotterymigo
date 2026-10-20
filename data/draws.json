@@ -1,14 +1,26 @@
 {
   "source": "NY Open Data (data.ny.gov)",
-  "fetchedAt": "2026-10-18T12:21:43.078Z",
+  "fetchedAt": "2026-10-20T12:28:47.597Z",
   "games": {
     "POWERBALL": {
       "datasetId": "d6yy-54nr",
       "name": "Lottery Powerball Winning Numbers: Beginning 2010",
       "sourceUrl": "https://data.ny.gov/d/d6yy-54nr",
-      "latestDrawDate": "2026-10-17",
-      "drawCount": 2013,
+      "latestDrawDate": "2026-10-19",
+      "drawCount": 2014,
       "draws": [
+        {
+          "date": "2026-10-19",
+          "whites": [
+            8,
+            31,
+            32,
+            42,
+            48
+          ],
+          "special": 23,
+          "multiplier": 4
+        },
         {
           "date": "2026-10-17",
           "whites": [

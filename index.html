@@ -191,7 +191,7 @@
         <p>These stay on this device only. Saving a line does not make it more likely to win.</p>
         <div id="favorites-list" class="stack"></div>
       </div>
-      <div id="saved-picks-panel" class="stack rule">
+      <div id="saved-picks-panel" class="stack rule hidden">
         <h3>Picks saved to an account</h3>
         <p>Sign in to keep a line with the draw date you intend to play. You can mark “I bought this ticket.” After that date is in the draw list, the page counts matches. That count is informational only.</p>
         <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
@@ -249,13 +249,13 @@
         <button type="button" id="btn-sign-out" class="btn btn-quiet hidden">Sign out</button>
         <button type="button" id="btn-delete-account" class="btn btn-quiet hidden">Delete my account and data</button>
       </div>
-      <p id="delete-confirm" class="panel hidden">This removes your virtual points, leaderboard row, and saved picks from LotteryMigo. It does not buy or cancel a lottery ticket. <button type="button" id="btn-delete-confirm" class="btn btn-gold">Yes, delete my LotteryMigo data</button></p>
+      <p id="delete-confirm" class="panel hidden">This removes your LotteryMigo sign-in and any saved account data. It does not buy or cancel a lottery ticket. <button type="button" id="btn-delete-confirm" class="btn btn-gold">Yes, delete my LotteryMigo data</button></p>
       <p id="account-note" class="lm-help"></p>
       <label id="account-opt-in-wrap" class="check-row hidden"><input id="account-opt-in" type="checkbox" /> Show my name and photo on the leaderboard</label>
       <p id="account-points">Virtual points on this device: 0. These points have no cash value.</p>
     </section>
 
-    <section id="section-board" class="card stack">
+    <section id="section-board" class="card stack hidden">
       <h2>Virtual points board</h2>
       <p>The daily board uses US Eastern Time (America/New_York) and starts over at midnight Eastern. The all-time board keeps the running total. Names and photos appear only when a player opts in. Otherwise the row says Anonymous player.</p>
       <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
@@ -399,7 +399,7 @@
           <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a>
         </nav>
       </div>
-      <div id="tip-wrap" class="stack"></div>
+      <div id="tip-wrap" class="stack hidden"></div>
       <p><strong>DISCLAIMER:</strong> LotteryMigo does not guarantee any lottery win or prize outcome. Powerball® and Mega Millions® are registered trademarks of their respective consortiums. LotteryMigo is not sponsored by or affiliated with any state or national lottery agency. © 2026 LotteryMigo.com. All rights reserved.</p>
     </div>
   </footer>

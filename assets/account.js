@@ -24,8 +24,13 @@ function firebaseReady() {
 }
 
 function tipReady() {
-  const url = config.paypalTipUrl || "";
-  return /^https:\/\/(www\.)?paypal\.me\/[A-Za-z0-9._-]+$/i.test(url) && url.indexOf("YOUR_") === -1;
+  const url = String(config.paypalTipUrl || "").trim();
+  if (!url || url.indexOf("YOUR_PAYPAL_NAME") !== -1) return false;
+  return /^https:\/\/(www\.)?paypal\.me\/[A-Za-z0-9._-]+$/i.test(url);
+}
+
+function boardsConfigured() {
+  return config.firestoreEnabled === true;
 }
 
 function easternDay(date) {
@@ -78,7 +83,7 @@ let fsTools = null;
 let signInMessage = "";
 let boardSetupMessage = "";
 let appliedUid = "";
-const LEADERBOARD_NOT_READY = "The leaderboard is not set up yet. You are still signed in. Create Firestore and publish firestore.rules, then reload.";
+let boardsOpen = boardsConfigured();
 
 function $(id) {
   return document.getElementById(id);
@@ -94,13 +99,36 @@ function show(id, on) {
   if (el) el.classList.toggle("hidden", !on);
 }
 
+function firestoreBlocked(err) {
+  const code = String((err && err.code) || "").toLowerCase();
+  const message = String((err && err.message) || err || "");
+  if (code === "permission-denied" || code === "unauthenticated" || code === "not-found") return true;
+  return /SERVICE_DISABLED|PERMISSION_DENIED|Cloud Firestore API has not been used|database \(default\) does not exist/i.test(message);
+}
+
+function applyBoardChrome() {
+  document.documentElement.classList.toggle("lm-boards-off", !boardsOpen);
+  show("section-board", boardsOpen);
+  show("saved-picks-panel", boardsOpen);
+}
+
+function hideBoards(err) {
+  console.error("Leaderboard storage is hidden.", err && err.code ? err.code : err, err);
+  boardsOpen = false;
+  boardSetupMessage = "";
+  applyBoardChrome();
+  renderAccount();
+}
+
 function renderTip() {
   const wrap = $("tip-wrap");
   if (!wrap) return;
   if (!tipReady()) {
-    wrap.innerHTML = '<p class="muted">Tip us is not connected yet. The owner adds a PayPal.me link in assets/site-config.js. A tip would be voluntary and would not buy points, tickets, or a better chance of winning.</p>';
+    wrap.classList.add("hidden");
+    wrap.innerHTML = "";
     return;
   }
+  wrap.classList.remove("hidden");
   wrap.innerHTML =
     '<a class="btn btn-gold" href="' + escapeHtml(config.paypalTipUrl) + '" rel="noopener noreferrer">Tip us</a>' +
     '<p class="lm-help">Voluntary tip through PayPal. It does not buy virtual points, lottery tickets, or a better chance of winning. LotteryMigo is not responsible for any win or loss.</p>';
@@ -114,7 +142,7 @@ function renderAccount() {
   show("btn-sign-out", signedIn);
   show("btn-delete-account", signedIn);
   show("delete-confirm", false);
-  show("account-opt-in-wrap", signedIn);
+  show("account-opt-in-wrap", signedIn && boardsOpen);
   const opt = $("account-opt-in");
   if (opt) opt.checked = !!profile.showOnBoard;
 
@@ -141,6 +169,12 @@ function renderAccount() {
     setText("account-status", native ? "You can use every tool in the app without an account." : "You are not signed in. The games still work.");
     if (signInMessage) {
       setText("account-note", signInMessage);
+    } else if (!boardsOpen) {
+      setText("account-note", native
+        ? "Sign in with Google opens a full-page sign-in, because this app cannot use a popup."
+        : prefersRedirect()
+          ? "On a phone, Sign in with Google opens a full-page sign-in."
+          : "Sign in with Google if you want this browser to remember you. The games still work either way.");
     } else if (native) {
       setText("account-note", "Sign in with Google opens a full-page sign-in, because this app cannot use a popup. If Google does not come back to the app, use the website or the native plugin in docs/FIREBASE_SETUP.md. Your name and photo stay off the board unless you opt in.");
     } else if (prefersRedirect()) {
@@ -165,10 +199,12 @@ function renderAccount() {
       avatar.classList.add("hidden");
     }
   }
-  if (boardSetupMessage) {
+  if (boardsOpen && boardSetupMessage) {
     setText("account-note", boardSetupMessage);
-  } else {
+  } else if (boardsOpen) {
     setText("account-note", "Virtual points on your account: " + (profile.points || 0).toLocaleString() + ". They cannot be cashed out. Your name and photo stay off the leaderboard unless you opt in.");
+  } else {
+    setText("account-note", "You are signed in. Virtual points on this device cannot be cashed out.");
   }
 }
 
@@ -182,6 +218,7 @@ function boardRow(entry) {
 }
 
 function renderBoards(daily, allTime, error) {
+  if (!boardsOpen) return;
   const zone = config.leaderboardTimeZoneLabel || "US Eastern Time (America/New_York)";
   const banner = $("winner-banner");
   const dailyList = $("board-daily");
@@ -215,6 +252,7 @@ function renderBoards(daily, allTime, error) {
 }
 
 async function loadBoards() {
+  if (!boardsOpen) return;
   if (!firebaseReady() || !db || !fsTools) {
     renderBoards([], [], "");
     return;
@@ -235,8 +273,12 @@ async function loadBoards() {
     const [dailySnap, allSnap] = await Promise.all([fsTools.getDocs(dailyQuery), fsTools.getDocs(allQuery)]);
     renderBoards(dailySnap.docs.map((item) => item.data()), allSnap.docs.map((item) => item.data()), "");
   } catch (err) {
+    if (firestoreBlocked(err)) {
+      hideBoards(err);
+      return;
+    }
     console.warn("Leaderboard read failed.", err);
-    renderBoards([], [], "The leaderboard is not set up yet. If Firebase asks for an index, open the link in the browser console and create it. The steps are in docs/FIREBASE_SETUP.md.");
+    renderBoards([], [], "The board could not load. If Firebase asks for an index, open the link in the browser console and create it. The steps are in docs/FIREBASE_SETUP.md.");
   }
 }
 
@@ -277,6 +319,7 @@ function renderPicks(picks, message) {
 }
 
 async function loadPicks(message) {
+  if (!boardsOpen) return;
   if (!currentUser || !db || !fsTools) {
     const note = !firebaseReady()
       ? "Saving picks to an account needs Firebase. Favorite numbers on this device still work, and they do not guarantee a win."
@@ -308,7 +351,7 @@ function publicFields() {
 }
 
 async function saveProfile(nextShow) {
-  if (!currentUser || !db || !fsTools) return;
+  if (!boardsOpen || !currentUser || !db || !fsTools) return;
   profile.showOnBoard = !!nextShow;
   profile.publicName = profile.showOnBoard ? String(currentUser.displayName || "").slice(0, 40) : "";
   profile.publicPhoto = profile.showOnBoard ? safePhoto(currentUser.photoURL) : "";
@@ -329,7 +372,7 @@ async function awardPoints(amount) {
   if (!add) return;
   writeLocalPoints(readLocalPoints() + add);
   renderAccount();
-  if (!currentUser || !db || !fsTools) return;
+  if (!boardsOpen || !currentUser || !db || !fsTools) return;
   const day = easternDay();
   const userRef = fsTools.doc(db, "users", currentUser.uid);
   const dailyRef = fsTools.doc(db, "dailyScores", day + "_" + currentUser.uid);
@@ -349,12 +392,17 @@ async function awardPoints(amount) {
     renderAccount();
     await loadBoards();
   } catch (err) {
+    if (firestoreBlocked(err)) {
+      hideBoards(err);
+      return;
+    }
     console.warn("Could not store virtual points.", err);
     setText("account-note", "The points were counted on this device, but the account board did not accept them. Client scores are easy to edit and are not a prize.");
   }
 }
 
 async function savePick(pick) {
+  if (!boardsOpen) return;
   if (!firebaseReady()) {
     await loadPicks("Saving picks to an account needs Firebase. The sign-in button explains that it is not configured yet.");
     return;
@@ -370,35 +418,56 @@ async function savePick(pick) {
   const whites = String(pick.whites || "").split(",").map(Number).filter((n) => n > 0);
   const special = Number(pick.special);
   if (whites.length !== 5 || !special) return;
-  const existing = await fsTools.getDocs(fsTools.collection(db, "users", currentUser.uid, "picks"));
-  if (existing.size >= MAX_PICKS) {
-    setText("pick-status", "This account already has " + MAX_PICKS + " picks. Remove one before saving another.");
-    return;
+  try {
+    const existing = await fsTools.getDocs(fsTools.collection(db, "users", currentUser.uid, "picks"));
+    if (existing.size >= MAX_PICKS) {
+      setText("pick-status", "This account already has " + MAX_PICKS + " picks. Remove one before saving another.");
+      return;
+    }
+    await fsTools.addDoc(fsTools.collection(db, "users", currentUser.uid, "picks"), {
+      game: pick.game === "MEGAMILLIONS" ? "MEGAMILLIONS" : "POWERBALL",
+      whites: whites,
+      special: special,
+      drawDate: pick.drawDate,
+      bought: !!pick.bought
+    });
+    await loadPicks("Saved. A match below is informational only and does not guarantee a win.");
+  } catch (err) {
+    if (firestoreBlocked(err)) {
+      hideBoards(err);
+      return;
+    }
+    console.error("Saved pick failed.", err);
+    setText("pick-status", "This pick could not be saved.");
   }
-  await fsTools.addDoc(fsTools.collection(db, "users", currentUser.uid, "picks"), {
-    game: pick.game === "MEGAMILLIONS" ? "MEGAMILLIONS" : "POWERBALL",
-    whites: whites,
-    special: special,
-    drawDate: pick.drawDate,
-    bought: !!pick.bought
-  });
-  await loadPicks("Saved. A match below is informational only and does not guarantee a win.");
 }
 
 async function deletePick(id) {
-  if (!currentUser || !db || !fsTools || !id) return;
-  await fsTools.deleteDoc(fsTools.doc(db, "users", currentUser.uid, "picks", id));
-  await loadPicks("Removed from the account. This does not change an official drawing.");
+  if (!boardsOpen || !currentUser || !db || !fsTools || !id) return;
+  try {
+    await fsTools.deleteDoc(fsTools.doc(db, "users", currentUser.uid, "picks", id));
+    await loadPicks("Removed from the account. This does not change an official drawing.");
+  } catch (err) {
+    if (firestoreBlocked(err)) hideBoards(err);
+    else console.error("Could not remove that pick.", err);
+  }
 }
 
 async function deleteAccount() {
   if (!currentUser || !authTools) return;
   const uid = currentUser.uid;
-  const picks = await fsTools.getDocs(fsTools.collection(db, "users", uid, "picks"));
-  for (const item of picks.docs) await fsTools.deleteDoc(item.ref);
-  const daily = await fsTools.getDocs(fsTools.query(fsTools.collection(db, "dailyScores"), fsTools.where("uid", "==", uid)));
-  for (const item of daily.docs) await fsTools.deleteDoc(item.ref);
-  await fsTools.deleteDoc(fsTools.doc(db, "users", uid));
+  if (boardsOpen && db && fsTools) {
+    try {
+      const picks = await fsTools.getDocs(fsTools.collection(db, "users", uid, "picks"));
+      for (const item of picks.docs) await fsTools.deleteDoc(item.ref);
+      const daily = await fsTools.getDocs(fsTools.query(fsTools.collection(db, "dailyScores"), fsTools.where("uid", "==", uid)));
+      for (const item of daily.docs) await fsTools.deleteDoc(item.ref);
+      await fsTools.deleteDoc(fsTools.doc(db, "users", uid));
+    } catch (err) {
+      if (firestoreBlocked(err)) hideBoards(err);
+      else throw err;
+    }
+  }
   try {
     await authTools.deleteUser(currentUser);
   } catch (err) {
@@ -548,14 +617,15 @@ function applyAuthUser(user) {
     boardSetupMessage = "";
     profile = emptyProfile();
     renderAccount();
-    loadPicks().catch((err) => console.warn(err));
+    if (boardsOpen) loadPicks().catch((err) => console.warn(err));
     return;
   }
   renderAccount();
-  if (firstSight) loadSignedInData(uid);
+  if (firstSight && boardsOpen) loadSignedInData(uid);
 }
 
 async function loadSignedInData(uid) {
+  if (!boardsOpen || !db || !fsTools) return;
   try {
     const snap = await withTimeout(fsTools.getDoc(fsTools.doc(db, "users", uid)), 8000);
     if (appliedUid !== uid) return;
@@ -574,16 +644,22 @@ async function loadSignedInData(uid) {
     try {
       await loadPicks();
     } catch (err) {
+      if (firestoreBlocked(err)) {
+        hideBoards(err);
+        return;
+      }
       console.error("Saved picks could not be loaded.", err);
     }
     await loadBoards();
   } catch (err) {
     if (appliedUid !== uid) return;
+    if (firestoreBlocked(err)) {
+      hideBoards(err);
+      return;
+    }
     console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
-    boardSetupMessage = LEADERBOARD_NOT_READY;
+    boardSetupMessage = "Scores and saved picks could not be loaded. You are still signed in.";
     renderAccount();
-    renderPicks([], "Saved picks need the leaderboard storage. Favorites on this device still work.");
-    renderBoards([], [], LEADERBOARD_NOT_READY);
   }
 }
 
@@ -592,7 +668,7 @@ async function connectFirebase() {
   const base = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION;
   const appMod = await import(base + "/firebase-app.js");
   authTools = await import(base + "/firebase-auth.js");
-  fsTools = await import(base + "/firebase-firestore.js");
+  if (boardsOpen) fsTools = await import(base + "/firebase-firestore.js");
   const app = appMod.getApps().length ? appMod.getApp() : appMod.initializeApp(firebaseConfig);
   auth = authTools.getAuth(app);
   try {
@@ -600,7 +676,7 @@ async function connectFirebase() {
   } catch (err) {
     console.error("Google sign-in could not use saved browser storage.", err && err.code ? err.code : err, err);
   }
-  db = fsTools.getFirestore(app);
+  if (boardsOpen) db = fsTools.getFirestore(app);
   authTools.onAuthStateChanged(auth, (user) => {
     applyAuthUser(user);
   }, (err) => {
@@ -658,8 +734,12 @@ function bind() {
   }));
   const opt = $("account-opt-in");
   if (opt) opt.addEventListener("change", () => saveProfile(opt.checked).catch((err) => {
+    if (firestoreBlocked(err)) {
+      hideBoards(err);
+      return;
+    }
     console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
-    boardSetupMessage = LEADERBOARD_NOT_READY;
+    boardSetupMessage = "The board did not save that choice. You are still signed in.";
     renderAccount();
   }));
   const picks = $("saved-picks-list");
@@ -676,11 +756,14 @@ window.lmSavePick = savePick;
 window.lmRenderPicks = () => loadPicks();
 document.addEventListener("lm-draws-ready", () => loadPicks());
 
+applyBoardChrome();
 renderTip();
 renderAccount();
-renderBoards([], [], "");
+if (boardsOpen) {
+  renderBoards([], [], "");
+  loadPicks();
+}
 bind();
-loadPicks();
 connectFirebase().catch((err) => {
   console.warn("Firebase did not start.", err);
   setText("account-note", "Firebase did not start. The rest of the site still works. Check assets/site-config.js.");

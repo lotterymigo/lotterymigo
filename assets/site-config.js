@@ -17,8 +17,12 @@ window.LOTTERYMIGO_CONFIG = {
     appId: "1:349957688958:web:0b4e7d2c93691f9cac922f",
     measurementId: "G-YN21YZ62BC"
   },
-  /* Voluntary tip. Not a payment for points, tickets, or wins. */
+  /* Tip us stays hidden until this is a real PayPal.me link.
+     An empty value, or YOUR_PAYPAL_NAME, keeps the whole tip area off the page. */
   paypalTipUrl: "https://paypal.me/YOUR_PAYPAL_NAME",
+  /* Leaderboard, winner banner, and saved picks stay hidden until this is true.
+     Turn it on only after Firestore exists and firestore.rules is published. */
+  firestoreEnabled: false,
   /* Daily board day boundary. Shown on the page in plain words. */
   leaderboardTimeZone: "America/New_York",
   leaderboardTimeZoneLabel: "US Eastern Time (America/New_York)"

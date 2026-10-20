@@ -899,6 +899,7 @@ main.wrap {
 }
 
 .pick-box { min-width: min(100%, 16rem); }
+html.lm-boards-off .pick-box { display: none !important; }
 
 #winner-banner {
   display: flex;

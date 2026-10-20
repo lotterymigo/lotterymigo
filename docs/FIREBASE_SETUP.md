@@ -2,7 +2,7 @@
 
 The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The page does not load Firebase Analytics, even though `measurementId` is in that file. Virtual points are not cash, and a score saved from the browser is not tamper-proof.
 
-The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. `paypalTipUrl` is `https://paypal.me/nabinpkl`. `firestoreEnabled` is `true` because Firestore exists and `firestore.rules` is published. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
+The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. `tipUrl` is `https://buymeacoffee.com/nabinp` on the website. The app build clears that value, and the page also hides the button inside Capacitor. `firestoreEnabled` is `true` because Firestore exists and `firestore.rules` is published. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
 
 ## Remaining manual steps
 
@@ -77,11 +77,12 @@ A signed-in player can press **Delete my account and data**, then **Yes, delete 
 
 You can also delete the user in **Authentication → Users** and delete their Firestore documents by hand. Email requests go to info@lotterymigo.com.
 
-## 7. PayPal tip
+## 7. Voluntary tip
 
-1. `assets/site-config.js` has `paypalTipUrl` set to `https://paypal.me/nabinpkl`. That is the link the **Tip us** button opens in a new tab.
-2. While `paypalTipUrl` is empty or still contains `YOUR_PAYPAL_NAME`, the tip area is not on the page at all. Visitors do not see a “not connected” note.
-3. The button is a voluntary tip. It does not buy points, tickets, or a better chance of winning.
+1. `assets/site-config.js` has `tipUrl` set to `https://buymeacoffee.com/nabinp`. On the website, that is the link the **Buy us a coffee** button opens in a new tab.
+2. While `tipUrl` is empty or still contains `YOUR_`, the tip area is not on the page at all. Visitors do not see a “not connected” note.
+3. The button is a voluntary tip. It does not buy points, tickets, or a better chance of winning. LotteryMigo is not responsible for any win or loss.
+4. The native app must not show an outside payment link. `npm run build:web` writes an empty `tipUrl` into `www/assets/site-config.js` and stops if that copy still names a payment host. The page also hides the button when it is running inside Capacitor.
 
 ## 8. Native app (Capacitor)
 

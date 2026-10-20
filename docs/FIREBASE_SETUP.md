@@ -2,7 +2,7 @@
 
 The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The page does not load Firebase Analytics, even though `measurementId` is in that file. Virtual points are not cash, and a score saved from the browser is not tamper-proof.
 
-The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. Leave `paypalTipUrl` as the PayPal placeholder until the tip section below. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
+The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. Leave `paypalTipUrl` as the PayPal placeholder until the tip section below. Leave `firestoreEnabled` set to `false` until Firestore exists and the rules are published. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
 
 ## Remaining manual steps
 
@@ -16,7 +16,9 @@ Also confirm **Authentication → Sign-in method** has **Google** enabled. A des
 
 `vercel.json` sends `Cross-Origin-Opener-Policy: same-origin-allow-popups`. A stricter `same-origin` policy makes the browser report the Google window as closed immediately, which is the popup that vanishes as soon as you click. There is no Content-Security-Policy header: a strict policy would block the Firebase, Chart.js, font, and AdSense scripts this page loads. `authDomain` stays `lotterymigo.firebaseapp.com`.
 
-Every visit to the home page registers `onAuthStateChanged` and calls `getRedirectResult`, including the return from a full-page sign-in. The Firebase app, Auth, and Firestore scripts are the same `11.6.0` build, and they share one Auth object. Sign-in is stored with `browserLocalPersistence`, so a refresh keeps the session. The Account card shows the Google display name, the photo when Google provides an `https` address, and **Sign out**, and it hides **Sign in with Google**. That card is drawn before any Firestore call. If Firestore is not created yet, or the rules are not published, the person still looks signed in and the page says the leaderboard is not set up yet.
+Every visit to the home page registers `onAuthStateChanged` and calls `getRedirectResult`, including the return from a full-page sign-in. The Firebase app, Auth, and Firestore scripts are the same `11.6.0` build, and they share one Auth object. Sign-in is stored with `browserLocalPersistence`, so a refresh keeps the session. The Account card shows the Google display name, the photo when Google provides an `https` address, and **Sign out**, and it hides **Sign in with Google**. That card is drawn before any Firestore call.
+
+While `firestoreEnabled` is `false`, visitors do not see the virtual points board, the winner banner, saved picks, or a “not set up” note. Google sign-in still works, and the signed-in card does not mention the leaderboard. After you create Firestore and publish `firestore.rules`, set `firestoreEnabled` to `true` in `assets/site-config.js`. If a later Firestore call fails because the API is disabled or the rules reject it (`SERVICE_DISABLED` or a permission error), the page hides those sections again and writes the error only to the browser console.
 
 ## 1. Web config already in the repo
 
@@ -40,13 +42,14 @@ Every visit to the home page registers `onAuthStateChanged` and calls `getRedire
 
 1. Open **Build → Firestore Database** and create a database. Start in **production mode**.
 2. Open the **Rules** tab and replace the editor contents with the full text of `firestore.rules` from this repository. Publish.
-3. What those rules allow:
+3. In `assets/site-config.js`, change `firestoreEnabled` from `false` to `true`. Until that flag is true, the board, the winner banner, and saved picks stay off the page.
+4. What those rules allow:
    - Anyone can read the public point totals and, only when that player opted in, the display name and photo URL stored for the board.
    - Saved picks sit under `users/{uid}/picks` and only that signed-in user can read or write them.
    - A player can only write their own user row and their own daily row (`dailyScores/{YYYY-MM-DD}_{uid}`).
    - A display name or photo URL is rejected unless “show on the board” is true. A photo URL must be empty or start with `https://`.
    - One write can add at most 800 virtual points, and point increases must be at least 2 seconds apart.
-4. That is basic abuse protection only. Anyone can still change the page’s JavaScript and submit a score. **Do not pay a prize from these numbers.** A server check, such as a Cloud Function that deals the card itself, would be required before any real prize. This site has no cash prizes.
+5. That is basic abuse protection only. Anyone can still change the page’s JavaScript and submit a score. **Do not pay a prize from these numbers.** A server check, such as a Cloud Function that deals the card itself, would be required before any real prize. This site has no cash prizes.
 
 ## 4. Create the daily-board index
 
@@ -77,8 +80,8 @@ You can also delete the user in **Authentication → Users** and delete their Fi
 ## 7. PayPal tip
 
 1. Create a PayPal.me name you control.
-2. In `assets/site-config.js`, replace `https://paypal.me/YOUR_PAYPAL_NAME` with your real `https://paypal.me/YourName` link. One file, one URL.
-3. Until that `YOUR_` text is gone, the page does not link anywhere. It says the tip is not connected.
+2. In `assets/site-config.js`, replace `https://paypal.me/YOUR_PAYPAL_NAME` with your real `https://paypal.me/YourName` link. One file, one URL. That is what turns the tip on.
+3. While `paypalTipUrl` is empty or still contains `YOUR_PAYPAL_NAME`, the tip area is not on the page at all. Visitors do not see a “not connected” note.
 4. The button is a voluntary tip. It does not buy points, tickets, or a better chance of winning.
 
 ## 8. Native app (Capacitor)

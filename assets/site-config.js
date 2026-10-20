@@ -17,9 +17,9 @@ window.LOTTERYMIGO_CONFIG = {
     appId: "1:349957688958:web:0b4e7d2c93691f9cac922f",
     measurementId: "G-YN21YZ62BC"
   },
-  /* Tip us stays hidden until this is a real PayPal.me link.
-     An empty value, or YOUR_PAYPAL_NAME, keeps the whole tip area off the page. */
-  paypalTipUrl: "https://paypal.me/YOUR_PAYPAL_NAME",
+  /* Voluntary tip. Not a payment for points, tickets, or wins.
+     An empty value, or YOUR_PAYPAL_NAME, hides the whole tip area. */
+  paypalTipUrl: "https://paypal.me/nabinpkl",
   /* Firestore is created and firestore.rules is published, so the board is on.
      Set this back to false only to hide the board, winner banner, and saved picks. */
   firestoreEnabled: true,

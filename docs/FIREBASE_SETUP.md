@@ -2,7 +2,7 @@
 
 The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The page does not load Firebase Analytics, even though `measurementId` is in that file. Virtual points are not cash, and a score saved from the browser is not tamper-proof.
 
-The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. Leave `paypalTipUrl` as the PayPal placeholder until the tip section below. `firestoreEnabled` is `true` because Firestore exists and `firestore.rules` is published. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
+The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. `paypalTipUrl` is `https://paypal.me/nabinpkl`. `firestoreEnabled` is `true` because Firestore exists and `firestore.rules` is published. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
 
 ## Remaining manual steps
 
@@ -79,10 +79,9 @@ You can also delete the user in **Authentication → Users** and delete their Fi
 
 ## 7. PayPal tip
 
-1. Create a PayPal.me name you control.
-2. In `assets/site-config.js`, replace `https://paypal.me/YOUR_PAYPAL_NAME` with your real `https://paypal.me/YourName` link. One file, one URL. That is what turns the tip on.
-3. While `paypalTipUrl` is empty or still contains `YOUR_PAYPAL_NAME`, the tip area is not on the page at all. Visitors do not see a “not connected” note.
-4. The button is a voluntary tip. It does not buy points, tickets, or a better chance of winning.
+1. `assets/site-config.js` has `paypalTipUrl` set to `https://paypal.me/nabinpkl`. That is the link the **Tip us** button opens in a new tab.
+2. While `paypalTipUrl` is empty or still contains `YOUR_PAYPAL_NAME`, the tip area is not on the page at all. Visitors do not see a “not connected” note.
+3. The button is a voluntary tip. It does not buy points, tickets, or a better chance of winning.
 
 ## 8. Native app (Capacitor)
 

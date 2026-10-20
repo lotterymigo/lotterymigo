@@ -130,7 +130,7 @@ function renderTip() {
   }
   wrap.classList.remove("hidden");
   wrap.innerHTML =
-    '<a class="btn btn-gold" href="' + escapeHtml(config.paypalTipUrl) + '" rel="noopener noreferrer">Tip us</a>' +
+    '<a class="btn btn-gold" href="' + escapeHtml(config.paypalTipUrl) + '" target="_blank" rel="noopener noreferrer">Tip us</a>' +
     '<p class="lm-help">Voluntary tip through PayPal. It does not buy virtual points, lottery tickets, or a better chance of winning. LotteryMigo is not responsible for any win or loss.</p>';
 }
 

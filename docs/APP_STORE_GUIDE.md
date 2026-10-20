@@ -168,7 +168,7 @@ The shell does not show an interstitial or a rewarded ad. Do not add one on the 
 
 The public website loads Google AdSense in the page head, and `ads.txt` lives at the site root. `npm run build:web` strips that AdSense script from the HTML copied into `www/` and does not copy `ads.txt`. The app keeps using AdMob only.
 
-The website **Buy us a coffee** button is a voluntary tip. It is not a charity donation, so Google Play does not allow that outside payment link in the app. `npm run build:web` writes an empty `tipUrl` into `www/assets/site-config.js` and stops if that file still names a payment host. The page also hides the button when Capacitor reports a native platform.
+The website header **Buy us a coffee** button is a voluntary tip. It is not a charity donation, so Google Play does not allow that outside payment link in the app. `npm run build:web` writes an empty `tipUrl` into `www/assets/site-config.js` and stops if that file still names a payment host. The page also hides the button when Capacitor reports a native platform.
 
 ### Consent (UMP)
 

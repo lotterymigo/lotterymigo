@@ -26,10 +26,13 @@
   </div>
   <header class="site-header">
     <div class="wrap header-bar">
-      <a class="brand" href="index.html">
-        <img src="icons/logo.svg" width="44" height="44" alt="" />
-        <span class="brand-name">LotteryMigo</span>
-      </a>
+      <div class="header-top">
+        <a class="brand" href="index.html">
+          <img src="icons/logo.svg" width="44" height="44" alt="" />
+          <span class="brand-name">LotteryMigo</span>
+        </a>
+        <a class="tip-chip hidden" data-tip="header" hidden></a>
+      </div>
       <nav class="nav" aria-label="Site pages">
         <a href="index.html">Home</a>
         <a href="about.html">About</a>
@@ -55,8 +58,11 @@
   <footer class="site-footer">
     <div class="wrap stack">
       <p>Entertainment only. Not gambling advice. No win is guaranteed. © 2026 LotteryMigo.com</p>
+      <p id="tip-note" class="tip-note hidden" data-tip="note" hidden></p>
       <p>Contact <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a></p>
     </div>
   </footer>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/tip.js"></script>
 </body>
 </html>

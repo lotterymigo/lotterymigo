@@ -79,8 +79,8 @@ You can also delete the user in **Authentication → Users** and delete their Fi
 
 ## 7. Voluntary tip
 
-1. `assets/site-config.js` has `tipUrl` set to `https://buymeacoffee.com/nabinp`. On the website, that is the link the **Buy us a coffee** button opens in a new tab.
-2. While `tipUrl` is empty or still contains `YOUR_`, the tip area is not on the page at all. Visitors do not see a “not connected” note.
+1. `assets/site-config.js` has `tipUrl` set to `https://buymeacoffee.com/nabinp`. On the website, the header **Buy us a coffee** button opens that link in a new tab. On a narrow phone the label shortens to **Coffee**. The footer keeps a smaller link next to the voluntary-tip note.
+2. While `tipUrl` is empty or still contains `YOUR_`, the header button and the footer note are not on the page at all.
 3. The button is a voluntary tip. It does not buy points, tickets, or a better chance of winning. LotteryMigo is not responsible for any win or loss.
 4. The native app must not show an outside payment link. `npm run build:web` writes an empty `tipUrl` into `www/assets/site-config.js` and stops if that copy still names a payment host. The page also hides the button when it is running inside Capacitor.
 

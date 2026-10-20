@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as esbuild from 'esbuild';
@@ -41,8 +41,48 @@ for (const file of pages) {
   }
 }
 await cp(path.join(root, 'assets'), path.join(www, 'assets'), { recursive: true });
+
+// Google Play does not allow an outside payment link for a non-charity tip.
+// The website keeps tipUrl. The app copy must not.
+const configPath = path.join(www, 'assets', 'site-config.js');
+let appConfig = await readFile(configPath, 'utf8');
+if (!/tipUrl:\s*"/.test(appConfig)) {
+  throw new Error('www/assets/site-config.js has no tipUrl to clear.');
+}
+appConfig = appConfig.replace(/tipUrl:\s*"[^"]*"/, 'tipUrl: ""');
+await writeFile(configPath, appConfig);
+
+const accountPath = path.join(www, 'assets', 'account.js');
+let accountSource = await readFile(accountPath, 'utf8');
+const tipMarker = '/* tip-host-check */';
+const markerAt = accountSource.indexOf(tipMarker);
+const markerLineEnd = markerAt === -1 ? -1 : accountSource.indexOf('\n', markerAt);
+const checkLineEnd = markerLineEnd === -1 ? -1 : accountSource.indexOf('\n', markerLineEnd + 1);
+if (markerAt === -1 || checkLineEnd === -1) {
+  throw new Error('www/assets/account.js is missing the tip host check to remove.');
+}
+accountSource = accountSource.slice(0, markerAt) + 'return false;' + accountSource.slice(checkLineEnd);
+await writeFile(accountPath, accountSource);
+
 await cp(path.join(root, 'icons'), path.join(www, 'icons'), { recursive: true });
 await mkdir(path.join(www, 'data'), { recursive: true });
 await cp(path.join(root, 'data', 'draws.json'), path.join(www, 'data', 'draws.json'));
+await assertNoPaymentLink(www);
 
 console.log('Copied web assets to www/, including data/draws.json for offline use.');
+
+async function assertNoPaymentLink(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await assertNoPaymentLink(full);
+      continue;
+    }
+    if (!/\.(html|js|css|json|txt|xml|webmanifest|md)$/i.test(entry.name)) continue;
+    const text = await readFile(full, 'utf8');
+    if (/buymeacoffee\.com|paypal\.me/i.test(text)) {
+      throw new Error('App build still contains a tip payment link in ' + path.relative(www, full));
+    }
+  }
+}

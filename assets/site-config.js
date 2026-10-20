@@ -20,9 +20,9 @@ window.LOTTERYMIGO_CONFIG = {
   /* Tip us stays hidden until this is a real PayPal.me link.
      An empty value, or YOUR_PAYPAL_NAME, keeps the whole tip area off the page. */
   paypalTipUrl: "https://paypal.me/YOUR_PAYPAL_NAME",
-  /* Leaderboard, winner banner, and saved picks stay hidden until this is true.
-     Turn it on only after Firestore exists and firestore.rules is published. */
-  firestoreEnabled: false,
+  /* Firestore is created and firestore.rules is published, so the board is on.
+     Set this back to false only to hide the board, winner banner, and saved picks. */
+  firestoreEnabled: true,
   /* Daily board day boundary. Shown on the page in plain words. */
   leaderboardTimeZone: "America/New_York",
   leaderboardTimeZoneLabel: "US Eastern Time (America/New_York)"

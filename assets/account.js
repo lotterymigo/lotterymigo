@@ -23,13 +23,6 @@ function firebaseReady() {
   return ["apiKey", "authDomain", "projectId", "appId"].every((key) => !isPlaceholder(firebaseConfig[key]));
 }
 
-function tipReady() {
-  const url = String(config.tipUrl || "").trim();
-  if (!url || url.indexOf("YOUR_") !== -1) return false;
-  /* tip-host-check */
-  return /^https:\/\/(www\.)?buymeacoffee\.com\/[A-Za-z0-9._-]+$/i.test(url);
-}
-
 function boardsConfigured() {
   return config.firestoreEnabled === true;
 }
@@ -119,27 +112,6 @@ function hideBoards(err) {
   boardSetupMessage = "";
   applyBoardChrome();
   renderAccount();
-}
-
-function renderTip() {
-  const wrap = $("tip-wrap");
-  if (!wrap) return;
-  /* Google Play does not allow an outside payment link for a non-charity tip. */
-  if (isNativeApp() || !tipReady()) {
-    wrap.classList.add("hidden");
-    wrap.innerHTML = "";
-    return;
-  }
-  const icon =
-    '<svg class="tip-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-    '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4.5 9h11.2v5.2a4.2 4.2 0 0 1-4.2 4.2H8.7a4.2 4.2 0 0 1-4.2-4.2V9z"/>' +
-    '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M15.7 10.2h2.1a2.4 2.4 0 0 1 0 4.8h-2.1"/>' +
-    '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 4.2c.5.9.5 1.5 0 2.4M11 4.2c.5.9.5 1.5 0 2.4"/>' +
-    '</svg>';
-  wrap.classList.remove("hidden");
-  wrap.innerHTML =
-    '<a class="btn btn-gold tip-link" href="' + escapeHtml(config.tipUrl) + '" target="_blank" rel="noopener noreferrer">' + icon + 'Buy us a coffee</a>' +
-    '<p class="lm-help">Voluntary tip. It does not buy virtual points, lottery tickets, or a better chance of winning. LotteryMigo is not responsible for any win or loss.</p>';
 }
 
 function renderAccount() {
@@ -765,7 +737,6 @@ window.lmRenderPicks = () => loadPicks();
 document.addEventListener("lm-draws-ready", () => loadPicks());
 
 applyBoardChrome();
-renderTip();
 renderAccount();
 if (boardsOpen) {
   renderBoards([], [], "");

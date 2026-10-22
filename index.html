@@ -37,12 +37,15 @@
   <!-- Header -->
   <header class="site-header">
     <div class="wrap header-bar">
-      <div class="brand">
-        <img src="icons/logo.svg" width="44" height="44" alt="" />
-        <span>
-          <span class="brand-name">LotteryMigo</span>
-          <span class="brand-tag">Number tools for fun</span>
-        </span>
+      <div class="header-top">
+        <div class="brand">
+          <img src="icons/logo.svg" width="44" height="44" alt="" />
+          <span>
+            <span class="brand-name">LotteryMigo</span>
+            <span class="brand-tag">Number tools for fun</span>
+          </span>
+        </div>
+        <a class="tip-chip hidden" data-tip="header" hidden></a>
       </div>
 
       <div id="game-toggle" class="seg" role="group" aria-label="Choose a lottery">
@@ -399,7 +402,7 @@
           <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a>
         </nav>
       </div>
-      <div id="tip-wrap" class="stack hidden"></div>
+      <p id="tip-note" class="tip-note hidden" data-tip="note" hidden></p>
       <p><strong>DISCLAIMER:</strong> LotteryMigo does not guarantee any lottery win or prize outcome. Powerball® and Mega Millions® are registered trademarks of their respective consortiums. LotteryMigo is not sponsored by or affiliated with any state or national lottery agency. © 2026 LotteryMigo.com. All rights reserved.</p>
     </div>
   </footer>
@@ -1695,6 +1698,7 @@
     });
   </script>
   <script src="assets/site-config.js"></script>
+  <script src="assets/tip.js"></script>
   <script type="module" src="assets/scratch-bridge.js"></script>
   <script type="module" src="assets/account.js"></script>
   <script type="module" src="assets/native-shell.js"></script>

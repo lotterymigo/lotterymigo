@@ -263,6 +263,21 @@ main.wrap {
   padding-block: var(--space-2);
 }
 
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.header-top .brand {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -518,12 +533,54 @@ main.wrap {
 
 .btn-gold:hover { filter: brightness(1.05); }
 
-.tip-link { gap: 0.45rem; }
+.tip-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex: none;
+  width: auto;
+  min-height: 48px;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--gold-ink);
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tip-chip:hover { filter: brightness(1.05); }
 
 .tip-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.15rem;
+  height: 1.15rem;
   flex: none;
+}
+
+.tip-label-short { display: none; }
+
+.tip-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.tip-footer-link {
+  color: var(--link);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 40rem) {
+  .tip-label-full { display: none; }
+  .tip-label-short { display: inline; }
+  .tip-chip { padding: 0.35rem 0.65rem; }
 }
 
 .btn-quiet {

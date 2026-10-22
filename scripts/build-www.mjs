@@ -52,17 +52,17 @@ if (!/tipUrl:\s*"/.test(appConfig)) {
 appConfig = appConfig.replace(/tipUrl:\s*"[^"]*"/, 'tipUrl: ""');
 await writeFile(configPath, appConfig);
 
-const accountPath = path.join(www, 'assets', 'account.js');
-let accountSource = await readFile(accountPath, 'utf8');
+const tipPath = path.join(www, 'assets', 'tip.js');
+let tipSource = await readFile(tipPath, 'utf8');
 const tipMarker = '/* tip-host-check */';
-const markerAt = accountSource.indexOf(tipMarker);
-const markerLineEnd = markerAt === -1 ? -1 : accountSource.indexOf('\n', markerAt);
-const checkLineEnd = markerLineEnd === -1 ? -1 : accountSource.indexOf('\n', markerLineEnd + 1);
+const markerAt = tipSource.indexOf(tipMarker);
+const markerLineEnd = markerAt === -1 ? -1 : tipSource.indexOf('\n', markerAt);
+const checkLineEnd = markerLineEnd === -1 ? -1 : tipSource.indexOf('\n', markerLineEnd + 1);
 if (markerAt === -1 || checkLineEnd === -1) {
-  throw new Error('www/assets/account.js is missing the tip host check to remove.');
+  throw new Error('www/assets/tip.js is missing the tip host check to remove.');
 }
-accountSource = accountSource.slice(0, markerAt) + 'return false;' + accountSource.slice(checkLineEnd);
-await writeFile(accountPath, accountSource);
+tipSource = tipSource.slice(0, markerAt) + 'return "";' + tipSource.slice(checkLineEnd);
+await writeFile(tipPath, tipSource);
 
 await cp(path.join(root, 'icons'), path.join(www, 'icons'), { recursive: true });
 await mkdir(path.join(www, 'data'), { recursive: true });

@@ -32,6 +32,7 @@
   </script>
 </head>
 <body class="page">
+  <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- Compliance -->
   <div class="compliance">
@@ -54,15 +55,6 @@
         <a class="tip-chip hidden" data-tip="header" hidden></a>
       </div>
 
-      <div id="game-toggle" class="seg" role="group" aria-label="Choose a lottery">
-        <button id="btn-toggle-pb" type="button" onclick="switchGame('POWERBALL')" aria-pressed="true" class="seg-btn is-pb">
-          <span class="dot" aria-hidden="true"></span> Powerball
-        </button>
-        <button id="btn-toggle-mm" type="button" onclick="switchGame('MEGAMILLIONS')" aria-pressed="false" class="seg-btn">
-          <span class="dot" aria-hidden="true"></span> Mega Millions
-        </button>
-      </div>
-
       <nav class="nav" aria-label="Site pages">
         <a href="#section-stats" aria-current="page">Stats</a>
         <a href="powerball/results.html">Powerball results</a>
@@ -76,21 +68,17 @@
     </div>
   </header>
 
-  <!-- Notice -->
-  <div id="legal-alert-banner" class="wrap banner">
-    <div class="card card-tight notice">
-      <p><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or number ideas <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions. This website uses Google AdSense, which may store cookies to show and measure ads.</p>
-      <div class="row">
-        <a href="terms.html">Terms</a>
-        <a href="privacy.html">Privacy</a>
-        <button type="button" class="btn btn-gold" onclick="dismissLegalAlert()">OK, hide this note</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Hero -->
   <section class="hero">
     <div class="wrap hero-inner">
+      <div id="game-toggle" class="seg" role="group" aria-label="Choose a lottery">
+        <button id="btn-toggle-pb" type="button" onclick="switchGame('POWERBALL')" aria-pressed="true" class="seg-btn is-pb">
+          <span class="dot" aria-hidden="true"></span> Powerball
+        </button>
+        <button id="btn-toggle-mm" type="button" onclick="switchGame('MEGAMILLIONS')" aria-pressed="false" class="seg-btn">
+          <span class="dot" aria-hidden="true"></span> Mega Millions
+        </button>
+      </div>
       <p id="hero-badge" class="badge">Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.</p>
       <h1>Most Frequent and Longest Gap for <span id="hero-title-game" class="tone-pb">Powerball</span></h1>
       <p>Frequencies, the longest gaps, and the official draw list are the focus of this page. Written guides, recent results, and a page for each current number are linked from <a href="learn/index.html">Guides</a>. <strong class="tone-gold">For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
@@ -119,6 +107,10 @@
       </div>
     </div>
   </section>
+
+  <div id="legal-alert-banner" class="guarantee-bar">
+    <p class="wrap guarantee-line"><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or number ideas <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions. This website uses Google AdSense, which may store cookies to show and measure ads. <a href="terms.html">Terms</a> <a href="privacy.html">Privacy</a> <button type="button" class="btn btn-gold" onclick="dismissLegalAlert()">OK, hide this note</button></p>
+  </div>
 
   <main id="main" class="wrap stack" tabindex="-1">
 

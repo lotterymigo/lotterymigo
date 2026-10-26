@@ -21,10 +21,16 @@ window.LOTTERYMIGO_CONFIG = {
      An empty value, or a YOUR_ placeholder, hides the whole tip area.
      The Capacitor build clears this so the app does not ship a payment link. */
   tipUrl: "https://buymeacoffee.com/nabinp",
-  /* Firestore is created and firestore.rules is published, so the board is on.
-     Set this back to false only to hide the board, winner banner, and saved picks. */
+  /* Saved picks use Firestore. The points board is no longer on the site.
+     Set this to false to hide account picks. Sign-in still works. */
   firestoreEnabled: true,
-  /* Daily board day boundary. Shown on the page in plain words. */
   leaderboardTimeZone: "America/New_York",
-  leaderboardTimeZoneLabel: "US Eastern Time (America/New_York)"
+  leaderboardTimeZoneLabel: "US Eastern Time (America/New_York)",
+  /* Responsive AdSense units. Leave a value empty until the owner creates it.
+     Auto ads can run from the AdSense script without these ids. */
+  adSlots: {
+    belowHeader: "",
+    betweenStats: "",
+    footer: ""
+  }
 };

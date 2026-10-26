@@ -1,6 +1,8 @@
-# Firebase, leaderboard, and tips
+# Firebase, saved picks, and tips
 
-The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The page does not load Firebase Analytics, even though `measurementId` is in that file. Virtual points are not cash, and a score saved from the browser is not tamper-proof.
+The website is a statistics site. It no longer shows a points board, a winner of the day, or a scratch game, and the page does not write `dailyScores`. Google sign-in and saved number picks remain. `firestore.rules` is unchanged in this change so the live database is not edited from the repo. Old `users` point fields and `dailyScores` rows can be deleted later from the Firebase console. The rules can later drop the points and `dailyScores` sections. Do not delete that data until you have decided you do not need it.
+
+The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The page does not load Firebase Analytics, even though `measurementId` is in that file.
 
 The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. `tipUrl` is `https://buymeacoffee.com/nabinp` on the website. The app build clears that value, and the page also hides the button inside Capacitor. `firestoreEnabled` is `true` because Firestore exists and `firestore.rules` is published. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
 
@@ -18,7 +20,7 @@ Also confirm **Authentication → Sign-in method** has **Google** enabled. A des
 
 Every visit to the home page registers `onAuthStateChanged` and calls `getRedirectResult`, including the return from a full-page sign-in. The Firebase app, Auth, and Firestore scripts are the same `11.6.0` build, and they share one Auth object. Sign-in is stored with `browserLocalPersistence`, so a refresh keeps the session. The Account card shows the Google display name, the photo when Google provides an `https` address, and **Sign out**, and it hides **Sign in with Google**. That card is drawn before any Firestore call.
 
-`firestoreEnabled` is `true`, so visitors see the virtual points board, the winner banner, and saved picks. Google sign-in still works when that flag is `false`, and the signed-in card then does not mention the leaderboard. If a Firestore call fails because the API is disabled or the rules reject it (`SERVICE_DISABLED` or a permission error), the page hides those sections and writes the error only to the browser console.
+`firestoreEnabled` is `true`, so a signed-in visitor can save number picks. The points board and winner banner are not on the page. Google sign-in still works when that flag is `false`, and saved picks stay hidden. If a Firestore call fails because the API is disabled or the rules reject it (`SERVICE_DISABLED` or a permission error), the page hides saved picks and writes the error only to the browser console.
 
 ## 1. Web config already in the repo
 
@@ -42,7 +44,7 @@ Every visit to the home page registers `onAuthStateChanged` and calls `getRedire
 
 1. Open **Build → Firestore Database** and create a database. Start in **production mode**.
 2. Open the **Rules** tab and replace the editor contents with the full text of `firestore.rules` from this repository. Publish.
-3. `assets/site-config.js` already has `firestoreEnabled` set to `true`, so the board, the winner banner, and saved picks are on the page.
+3. `assets/site-config.js` already has `firestoreEnabled` set to `true`, so saved picks are available after sign-in. The site does not write `dailyScores`.
 4. What those rules allow:
    - Anyone can read the public point totals and, only when that player opted in, the display name and photo URL stored for the board.
    - Saved picks sit under `users/{uid}/picks` and only that signed-in user can read or write them.
@@ -98,4 +100,4 @@ When you are ready to sign in from the app:
 6. Rebuild with `npm run build:web` and `npx cap sync`.
 7. The app is still not store-ready. Update the privacy labels and `privacy.html` if the native SDK collects anything this page does not already describe.
 
-Favorites on the device (`lotterymigo_favorites`) and the scratch game keep working with no account, in the browser and in the app shell.
+Favorites on the device (`lotterymigo_favorites`) and the statistics keep working with no account, in the browser and in the app shell.

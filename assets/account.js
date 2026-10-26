@@ -1,14 +1,14 @@
 /* ============================================================
-   Accounts, virtual points, and saved picks
+   Accounts and saved number picks
    ------------------------------------------------------------
    Reads window.LOTTERYMIGO_CONFIG from assets/site-config.js.
    If the Firebase values still contain YOUR_, nothing calls
-   Google. Signed-out visitors keep the full free site.
-   Scores written from the browser are not tamper-proof.
+   Google. Signed-out visitors keep the full stats site.
+   The published Firestore rules still expect a points field.
+   New profiles store 0 and do not write dailyScores.
    ============================================================ */
 
 const DISCLAIMER = "18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.";
-const LOCAL_POINTS_KEY = "lotterymigo_local_points";
 const FIREBASE_VERSION = "11.6.0";
 const MAX_PICKS = 30;
 
@@ -25,25 +25,6 @@ function firebaseReady() {
 
 function boardsConfigured() {
   return config.firestoreEnabled === true;
-}
-
-function easternDay(date) {
-  const zone = config.leaderboardTimeZone || "America/New_York";
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: zone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(date || new Date());
-}
-
-function readLocalPoints() {
-  const n = parseInt(localStorage.getItem(LOCAL_POINTS_KEY) || "0", 10);
-  return Number.isFinite(n) && n > 0 ? n : 0;
-}
-
-function writeLocalPoints(n) {
-  localStorage.setItem(LOCAL_POINTS_KEY, String(Math.max(0, n)));
 }
 
 function isNativeApp() {
@@ -102,12 +83,11 @@ function firestoreBlocked(err) {
 
 function applyBoardChrome() {
   document.documentElement.classList.toggle("lm-boards-off", !boardsOpen);
-  show("section-board", boardsOpen);
   show("saved-picks-panel", boardsOpen);
 }
 
 function hideBoards(err) {
-  console.error("Leaderboard storage is hidden.", err && err.code ? err.code : err, err);
+  console.error("Saved picks are hidden.", err && err.code ? err.code : err, err);
   boardsOpen = false;
   boardSetupMessage = "";
   applyBoardChrome();
@@ -118,13 +98,9 @@ function renderAccount() {
   const configured = firebaseReady();
   const native = isNativeApp();
   const signedIn = !!(currentUser && configured);
-  setText("account-points", "Virtual points on this device: " + readLocalPoints().toLocaleString() + ". These points have no cash value.");
   show("btn-sign-out", signedIn);
   show("btn-delete-account", signedIn);
   show("delete-confirm", false);
-  show("account-opt-in-wrap", signedIn && boardsOpen);
-  const opt = $("account-opt-in");
-  if (opt) opt.checked = !!profile.showOnBoard;
 
   const signIn = $("btn-sign-in");
   if (signIn) {
@@ -142,11 +118,11 @@ function renderAccount() {
     }
     setText("account-name", "");
     if (!configured) {
-      setText("account-status", "You can use every tool on this page without an account.");
-      setText("account-note", "Sign in with Google is not set up yet. The owner still needs to paste Firebase keys into assets/site-config.js. Scratch cards, the generator, history, and favorites on this device keep working.");
+      setText("account-status", "The statistics stay available without an account.");
+      setText("account-note", "Sign in with Google is not set up yet. Frequencies, the draw list, and favorites on this device keep working.");
       return;
     }
-    setText("account-status", native ? "You can use every tool in the app without an account." : "You are not signed in. The games still work.");
+    setText("account-status", native ? "The statistics stay available in the app without an account." : "You are not signed in.");
     if (signInMessage) {
       setText("account-note", signInMessage);
     } else if (!boardsOpen) {
@@ -154,13 +130,13 @@ function renderAccount() {
         ? "Sign in with Google opens a full-page sign-in, because this app cannot use a popup."
         : prefersRedirect()
           ? "On a phone, Sign in with Google opens a full-page sign-in."
-          : "Sign in with Google if you want this browser to remember you. The games still work either way.");
+          : "Sign in with Google if you want to save number picks. The statistics stay available either way.");
     } else if (native) {
-      setText("account-note", "Sign in with Google opens a full-page sign-in, because this app cannot use a popup. If Google does not come back to the app, use the website or the native plugin in docs/FIREBASE_SETUP.md. Your name and photo stay off the board unless you opt in.");
+      setText("account-note", "Sign in with Google opens a full-page sign-in, because this app cannot use a popup. If Google does not come back to the app, use the website or the native plugin in docs/FIREBASE_SETUP.md. Saving a pick does not change the odds.");
     } else if (prefersRedirect()) {
-      setText("account-note", "On a phone, Sign in with Google opens a full-page sign-in. Your Google name and photo stay off the board unless you opt in.");
+      setText("account-note", "On a phone, Sign in with Google opens a full-page sign-in. Saving a pick does not change the odds.");
     } else {
-      setText("account-note", "Sign in to put virtual points on the board and to save picks with a draw date. Your Google name and photo stay off the board unless you opt in.");
+      setText("account-note", "Sign in to save a number line with the draw date you intend to play. A saved pick does not guarantee a win.");
     }
     return;
   }
@@ -182,83 +158,9 @@ function renderAccount() {
   if (boardsOpen && boardSetupMessage) {
     setText("account-note", boardSetupMessage);
   } else if (boardsOpen) {
-    setText("account-note", "Virtual points on your account: " + (profile.points || 0).toLocaleString() + ". They cannot be cashed out. Your name and photo stay off the leaderboard unless you opt in.");
+    setText("account-note", "Saved picks are listed with Number ideas. A match against the draw list is informational only and does not guarantee a win.");
   } else {
-    setText("account-note", "You are signed in. Virtual points on this device cannot be cashed out.");
-  }
-}
-
-function boardRow(entry) {
-  const name = entry.showOnBoard && entry.publicName ? entry.publicName : "Anonymous player";
-  const photoUrl = entry.showOnBoard ? safePhoto(entry.publicPhoto) : "";
-  const photo = photoUrl
-    ? '<img class="avatar" src="' + escapeHtml(photoUrl) + '" alt="" width="40" height="40" referrerpolicy="no-referrer" />'
-    : "";
-  return '<li class="board-row">' + photo + '<span>' + escapeHtml(name) + '</span><strong>' + Number(entry.points || 0).toLocaleString() + ' pts</strong></li>';
-}
-
-function renderBoards(daily, allTime, error) {
-  if (!boardsOpen) return;
-  const zone = config.leaderboardTimeZoneLabel || "US Eastern Time (America/New_York)";
-  const banner = $("winner-banner");
-  const dailyList = $("board-daily");
-  const allList = $("board-all");
-  if (!firebaseReady()) {
-    if (banner) banner.textContent = "The daily board and the all-time board turn on after Firebase is connected. You can still play. " + zone + " will be the daily cutoff. Virtual points only. No cash prize.";
-    if (dailyList) dailyList.innerHTML = "";
-    if (allList) allList.innerHTML = "";
-    return;
-  }
-  if (error) {
-    if (banner) banner.textContent = error;
-    return;
-  }
-  const today = easternDay();
-  const winner = daily[0];
-  if (banner) {
-    if (!winner) {
-      banner.textContent = "No winner of the day yet for " + today + " (" + zone + "). The day starts over at midnight Eastern. Virtual points only. No cash prize.";
-    } else {
-      const name = winner.showOnBoard && winner.publicName ? winner.publicName : "Anonymous player";
-      const photoUrl = winner.showOnBoard ? safePhoto(winner.publicPhoto) : "";
-      const photo = photoUrl
-        ? '<img class="avatar" src="' + escapeHtml(photoUrl) + '" alt="" width="40" height="40" referrerpolicy="no-referrer" />'
-        : "";
-      banner.innerHTML = photo + "<span>Winner of the day (" + escapeHtml(today) + ", " + escapeHtml(zone) + "): " + escapeHtml(name) + " with " + Number(winner.points || 0).toLocaleString() + " virtual points. This is not a cash prize.</span>";
-    }
-  }
-  if (dailyList) dailyList.innerHTML = daily.length ? daily.map(boardRow).join("") : "<li>No scores yet today.</li>";
-  if (allList) allList.innerHTML = allTime.length ? allTime.map(boardRow).join("") : "<li>No all-time scores yet.</li>";
-}
-
-async function loadBoards() {
-  if (!boardsOpen) return;
-  if (!firebaseReady() || !db || !fsTools) {
-    renderBoards([], [], "");
-    return;
-  }
-  try {
-    const day = easternDay();
-    const dailyQuery = fsTools.query(
-      fsTools.collection(db, "dailyScores"),
-      fsTools.where("day", "==", day),
-      fsTools.orderBy("points", "desc"),
-      fsTools.limit(10)
-    );
-    const allQuery = fsTools.query(
-      fsTools.collection(db, "users"),
-      fsTools.orderBy("points", "desc"),
-      fsTools.limit(10)
-    );
-    const [dailySnap, allSnap] = await Promise.all([fsTools.getDocs(dailyQuery), fsTools.getDocs(allQuery)]);
-    renderBoards(dailySnap.docs.map((item) => item.data()), allSnap.docs.map((item) => item.data()), "");
-  } catch (err) {
-    if (firestoreBlocked(err)) {
-      hideBoards(err);
-      return;
-    }
-    console.warn("Leaderboard read failed.", err);
-    renderBoards([], [], "The board could not load. If Firebase asks for an index, open the link in the browser console and create it. The steps are in docs/FIREBASE_SETUP.md.");
+    setText("account-note", "You are signed in. Saved picks are not available until account storage is connected.");
   }
 }
 
@@ -319,66 +221,14 @@ function safePhoto(value) {
 }
 
 function publicFields() {
-  const show = !!profile.showOnBoard;
-  const person = currentUser || {};
+  /* The live rules still require these keys. The site no longer shows a board. */
   return {
     uid: currentUser.uid,
-    showOnBoard: show,
-    publicName: show ? String(person.displayName || "").slice(0, 40) : "",
-    publicPhoto: show ? safePhoto(person.photoURL) : "",
+    showOnBoard: false,
+    publicName: "",
+    publicPhoto: "",
     lastAwardAt: profile.lastAwardAt || Date.now()
   };
-}
-
-async function saveProfile(nextShow) {
-  if (!boardsOpen || !currentUser || !db || !fsTools) return;
-  profile.showOnBoard = !!nextShow;
-  profile.publicName = profile.showOnBoard ? String(currentUser.displayName || "").slice(0, 40) : "";
-  profile.publicPhoto = profile.showOnBoard ? safePhoto(currentUser.photoURL) : "";
-  const payload = Object.assign({ points: profile.points || 0 }, publicFields());
-  await fsTools.setDoc(fsTools.doc(db, "users", currentUser.uid), payload, { merge: true });
-  const day = easternDay();
-  const dailyRef = fsTools.doc(db, "dailyScores", day + "_" + currentUser.uid);
-  const dailySnap = await fsTools.getDoc(dailyRef);
-  if (dailySnap.exists()) {
-    await fsTools.setDoc(dailyRef, Object.assign({ points: dailySnap.data().points || 0, day: day }, publicFields()), { merge: true });
-  }
-  renderAccount();
-  await loadBoards();
-}
-
-async function awardPoints(amount) {
-  const add = Math.max(0, Math.min(800, parseInt(amount, 10) || 0));
-  if (!add) return;
-  writeLocalPoints(readLocalPoints() + add);
-  renderAccount();
-  if (!boardsOpen || !currentUser || !db || !fsTools) return;
-  const day = easternDay();
-  const userRef = fsTools.doc(db, "users", currentUser.uid);
-  const dailyRef = fsTools.doc(db, "dailyScores", day + "_" + currentUser.uid);
-  try {
-    await fsTools.runTransaction(db, async (tx) => {
-      const userSnap = await tx.get(userRef);
-      const dailySnap = await tx.get(dailyRef);
-      const now = Date.now();
-      const nextAll = (userSnap.exists() ? userSnap.data().points || 0 : 0) + add;
-      const nextDay = (dailySnap.exists() ? dailySnap.data().points || 0 : 0) + add;
-      profile.points = nextAll;
-      profile.lastAwardAt = now;
-      const fields = publicFields();
-      tx.set(userRef, Object.assign({ points: nextAll }, fields), { merge: true });
-      tx.set(dailyRef, Object.assign({ points: nextDay, day: day }, fields), { merge: true });
-    });
-    renderAccount();
-    await loadBoards();
-  } catch (err) {
-    if (firestoreBlocked(err)) {
-      hideBoards(err);
-      return;
-    }
-    console.warn("Could not store virtual points.", err);
-    setText("account-note", "The points were counted on this device, but the account board did not accept them. Client scores are easy to edit and are not a prize.");
-  }
 }
 
 async function savePick(pick) {
@@ -574,7 +424,7 @@ function emptyProfile() {
 function withTimeout(promise, ms) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(Object.assign(new Error("The leaderboard storage did not answer."), { code: "deadline-exceeded" }));
+      reject(Object.assign(new Error("Saved picks did not answer."), { code: "deadline-exceeded" }));
     }, ms);
     Promise.resolve(promise).then((value) => {
       clearTimeout(timer);
@@ -630,15 +480,14 @@ async function loadSignedInData(uid) {
       }
       console.error("Saved picks could not be loaded.", err);
     }
-    await loadBoards();
   } catch (err) {
     if (appliedUid !== uid) return;
     if (firestoreBlocked(err)) {
       hideBoards(err);
       return;
     }
-    console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
-    boardSetupMessage = "Scores and saved picks could not be loaded. You are still signed in.";
+    console.error("Saved picks are not ready.", err && err.code ? err.code : err, err);
+    boardSetupMessage = "Saved picks could not be loaded. You are still signed in.";
     renderAccount();
   }
 }
@@ -712,16 +561,6 @@ function bind() {
     console.warn(err);
     setText("account-note", "The account could not be deleted. Email info@lotterymigo.com and we will remove the stored data.");
   }));
-  const opt = $("account-opt-in");
-  if (opt) opt.addEventListener("change", () => saveProfile(opt.checked).catch((err) => {
-    if (firestoreBlocked(err)) {
-      hideBoards(err);
-      return;
-    }
-    console.error("Leaderboard storage is not ready.", err && err.code ? err.code : err, err);
-    boardSetupMessage = "The board did not save that choice. You are still signed in.";
-    renderAccount();
-  }));
   const picks = $("saved-picks-list");
   if (picks) {
     picks.addEventListener("click", (event) => {
@@ -731,17 +570,14 @@ function bind() {
   }
 }
 
-window.lmAwardPoints = awardPoints;
+window.lmAwardPoints = function () {};
 window.lmSavePick = savePick;
 window.lmRenderPicks = () => loadPicks();
 document.addEventListener("lm-draws-ready", () => loadPicks());
 
 applyBoardChrome();
 renderAccount();
-if (boardsOpen) {
-  renderBoards([], [], "");
-  loadPicks();
-}
+if (boardsOpen) loadPicks();
 bind();
 connectFirebase().catch((err) => {
   console.warn("Firebase did not start.", err);

@@ -12,7 +12,7 @@ The branch that added this shell was cut from the latest `main` **plus** the unm
 - On a phone, the app loads the hosted draw file at `https://lotterymigo.com/data/draws.json` when it can, and otherwise uses the `draws.json` copied into the app. That saved copy is a snapshot from the day you last ran the build. It is not a live feed.
 - Favorite numbers are stored on the device under `lotterymigo_favorites`.
 - Draw alerts are off until the person taps **Turn on draw alerts**. They are local notifications, not remote push. The first opt-in remembers the dates already on screen and only alerts when a later date appears.
-- Ads use Google’s public **test** ad unit IDs from `admob.config.json`. A consent check runs through Google’s User Messaging Platform (UMP) before any banner. The banner is hidden while the scratch-card result is visible, so it does not cover **Try again**.
+- Ads use Google’s public **test** ad unit IDs from `admob.config.json`. A consent check runs through Google’s User Messaging Platform (UMP) before any banner.
 
 ## What this environment did not do
 
@@ -82,7 +82,7 @@ The debug build (`npx cap run android`) is only for a device or emulator you con
 1. Create the app with the name LotteryMigo and default language.
 2. Complete the store listing: short description, full description, icon, feature graphic, phone screenshots. Say clearly that the app is entertainment, does not sell tickets, and does not promise a win.
 3. Set the privacy policy URL to `https://lotterymigo.com/privacy.html` after that page matches the binary you ship.
-4. Complete the content rating questionnaire **honestly**. The app discusses lottery drawings and includes a free scratch game with no cash value. That is still a gambling or simulated-gambling theme. Do not label it as a children’s app. Expect a mature rating.
+4. Complete the content rating questionnaire **honestly**. The app discusses lottery drawings and shows past numbers. That is still a gambling-related theme. Do not label it as a children’s app. Expect a mature rating.
 5. Complete **Data safety**. See the form section below. Declare device-local favorites and notification preference, and advertising data if any ad SDK ships in the binary. The test AdMob SDK is still the Google Mobile Ads SDK, so declare it if you leave the dependency in the app.
 6. Complete ads declaration. If the binary includes AdMob, answer that the app contains ads, even while only test ids are configured.
 7. Upload the `.aab` to a **closed testing** track first, not production.
@@ -123,9 +123,9 @@ A signed iOS archive cannot be made on Linux. Use one of these:
 
 Treat both questionnaires as legal forms.
 
-- Say that the app shows lottery drawings, odds, and a free scratch game.
+- Say that the app shows lottery drawings, frequencies, and odds.
 - Say that it does not sell tickets, take wagers, or pay prizes.
-- Do not describe the scratch game as a cash prize.
+- Do not describe the statistics as a way to win.
 - A “made for ages 18+ / 21+” note on the website does not replace the store rating. The store may still rate the app 17+ or equivalent because of gambling themes.
 - If a question does not match the app, stop and re-read it. Do not pick the answer that looks easiest.
 
@@ -164,7 +164,7 @@ Application ids in the native projects:
 
 These are Google’s demo ids (also documented by `@capacitor-community/admob`). They always request test ads. They are not your publisher id.
 
-The shell does not show an interstitial or a rewarded ad. Do not add one on the scratch result. The result’s **Try again** button must stay clear of ad taps. The banner is removed while `#scratch-result` is visible and the page padding is cleared so the button is not sitting under a native banner.
+The shell does not show an interstitial or a rewarded ad. Keep the banner at the bottom so it does not cover the frequency chart or the history table.
 
 The public website loads Google AdSense in the page head, and `ads.txt` lives at the site root. `npm run build:web` strips that AdSense script from the HTML copied into `www/` and does not copy `ads.txt`. The app keeps using AdMob only.
 
@@ -199,7 +199,7 @@ Read these yourself before you apply for real ads or production store access. Po
 - [Google Publisher policies](https://support.google.com/admob/answer/6128543), including the gambling content rules linked from AdMob policy help
 - [AdMob allowed countries and restricted categories](https://support.google.com/admob/answer/7666519) (confirm the current gambling section)
 
-Lottery and gambling apps are restricted. Many of them need a license, a country allow-list, and a separate Google certification. An entertainment-only frequency app that does not sell tickets can still be rejected because it discusses gambling or includes a scratch game. **Test ad units do not mean Google has approved this app.** If the current policy says this app is not eligible, remove `@capacitor-community/admob`, the manifest meta-data, and the Info.plist ad keys, then submit without ads. Do not try to disguise the lottery subject to pass review.
+Lottery and gambling apps are restricted. Many of them need a license, a country allow-list, and a separate Google certification. An entertainment-only frequency app that does not sell tickets can still be rejected because it discusses gambling. **Test ad units do not mean Google has approved this app.** If the current policy says this app is not eligible, remove `@capacitor-community/admob`, the manifest meta-data, and the Info.plist ad keys, then submit without ads. Do not try to disguise the lottery subject to pass review.
 
 ## 7b. Google sign-in in the app
 
@@ -219,7 +219,7 @@ Check these off yourself. None of them were done for this repository:
 
 - [ ] Merge or rebase onto `main` after accessibility pull request #3 lands, then re-run `npm run build:web` and `npx cap sync`.
 - [ ] On a Mac, install Xcode, resolve iOS packages, and run the app on a simulator and a device.
-- [ ] Run the Android app on an emulator and a device. Confirm favorites survive a restart, draw alerts ask permission only after the button tap, and the scratch result’s **Try again** button is not under a banner.
+- [ ] Run the Android app on an emulator and a device. Confirm favorites survive a restart, draw alerts ask permission only after the button tap, and the bottom banner does not cover the frequency chart.
 - [ ] Confirm the bundled draw file appears when the phone is offline, and that a newer hosted file wins when the phone is online.
 - [ ] Replace splash screens and the Android notification icon. The launcher icon is already the brand mark.
 - [ ] Create the Apple Developer account, App Store Connect app, certificate, and provisioning profile.

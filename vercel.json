@@ -1,4 +1,19 @@
 {
+  "redirects": [
+    { "source": "/scratch", "destination": "/#section-stats", "permanent": true },
+    { "source": "/scratch.html", "destination": "/#section-stats", "permanent": true },
+    { "source": "/scratcher", "destination": "/#section-stats", "permanent": true },
+    { "source": "/scratcher.html", "destination": "/#section-stats", "permanent": true },
+    { "source": "/scratch-cards", "destination": "/#section-stats", "permanent": true },
+    { "source": "/bingo", "destination": "/#section-stats", "permanent": true },
+    { "source": "/bingo.html", "destination": "/#section-stats", "permanent": true },
+    { "source": "/777", "destination": "/#section-stats", "permanent": true },
+    { "source": "/777.html", "destination": "/#section-stats", "permanent": true },
+    { "source": "/games", "destination": "/#section-stats", "permanent": true },
+    { "source": "/games.html", "destination": "/#section-stats", "permanent": true },
+    { "source": "/mini-game", "destination": "/#section-stats", "permanent": true },
+    { "source": "/mini-game.html", "destination": "/#section-stats", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",

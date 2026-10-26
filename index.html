@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Entertainment-only Powerball and Mega Millions frequency stats, longest-gap counts, and number tools. Past draws do not predict future results." />
+  <meta name="description" content="Powerball and Mega Millions statistics: draw history, frequencies, and hot and cold numbers. Past draws do not predict future results." />
   <meta name="theme-color" content="#067A38" />
   <link rel="canonical" href="https://lotterymigo.com/" />
-  <title>LotteryMigo | Powerball & Mega Millions Analytics, Games & Generator</title>
+  <title>LotteryMigo | Powerball and Mega Millions statistics</title>
 
   <!-- Brand icon -->
   <link rel="icon" href="icons/favicon.ico" sizes="any" />
@@ -24,6 +24,12 @@
   <script src="assets/a11y.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4173178569579798" crossorigin="anonymous"></script>
+  <script>
+    (function () {
+      var retired = { "#section-scratcher": 1, "#section-board": 1, "#scratch": 1, "#bingo": 1, "#777": 1 };
+      if (retired[location.hash]) location.replace(location.pathname + location.search + "#section-stats");
+    })();
+  </script>
 </head>
 <body class="page">
 
@@ -58,20 +64,17 @@
       </div>
 
       <nav class="nav nav-desktop" aria-label="On this page">
-        <a href="#section-hopper">Draw balls</a>
-        <a href="#section-generator">Number ideas</a>
-        <a href="#section-scratcher">Scratch cards</a>
         <a href="#section-stats">How often</a>
+        <a href="#section-history">Past draws</a>
+        <a href="#section-generator">Number ideas</a>
         <a href="#section-account">Account</a>
         <a href="#section-about">About</a>
       </nav>
     </div>
     <nav class="nav nav-mobile wrap" aria-label="On this page">
-      <a href="#section-hopper">Draw balls</a>
-      <a href="#section-generator">Number ideas</a>
-      <a href="#section-scratcher">Scratch cards</a>
       <a href="#section-stats">How often</a>
       <a href="#section-history">Past draws</a>
+      <a href="#section-generator">Number ideas</a>
       <a href="#section-account">Account</a>
       <a href="#section-about">About</a>
     </nav>
@@ -80,7 +83,7 @@
   <!-- Notice -->
   <div id="legal-alert-banner" class="wrap banner">
     <div class="card card-tight notice">
-      <p><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or machine suggestions <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions.</p>
+      <p><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or number ideas <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions. This website uses Google AdSense, which may store cookies to show and measure ads.</p>
       <div class="row">
         <a href="terms.html">Terms</a>
         <a href="privacy.html">Privacy</a>
@@ -94,7 +97,7 @@
     <div class="wrap hero-inner">
       <p id="hero-badge" class="badge">Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.</p>
       <h1>Most Frequent and Longest Gap for <span id="hero-title-game" class="tone-pb">Powerball</span></h1>
-      <p>See how often each number was drawn, then try the draw drum, number ideas, or a free scratch card. <strong class="tone-gold">For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
+      <p>Frequencies, the longest gaps, and the official draw list are the focus of this page. <strong class="tone-gold">For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
       <p id="latest-draw-note">Loading official draw dates…</p>
       <div class="stats">
         <div class="panel">
@@ -122,6 +125,125 @@
   </section>
 
   <main id="main" class="wrap stack" tabindex="-1">
+
+    <div class="ad-slot" data-ad-placement="below-header" hidden></div>
+
+    <!-- How often -->
+    <section id="section-stats" class="card stack">
+      <div class="between">
+        <div class="stack">
+          <h2>How often each number was drawn</h2>
+          <p id="heatmap-blurb">A heatmap is a color grid. Each square is one white-ball number. Brighter squares were drawn more often. The colors describe the past. They do not predict the next draw.</p>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span class="legend-item"><span class="swatch heat-high"></span> Drawn more often</span>
+          <span class="legend-item"><span class="swatch heat-mid"></span> In the middle</span>
+          <span class="legend-item"><span class="swatch heat-low"></span> Drawn less often</span>
+        </div>
+      </div>
+      <div id="heatmap-grid" class="heatmap"></div>
+      <div class="rule stack">
+        <h3>Ten most drawn and ten least drawn</h3>
+        <p id="chart-summary">The chart loads with the draw list. Green bars were drawn more often. Gold bars were drawn less often. This is history, not a forecast.</p>
+        <div class="chart-frame">
+          <canvas id="frequencyChart" role="img" aria-labelledby="chart-summary"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <div class="ad-slot" data-ad-placement="between-stats" hidden></div>
+
+    <!-- Past draws -->
+    <section id="section-history" class="card stack">
+      <div class="between">
+        <div class="stack">
+          <h2>Past winning numbers</h2>
+          <p id="history-blurb">Official winning numbers from NY Open Data.</p>
+          <p class="lm-help">The multiplier is Power Play or Megaplier when the official file lists one. A dash means it was not listed. On a phone, swipe the table sideways to see every column.</p>
+        </div>
+        <div class="row">
+          <div class="stack field-grow">
+            <label for="history-search">Find a number</label>
+            <input id="history-search" class="field" oninput="filterHistory()" type="text" inputmode="numeric" placeholder="Such as 12" aria-describedby="history-search-help" />
+          </div>
+          <button type="button" id="btn-export-csv" class="btn btn-quiet">Download CSV</button>
+        </div>
+      </div>
+      <p id="history-search-help" class="lm-help">Shows drawings that used the number you type.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Winning numbers table. Swipe sideways on a small screen.">
+        <table>
+          <caption>Newest drawings are listed first.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">White balls</th>
+              <th scope="col" class="num" id="history-special-header">Powerball</th>
+              <th scope="col" class="num">Multiplier</th>
+              <th scope="col" class="num">Odd and even</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body"></tbody>
+        </table>
+      </div>
+      <div id="history-pagination" class="pager">
+        <span id="history-count-label">Showing 1-10 of 1,042 draws</span>
+        <div class="row">
+          <button type="button" class="btn btn-quiet" onclick="changeHistoryPage(-1)" aria-label="Previous page of drawings">Previous</button>
+          <button type="button" class="btn btn-quiet" onclick="changeHistoryPage(1)" aria-label="Next page of drawings">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Number ideas -->
+    <section id="section-generator" class="card stack">
+      <div class="between">
+        <div class="stack">
+          <h2>Number ideas</h2>
+          <p>Make five sets of numbers. <strong class="tone-gold">This does not raise your chance of winning.</strong></p>
+          <p class="lm-help">“Seen more often” uses numbers that showed up a lot in the past. “Longest wait” uses numbers that have been missing. Neither one means that number is due.</p>
+        </div>
+        <div class="row">
+          <label for="gen-strategy" class="sr-only">How to pick the numbers</label>
+          <select id="gen-strategy" class="field field-grow">
+            <option value="balanced">Balanced mix: 3 odd and 2 even</option>
+            <option value="hot">Seen more often (Recent Frequency)</option>
+            <option value="cold">Longest wait (Longest Gap Bias)</option>
+            <option value="random">Random quick pick</option>
+          </select>
+          <button type="button" id="btn-generate" class="btn btn-primary">Generate</button>
+        </div>
+      </div>
+      <div id="generated-lines-container" class="stack"></div>
+      <div id="favorites-panel" class="stack rule">
+        <h3>Saved favorite numbers</h3>
+        <p>These stay on this device only. Saving a line does not make it more likely to win.</p>
+        <div id="favorites-list" class="stack"></div>
+      </div>
+      <div id="saved-picks-panel" class="stack rule hidden">
+        <h3>Picks saved to an account</h3>
+        <p>Sign in to keep a line with the draw date you intend to play. You can mark “I bought this ticket.” After that date is in the draw list, the page counts matches. That count is informational only.</p>
+        <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
+        <p id="pick-status" class="lm-help"></p>
+        <div id="saved-picks-list" class="stack"></div>
+      </div>
+    </section>
+
+    <!-- Account and boards -->
+    <section id="section-account" class="card stack">
+      <h2>Account</h2>
+      <p id="account-status">The statistics stay available without an account. Sign in only if you want to save number picks.</p>
+      <div id="account-identity" class="row hidden">
+        <img id="account-avatar" class="avatar hidden" alt="" width="40" height="40" referrerpolicy="no-referrer" />
+        <p id="account-name"></p>
+      </div>
+      <div class="row">
+        <button type="button" id="btn-sign-in" class="btn btn-primary">Sign in with Google</button>
+        <button type="button" id="btn-sign-out" class="btn btn-quiet hidden">Sign out</button>
+        <button type="button" id="btn-delete-account" class="btn btn-quiet hidden">Delete my account and data</button>
+      </div>
+      <p id="delete-confirm" class="panel hidden">This removes your LotteryMigo sign-in and any saved picks. It does not buy or cancel a lottery ticket. <button type="button" id="btn-delete-confirm" class="btn btn-gold">Yes, delete my LotteryMigo data</button></p>
+      <p id="account-note" class="lm-help"></p>
+    </section>
 
     <!-- Draw drum -->
     <section id="section-hopper" class="card">
@@ -165,171 +287,6 @@
               <span class="vents" aria-hidden="true"><i></i><i></i><i></i></span>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Number ideas -->
-    <section id="section-generator" class="card stack">
-      <div class="between">
-        <div class="stack">
-          <h2>Number ideas</h2>
-          <p>Make five sets of numbers. <strong class="tone-gold">This does not raise your chance of winning.</strong></p>
-          <p class="lm-help">“Seen more often” uses numbers that showed up a lot in the past. “Longest wait” uses numbers that have been missing. Neither one means that number is due.</p>
-        </div>
-        <div class="row">
-          <label for="gen-strategy" class="sr-only">How to pick the numbers</label>
-          <select id="gen-strategy" class="field field-grow">
-            <option value="balanced">Balanced mix: 3 odd and 2 even</option>
-            <option value="hot">Seen more often (Recent Frequency)</option>
-            <option value="cold">Longest wait (Longest Gap Bias)</option>
-            <option value="random">Random quick pick</option>
-          </select>
-          <button type="button" id="btn-generate" class="btn btn-primary">Generate</button>
-        </div>
-      </div>
-      <div id="generated-lines-container" class="stack"></div>
-      <div id="favorites-panel" class="stack rule">
-        <h3>Saved favorite numbers</h3>
-        <p>These stay on this device only. Saving a line does not make it more likely to win.</p>
-        <div id="favorites-list" class="stack"></div>
-      </div>
-      <div id="saved-picks-panel" class="stack rule hidden">
-        <h3>Picks saved to an account</h3>
-        <p>Sign in to keep a line with the draw date you intend to play. You can mark “I bought this ticket.” After that date is in the draw list, the page counts matches. That count is informational only.</p>
-        <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
-        <p id="pick-status" class="lm-help"></p>
-        <div id="saved-picks-list" class="stack"></div>
-      </div>
-    </section>
-
-    <!-- Scratch cards -->
-    <section id="section-scratcher" class="card stack">
-      <div class="between">
-        <div class="stack">
-          <p class="badge">Free mini-game · No real-money value</p>
-          <h2>Scratch cards</h2>
-          <p>Rub the coating with a finger or mouse, or press Quick Reveal. Lucky Numbers, Starlight, Gold Rush, Clover Patch, Gem Match, Bingo Line, and 777 are all free. About 1 in 4 cards wins virtual points only. Points cannot be cashed out. After a reveal, the coating fades so you can still read the card.</p>
-        </div>
-        <div class="row">
-          <button type="button" id="btn-scratch-reveal" class="btn btn-quiet">Quick Reveal</button>
-          <button type="button" id="btn-scratch-new" class="btn btn-gold">New Card</button>
-        </div>
-      </div>
-      <div id="scratch-theme-picker" class="row" role="tablist" aria-label="Scratch card themes"></div>
-      <div id="scratch-card" class="scratch-card theme-numbers">
-        <div id="scratch-underlayer" class="scratch-underlayer">
-          <div class="scratch-block">
-            <span id="scratch-win-label" class="kicker">Winning Numbers</span>
-            <div id="scratch-winning-nums" class="scratch-targets"></div>
-          </div>
-          <div class="scratch-block">
-            <span id="scratch-player-label" class="kicker">Your Numbers</span>
-            <div id="scratch-player-nums" class="scratch-grid"></div>
-          </div>
-        </div>
-        <canvas id="scratch-canvas" role="img" aria-label="Scratch coating. Rub to reveal the card, or use the Quick Reveal button."></canvas>
-      </div>
-      <div id="scratch-result" class="scratch-result hidden" aria-live="polite">
-        <p id="scratch-result-title"></p>
-        <p id="scratch-result-detail"></p>
-        <button type="button" id="btn-scratch-again" class="btn btn-gold">Try Again</button>
-      </div>
-      <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
-      <p class="center muted">Free game only. Virtual points have no cash value and cannot be redeemed.</p>
-    </section>
-
-    <!-- Account and boards -->
-    <section id="section-account" class="card stack">
-      <h2>Account</h2>
-      <p id="account-status">You can use every tool on this page without an account.</p>
-      <div id="account-identity" class="row hidden">
-        <img id="account-avatar" class="avatar hidden" alt="" width="40" height="40" referrerpolicy="no-referrer" />
-        <p id="account-name"></p>
-      </div>
-      <div class="row">
-        <button type="button" id="btn-sign-in" class="btn btn-primary">Sign in with Google</button>
-        <button type="button" id="btn-sign-out" class="btn btn-quiet hidden">Sign out</button>
-        <button type="button" id="btn-delete-account" class="btn btn-quiet hidden">Delete my account and data</button>
-      </div>
-      <p id="delete-confirm" class="panel hidden">This removes your LotteryMigo sign-in and any saved account data. It does not buy or cancel a lottery ticket. <button type="button" id="btn-delete-confirm" class="btn btn-gold">Yes, delete my LotteryMigo data</button></p>
-      <p id="account-note" class="lm-help"></p>
-      <label id="account-opt-in-wrap" class="check-row hidden"><input id="account-opt-in" type="checkbox" /> Show my name and photo on the leaderboard</label>
-      <p id="account-points">Virtual points on this device: 0. These points have no cash value.</p>
-    </section>
-
-    <section id="section-board" class="card stack hidden">
-      <h2>Virtual points board</h2>
-      <p>The daily board uses US Eastern Time (America/New_York) and starts over at midnight Eastern. The all-time board keeps the running total. Names and photos appear only when a player opts in. Otherwise the row says Anonymous player.</p>
-      <aside class="disclaimer">18+ (21+ where required). These selections do not guarantee any win. Results are informational only. LotteryMigo is not responsible for any win or loss. Always verify numbers with official lottery sources.</aside>
-      <p class="lm-help">Scores are saved from the browser. They are not tamper-proof, and they are not a cash prize. A server-side check would be required before any real prize.</p>
-      <div id="winner-banner" class="panel">Winner of the day appears here after Firebase is connected. Virtual points only. No cash prize.</div>
-      <h3>Today</h3>
-      <ol id="board-daily" class="board"></ol>
-      <h3>All time</h3>
-      <ol id="board-all" class="board"></ol>
-    </section>
-
-    <!-- How often -->
-    <section id="section-stats" class="card stack">
-      <div class="between">
-        <div class="stack">
-          <h2>How often each number was drawn</h2>
-          <p id="heatmap-blurb">A heatmap is a color grid. Each square is one white-ball number. Brighter squares were drawn more often. The colors describe the past. They do not predict the next draw.</p>
-        </div>
-        <div class="legend" aria-hidden="true">
-          <span class="legend-item"><span class="swatch heat-high"></span> Drawn more often</span>
-          <span class="legend-item"><span class="swatch heat-mid"></span> In the middle</span>
-          <span class="legend-item"><span class="swatch heat-low"></span> Drawn less often</span>
-        </div>
-      </div>
-      <div id="heatmap-grid" class="heatmap"></div>
-      <div class="rule stack">
-        <h3>Ten most drawn and ten least drawn</h3>
-        <p id="chart-summary">The chart loads with the draw list. Green bars were drawn more often. Gold bars were drawn less often. This is history, not a forecast.</p>
-        <div class="chart-frame">
-          <canvas id="frequencyChart" role="img" aria-labelledby="chart-summary"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- Past draws -->
-    <section id="section-history" class="card stack">
-      <div class="between">
-        <div class="stack">
-          <h2>Past winning numbers</h2>
-          <p id="history-blurb">Official winning numbers from NY Open Data.</p>
-          <p class="lm-help">The multiplier is Power Play or Megaplier when the official file lists one. A dash means it was not listed. On a phone, swipe the table sideways to see every column.</p>
-        </div>
-        <div class="row">
-          <div class="stack field-grow">
-            <label for="history-search">Find a number</label>
-            <input id="history-search" class="field" oninput="filterHistory()" type="text" inputmode="numeric" placeholder="Such as 12" aria-describedby="history-search-help" />
-          </div>
-          <button type="button" id="btn-export-csv" class="btn btn-quiet">Download CSV</button>
-        </div>
-      </div>
-      <p id="history-search-help" class="lm-help">Shows drawings that used the number you type.</p>
-      <div class="table-scroll" tabindex="0" role="region" aria-label="Winning numbers table. Swipe sideways on a small screen.">
-        <table>
-          <caption>Newest drawings are listed first.</caption>
-          <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">White balls</th>
-              <th scope="col" class="num" id="history-special-header">Powerball</th>
-              <th scope="col" class="num">Multiplier</th>
-              <th scope="col" class="num">Odd and even</th>
-            </tr>
-          </thead>
-          <tbody id="history-table-body"></tbody>
-        </table>
-      </div>
-      <div id="history-pagination" class="pager">
-        <span id="history-count-label">Showing 1-10 of 1,042 draws</span>
-        <div class="row">
-          <button type="button" class="btn btn-quiet" onclick="changeHistoryPage(-1)" aria-label="Previous page of drawings">Previous</button>
-          <button type="button" class="btn btn-quiet" onclick="changeHistoryPage(1)" aria-label="Next page of drawings">Next</button>
         </div>
       </div>
     </section>
@@ -389,6 +346,7 @@
   <!-- Footer -->
   <footer class="site-footer">
     <div class="wrap">
+      <div class="ad-slot" data-ad-placement="footer" hidden></div>
       <div class="footer-bar">
         <div>
           <strong>LotteryMigo.com</strong>
@@ -1081,350 +1039,6 @@
       return { whites, special };
     }
 
-    // --- 3. SCRATCHER CARD ---
-    const SCRATCH_THEMES = [
-      {
-        id: 'numbers',
-        name: 'Lucky Numbers',
-        kind: 'match',
-        eyebrow: 'Winning Numbers',
-        playerLabel: 'Your Numbers',
-        coating: '#64748b',
-        ink: '#f8fafc',
-        cardClass: 'theme-numbers',
-        accent: 'tone-gold',
-        pool: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30'],
-        prizes: ['10 PTS', '25 PTS', '50 PTS', '100 PTS', '250 PTS', '500 PTS']
-      },
-      {
-        id: 'stars',
-        name: 'Starlight',
-        kind: 'match',
-        eyebrow: 'Lucky Stars',
-        playerLabel: 'Your Stars',
-        coating: '#312e81',
-        ink: '#e0e7ff',
-        cardClass: 'theme-stars',
-        accent: 'tone-indigo',
-        pool: ['★', '☆', '✦', '✧', '✴', '✵', '✶', '✷', '✸', '✹', '✺', '✻'],
-        prizes: ['5 PTS', '15 PTS', '40 PTS', '80 PTS', '200 PTS', '400 PTS']
-      },
-      {
-        id: 'gold',
-        name: 'Gold Rush',
-        kind: 'match',
-        eyebrow: 'Target Bars',
-        playerLabel: 'Your Bars',
-        coating: '#854d0e',
-        ink: '#fef3c7',
-        cardClass: 'theme-gold',
-        accent: 'tone-gold',
-        pool: ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3'],
-        prizes: ['20 PTS', '40 PTS', '75 PTS', '150 PTS', '300 PTS', '600 PTS']
-      },
-      {
-        id: 'clover',
-        name: 'Clover Patch',
-        kind: 'match',
-        eyebrow: 'Lucky Marks',
-        playerLabel: 'Your Patch',
-        coating: '#14532d',
-        ink: '#dcfce7',
-        cardClass: 'theme-clover',
-        accent: 'tone-green',
-        pool: ['♣', '♠', '♥', '♦', '☘', '✿', '❀', '❁', '🍀', '🌸', '🌼', '☀'],
-        prizes: ['8 PTS', '16 PTS', '32 PTS', '64 PTS', '128 PTS', '256 PTS']
-      },
-      {
-        id: 'gems',
-        name: 'Gem Match',
-        kind: 'match',
-        eyebrow: 'Target Gems',
-        playerLabel: 'Your Gems',
-        coating: '#9f1239',
-        ink: '#ffe4e6',
-        cardClass: 'theme-gems',
-        accent: 'tone-rose',
-        pool: ['Ruby', 'Jade', 'Opal', 'Onyx', 'Pearl', 'Topaz', 'Amber', 'Garnet', 'Quartz', 'Agate', 'Coral', 'Flint'],
-        prizes: ['12 PTS', '24 PTS', '48 PTS', '96 PTS', '180 PTS', '360 PTS']
-      },
-      {
-        id: 'bingo',
-        name: 'Bingo Line',
-        kind: 'bingo',
-        coating: '#14532d',
-        ink: '#dcfce7',
-        cardClass: 'theme-clover',
-        accent: 'tone-green'
-      },
-      {
-        id: 'slots',
-        name: '777',
-        kind: 'slots',
-        coating: '#854d0e',
-        ink: '#fef3c7',
-        cardClass: 'theme-gold',
-        accent: 'tone-gold'
-      }
-    ];
-
-    let scratchCanvas, sCtx;
-    let isScratching = false;
-    let scratchListenersBound = false;
-    let scratchRevealed = false;
-    let scratchThemeIndex = 0;
-    let scratchOutcome = null;
-
-    function currentScratchTheme() {
-      return SCRATCH_THEMES[scratchThemeIndex] || SCRATCH_THEMES[0];
-    }
-
-    function pickDistinct(pool, count, blocked) {
-      const banned = new Set(blocked || []);
-      const choices = pool.filter(value => !banned.has(value));
-      const picked = [];
-      let guard = 0;
-      while (picked.length < count && choices.length && guard < 1000) {
-        guard++;
-        const value = choices[Math.floor(Math.random() * choices.length)];
-        if (!picked.includes(value)) picked.push(value);
-      }
-      return picked;
-    }
-
-    function renderThemePicker() {
-      const picker = document.getElementById('scratch-theme-picker');
-      if (!picker) return;
-      if (!picker.childElementCount) {
-        SCRATCH_THEMES.forEach((theme, index) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.textContent = theme.name;
-          button.setAttribute('role', 'tab');
-          button.setAttribute('aria-label', theme.name + ' scratch card');
-          bindPress(button, () => {
-            scratchThemeIndex = index;
-            resetScratcher();
-          });
-          picker.appendChild(button);
-        });
-      }
-      [...picker.children].forEach((button, index) => {
-        const active = index === scratchThemeIndex;
-        button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        button.className = active ? 'chip is-on' : 'chip';
-      });
-    }
-
-    function dealScratchCard() {
-      const theme = currentScratchTheme();
-      scratchOutcome = typeof window.lmDealScratch === 'function'
-        ? window.lmDealScratch(theme)
-        : { won: false, prize: '', prizePoints: 0, kind: theme.kind || 'match', winning: [], player: [], cells: [], reels: [] };
-      return scratchOutcome;
-    }
-
-    function paintScratchCard() {
-      const theme = currentScratchTheme();
-      const card = document.getElementById('scratch-card');
-      const under = document.getElementById('scratch-underlayer');
-      if (card) card.className = 'scratch-card ' + theme.cardClass;
-      if (!under) return;
-      const outcome = scratchOutcome || dealScratchCard();
-      if (outcome.kind === 'bingo') {
-        const letters = ['B', 'I', 'N', 'G', 'O'];
-        under.innerHTML = '<div class="scratch-block"><span class="kicker ' + theme.accent + '">Bingo line</span>' +
-          '<p>A gold square was called. A full row, column, or diagonal wins virtual points.</p>' +
-          '<div class="bingo-head">' + letters.map(letter => '<span>' + letter + '</span>').join('') + '</div>' +
-          '<div class="bingo-grid">' + outcome.cells.map(cell =>
-            '<div class="bingo-cell' + (cell.called ? ' is-called' : '') + '"><span>' + cell.label + '</span></div>'
-          ).join('') + '</div></div>';
-        return;
-      }
-      if (outcome.kind === 'slots') {
-        under.innerHTML = '<div class="scratch-block"><span class="kicker ' + theme.accent + '">777</span>' +
-          '<p>Three matching 7s wins 777 virtual points. Any other spin loses.</p>' +
-          '<div class="reel-row">' + outcome.reels.map(symbol =>
-            '<div class="reel">' + symbol + '</div>'
-          ).join('') + '</div></div>';
-        return;
-      }
-      under.innerHTML = '<div class="scratch-block"><span class="kicker ' + theme.accent + '">' + theme.eyebrow + '</span>' +
-        '<div class="scratch-targets">' + (outcome.winning || []).map(value =>
-          '<span class="scratch-chip ' + theme.accent + '">' + value + '</span>'
-        ).join('') + '</div></div>' +
-        '<div class="scratch-block"><span class="kicker ' + theme.accent + '">' + theme.playerLabel + '</span>' +
-        '<div class="scratch-grid">' + (outcome.player || []).map((value, index) =>
-          '<div class="scratch-cell"><span class="scratch-value">' + value + '</span><span class="' + theme.accent + '">' + theme.prizes[index] + '</span></div>'
-        ).join('') + '</div></div>';
-    }
-
-    function initScratchCard() {
-      try {
-        scratchCanvas = document.getElementById('scratch-canvas');
-        if (!scratchCanvas || scratchRevealed) return;
-        const rect = scratchCanvas.getBoundingClientRect();
-        if (rect.width < 20 || rect.height < 20) {
-          requestAnimationFrame(initScratchCard);
-          return;
-        }
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        scratchCanvas.width = Math.max(1, Math.round(rect.width * dpr));
-        scratchCanvas.height = Math.max(1, Math.round(rect.height * dpr));
-        sCtx = scratchCanvas.getContext('2d');
-        paintCoating();
-        ensureScratchListeners();
-      } catch (err) {
-        console.error('Scratcher init error:', err);
-      }
-    }
-
-    function paintCoating() {
-      if (!sCtx || !scratchCanvas) return;
-      const theme = currentScratchTheme();
-      const rect = scratchCanvas.getBoundingClientRect();
-      const scale = rect.width ? scratchCanvas.width / rect.width : 1;
-      sCtx.globalCompositeOperation = 'source-over';
-      sCtx.fillStyle = theme.coating;
-      sCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-      sCtx.fillStyle = theme.ink;
-      sCtx.textAlign = 'center';
-      sCtx.textBaseline = 'middle';
-      sCtx.font = 'bold ' + Math.round(18 * scale) + 'px sans-serif';
-      const coatingLabel = 'FREE GAME. NO CASH VALUE';
-      const labelWidth = sCtx.measureText(coatingLabel).width;
-      if (labelWidth > scratchCanvas.width * 0.88) {
-        sCtx.font = 'bold ' + Math.round(18 * scale * (scratchCanvas.width * 0.88 / labelWidth)) + 'px sans-serif';
-      }
-      sCtx.fillText(coatingLabel, scratchCanvas.width / 2, scratchCanvas.height / 2 - 16 * scale);
-      sCtx.font = 'bold ' + Math.round(20 * scale) + 'px sans-serif';
-      sCtx.fillText('RUB HERE TO SCRATCH', scratchCanvas.width / 2, scratchCanvas.height / 2 + 10 * scale);
-    }
-
-    function eraseAt(clientX, clientY) {
-      if (!sCtx || !scratchCanvas) return;
-      const rect = scratchCanvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const x = (clientX - rect.left) * (scratchCanvas.width / rect.width);
-      const y = (clientY - rect.top) * (scratchCanvas.height / rect.height);
-      const radius = 22 * (scratchCanvas.width / rect.width);
-      sCtx.globalCompositeOperation = 'destination-out';
-      sCtx.beginPath();
-      sCtx.arc(x, y, radius, 0, Math.PI * 2);
-      sCtx.fill();
-    }
-
-    function scratchedFraction() {
-      if (!sCtx || !scratchCanvas) return 0;
-      const data = sCtx.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height).data;
-      let clear = 0;
-      let samples = 0;
-      for (let i = 3; i < data.length; i += 32) {
-        samples++;
-        if (data[i] < 48) clear++;
-      }
-      return samples ? clear / samples : 0;
-    }
-
-    function ensureScratchListeners() {
-      if (scratchListenersBound || !scratchCanvas) return;
-      scratchListenersBound = true;
-
-      scratchCanvas.addEventListener('pointerdown', (event) => {
-        if (scratchRevealed) return;
-        if (event.pointerType === 'mouse' && event.button !== 0) return;
-        isScratching = true;
-        try { scratchCanvas.setPointerCapture(event.pointerId); } catch (err) {}
-        event.preventDefault();
-        eraseAt(event.clientX, event.clientY);
-      }, { passive: false });
-
-      scratchCanvas.addEventListener('pointermove', (event) => {
-        if (!isScratching || scratchRevealed) return;
-        event.preventDefault();
-        eraseAt(event.clientX, event.clientY);
-      }, { passive: false });
-
-      const endPointer = () => {
-        if (!isScratching) return;
-        isScratching = false;
-        if (scratchedFraction() >= 0.5) finishScratch();
-      };
-      scratchCanvas.addEventListener('pointerup', endPointer);
-      scratchCanvas.addEventListener('pointercancel', () => { isScratching = false; });
-
-      scratchCanvas.addEventListener('touchstart', (event) => {
-        if (scratchRevealed) return;
-        event.preventDefault();
-        if (window.PointerEvent || !event.touches[0]) return;
-        isScratching = true;
-        eraseAt(event.touches[0].clientX, event.touches[0].clientY);
-      }, { passive: false });
-
-      scratchCanvas.addEventListener('touchmove', (event) => {
-        if (scratchRevealed) return;
-        event.preventDefault();
-        if (window.PointerEvent || !isScratching || !event.touches[0]) return;
-        eraseAt(event.touches[0].clientX, event.touches[0].clientY);
-      }, { passive: false });
-
-      scratchCanvas.addEventListener('touchend', () => {
-        if (window.PointerEvent) return;
-        if (!isScratching) return;
-        isScratching = false;
-        if (scratchedFraction() >= 0.5) finishScratch();
-      });
-    }
-
-    function finishScratch() {
-      if (scratchRevealed) return;
-      scratchRevealed = true;
-      isScratching = false;
-      const card = document.getElementById('scratch-card');
-      if (card) card.classList.add('is-revealed');
-      if (scratchCanvas) scratchCanvas.style.pointerEvents = 'none';
-      const outcome = scratchOutcome || { won: false, prize: '', prizePoints: 0 };
-      const title = document.getElementById('scratch-result-title');
-      const detail = document.getElementById('scratch-result-detail');
-      const result = document.getElementById('scratch-result');
-      if (outcome.won) {
-        if (title) title.textContent = 'You won ' + outcome.prize + ' in virtual points!';
-        if (detail) detail.textContent = 'Free game only. These points have no cash value and cannot be redeemed. The card stays visible under the faded coating.';
-        if (typeof window.lmAwardPoints === 'function') window.lmAwardPoints(outcome.prizePoints || 0);
-      } else {
-        if (title) title.textContent = "Sorry, you're not a winner. Try again!";
-        if (detail) detail.textContent = 'Most cards do not win. This is a free game with no real-money prizes. You can still read the card under the faded coating.';
-      }
-      if (result) result.classList.remove('hidden');
-    }
-
-    function revealAllScratcher() {
-      if (!scratchCanvas || !sCtx) initScratchCard();
-      finishScratch();
-    }
-
-    function resetScratcher() {
-      try {
-        scratchRevealed = false;
-        isScratching = false;
-        scratchOutcome = null;
-        renderThemePicker();
-        dealScratchCard();
-        paintScratchCard();
-        const result = document.getElementById('scratch-result');
-        if (result) result.classList.add('hidden');
-        const card = document.getElementById('scratch-card');
-        if (card) card.classList.remove('is-revealed');
-        if (scratchCanvas) {
-          scratchCanvas.style.pointerEvents = '';
-          scratchCanvas.style.opacity = '';
-        }
-        requestAnimationFrame(initScratchCard);
-      } catch (err) {
-        console.error('Scratcher reset error:', err);
-      }
-    }
-
     // --- 4. HEATMAP & CHART ---
     function renderHeatmap() {
       try {
@@ -1636,9 +1250,6 @@
       bindPress(document.getElementById('btn-reset-hopper'), resetHopper);
       bindPress(document.getElementById('btn-generate'), () => generateTickets(5));
       bindPress(document.getElementById('btn-export-csv'), exportHistoryCSV);
-      bindPress(document.getElementById('btn-scratch-reveal'), revealAllScratcher);
-      bindPress(document.getElementById('btn-scratch-new'), resetScratcher);
-      bindPress(document.getElementById('btn-scratch-again'), resetScratcher);
       const lines = document.getElementById('generated-lines-container');
       if (lines) {
         lines.addEventListener('click', (event) => {
@@ -1690,7 +1301,6 @@
       checkDismissedAlert();
       bindMobileControls();
       initHopperChamber();
-      resetScratcher();
       loadOfficialDraws().then(() => {
         generateTickets(5);
         renderFavorites();
@@ -1699,7 +1309,7 @@
   </script>
   <script src="assets/site-config.js"></script>
   <script src="assets/tip.js"></script>
-  <script type="module" src="assets/scratch-bridge.js"></script>
+  <script src="assets/ads.js"></script>
   <script type="module" src="assets/account.js"></script>
   <script type="module" src="assets/native-shell.js"></script>
 </body>

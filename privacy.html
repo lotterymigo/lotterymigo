@@ -42,6 +42,7 @@
       </nav>
     </div>
   </header>
+  <div class="wrap"><div class="ad-slot" data-ad-placement="below-header" hidden></div></div>
   <main id="main" class="wrap stack" tabindex="-1">
     <div class="stack">
       <p class="kicker">Privacy</p>
@@ -49,19 +50,19 @@
       <p class="muted">Last updated October 17, 2026</p>
     </div>
     <article class="card prose">
-      <p>You can use the number tools, the draw simulator, and the scratch game without an account. Sign-in is optional. The draw archive is a public JSON file of winning numbers from NY Open Data. We do not sell personal information. Virtual points and saved picks are not cash and do not buy a ticket.</p>
+      <p>You can read the frequencies, gaps, and draw history without an account. Sign-in is optional and is only for saving number picks. The draw archive is a public JSON file of winning numbers from NY Open Data. We do not sell personal information. Saved picks are not tickets and do not guarantee a win.</p>
       <h2>What is stored on your device</h2>
-      <p>If you dismiss the notice at the top of the home page, the site saves that choice in your browser’s local storage under the key lotterymigo_alert_dismissed. Text size is saved as lotterymigo_font_px. High contrast is saved as lotterymigo_contrast. Ball motion is saved as lotterymigo_motion. Favorite numbers are saved as lotterymigo_favorites. Scratch points earned on this device are saved as lotterymigo_local_points. Those points have no cash value. In the Android or iOS app, the draw-alert choice is saved as lotterymigo_draw_alerts and the last alert date as lotterymigo_last_notified. Those values stay on your device. Clearing site data removes them.</p>
+      <p>If you dismiss the notice at the top of the home page, the site saves that choice in your browser’s local storage under the key lotterymigo_alert_dismissed. Dismissing the advertising-cookie note saves lotterymigo_ads_notice. Text size is saved as lotterymigo_font_px. High contrast is saved as lotterymigo_contrast. Ball motion is saved as lotterymigo_motion. Favorite numbers are saved as lotterymigo_favorites. In the Android or iOS app, the draw-alert choice is saved as lotterymigo_draw_alerts and the last alert date as lotterymigo_last_notified. Those values stay on your device. Clearing site data removes them.</p>
       <h2>Google sign-in and stored account data</h2>
       <p>If the owner has connected Firebase, you can sign in with Google. Firebase Authentication receives the Google account id, name, email, and photo from Google. LotteryMigo does not copy that email into its own database. The setup steps and the security rules are in the project file docs/FIREBASE_SETUP.md.</p>
-      <p>When you are signed in, Firestore can store: your virtual-point total, the day those points were earned in US Eastern Time, whether you opted in to the leaderboard, and picks you save (game, five numbers, bonus number, the draw date you intend to play, and whether you checked “I bought this ticket”). Your display name and photo are written only if you check “Show my name and photo on the leaderboard.” Otherwise the board shows “Anonymous player” and no photo. Point totals on the board are visible to anyone. Saved picks are visible only to you.</p>
+      <p>When you are signed in, Firestore can store the number picks you save (game, five numbers, bonus number, the draw date you intend to play, and whether you checked “I bought this ticket”). Saved picks are visible only to you. The website no longer shows a points leaderboard or a winner of the day. Older point totals may still sit in the database until the owner deletes them. They are not shown on the site and they are not a prize.</p>
       <p>Press Delete my account and data, then confirm, to remove those Firestore documents and ask Google to delete the app sign-in. If Google asks you to sign in again first, do that and press delete once more. You can also email <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a> and ask us to delete the data.</p>
       <h2>Tips</h2>
       <p>A Buy us a coffee button in the page header, when a tip address is configured, opens Buy Me a Coffee in a new tab. On a narrow screen the label says Coffee. The footer repeats a smaller link beside the voluntary-tip note. A tip does not buy virtual points, tickets, or a better chance of winning. LotteryMigo is not responsible for any win or loss. Buy Me a Coffee’s own policy covers that payment. The Android and iOS app does not show this link. Until a real link is configured, the website does not show the button.</p>
       <h2>Advertising and cookies</h2>
-      <p>The website loads Google AdSense for publisher ca-pub-4173178569579798. Google may set or read cookies and similar technologies to deliver ads, measure them, and personalize them from your activity on this and other sites. Ads are not required to use the frequency tools, the generator, the draw drum, or the free scratch game. The pages do not place an ad unit over the scratch-card result or the Try again button.</p>
-      <p>You can review or turn off personalized ads in <a href="https://adssettings.google.com/">Google’s ad settings</a>. Google explains these cookies in <a href="https://policies.google.com/technologies/ads">How Google uses cookies in advertising</a>. You can also opt out of some personalized ads from other companies at <a href="https://optout.aboutads.info/">optout.aboutads.info</a>. Blocking or deleting cookies in your browser should not stop the draw archive or the free games from loading.</p>
-      <p>The Android and iOS app does not load the website AdSense script. That app project includes Google AdMob scaffolding that uses Google’s public test ad units only. A test ad does not mean a production ad account is connected. Before any ad request, the app asks Google’s User Messaging Platform (UMP) for consent. If consent does not allow ads, no banner is shown. Banners are hidden while a scratch-card result is on screen so they do not cover Try again.</p>
+      <p>The website loads Google AdSense for publisher ca-pub-4173178569579798 on every page. Google may set or read cookies and similar technologies to deliver ads, measure them, and personalize them from your activity on this and other sites. Ads are not required to read the frequencies or the draw history. A short note at the bottom of the page links to this policy and to Google’s ad settings. Visitors in regions where Google requires a consent message will see that message after the owner turns it on in AdSense under Privacy &amp; messaging.</p>
+      <p>You can review or turn off personalized ads in <a href="https://adssettings.google.com/">Google’s ad settings</a>. Google explains these cookies in <a href="https://policies.google.com/technologies/ads">How Google uses cookies in advertising</a>. You can also opt out of some personalized ads from other companies at <a href="https://optout.aboutads.info/">optout.aboutads.info</a>. Blocking or deleting cookies in your browser should not stop the draw archive from loading.</p>
+      <p>The Android and iOS app does not load the website AdSense script. That app project includes Google AdMob scaffolding that uses Google’s public test ad units only. A test ad does not mean a production ad account is connected. Before any ad request, the app asks Google’s User Messaging Platform (UMP) for consent. If consent does not allow ads, no banner is shown.</p>
       <h2>App notifications</h2>
       <p>The website does not send notifications. The Android and iOS app can ask for permission to show a local notification when a newer drawing date is in the list. That notice stays on the device. It is not a prediction and it is not a remote push message. Alerts stay off until you turn them on.</p>
       <h2>Logs</h2>
@@ -72,6 +73,7 @@
   </main>
   <footer class="site-footer">
     <div class="wrap stack">
+      <div class="ad-slot" data-ad-placement="footer" hidden></div>
       <p>Entertainment only. Not gambling advice. No win is guaranteed. © 2026 LotteryMigo.com</p>
       <p id="tip-note" class="tip-note hidden" data-tip="note" hidden></p>
       <p>Contact <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a></p>
@@ -79,5 +81,6 @@
   </footer>
   <script src="assets/site-config.js"></script>
   <script src="assets/tip.js"></script>
+  <script src="assets/ads.js"></script>
 </body>
 </html>

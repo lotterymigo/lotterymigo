@@ -1171,32 +1171,11 @@ function bannerUnitId() {
   const id = Capacitor.getPlatform() === "ios" ? block.iosBannerId : block.androidBannerId;
   return id || "";
 }
-function scratchResultOpen() {
-  const result = document.getElementById("scratch-result");
-  return !!(result && !result.classList.contains("hidden"));
-}
 function setBannerPadding(px) {
   document.body.style.paddingBottom = px > 0 ? px + "px" : "";
 }
-async function hideBannerForScratch() {
-  if (!bannerShown) {
-    setBannerPadding(0);
-    return;
-  }
-  try {
-    await AdMob.hideBanner();
-  } catch (err) {
-    console.warn("Could not hide the banner.", err);
-  }
-  bannerShown = false;
-  setBannerPadding(0);
-}
 async function syncBanner() {
   if (!adsAllowed) return;
-  if (scratchResultOpen()) {
-    await hideBannerForScratch();
-    return;
-  }
   const adId = bannerUnitId();
   if (!adId) {
     console.warn("AdMob banner id is empty. Ads stay off until admob.config.json has an id.");
@@ -1226,17 +1205,10 @@ async function setupAds() {
     initializeForTesting: !!admob_config_default.useTestAds
   });
   await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info) => {
-    if (!bannerShown || scratchResultOpen()) return;
+    if (!bannerShown) return;
     const height = Number(info && (info.height || info.adHeight)) || 0;
     if (height > 0) setBannerPadding(height + 8);
   });
-  const result = document.getElementById("scratch-result");
-  if (result) {
-    const observer = new MutationObserver(() => {
-      syncBanner().catch((err) => console.warn("Banner update failed.", err));
-    });
-    observer.observe(result, { attributes: true, attributeFilter: ["class"] });
-  }
   adsAllowed = true;
   await syncBanner();
 }

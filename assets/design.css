@@ -816,137 +816,6 @@ main.wrap {
   display: block;
 }
 
-/* --- Scratch cards --- */
-.scratch-card {
-  position: relative;
-  max-width: 28rem;
-  margin-inline: auto;
-  min-height: 20rem;
-  padding: var(--space-4);
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--gold);
-  color: #f8fafc;
-  touch-action: none;
-}
-
-.scratch-card.theme-numbers { background: linear-gradient(145deg, #10241b, #0e7490); }
-.scratch-card.theme-stars { background: linear-gradient(145deg, #1e1b4b, #5b21b6); border-color: #a5b4fc; }
-.scratch-card.theme-gold { background: linear-gradient(145deg, #3f2a08, #a16207); }
-.scratch-card.theme-clover { background: linear-gradient(145deg, #052e16, #15803d); border-color: #86efac; }
-.scratch-card.theme-gems { background: linear-gradient(145deg, #4c0519, #be123c); border-color: #fda4af; }
-
-.scratch-card .kicker,
-.scratch-card .tone-gold,
-.scratch-card .tone-indigo,
-.scratch-card .tone-green,
-.scratch-card .tone-rose { color: #fde68a; }
-.scratch-card.theme-stars .tone-indigo { color: #e0e7ff; }
-.scratch-card.theme-clover .tone-green { color: #dcfce7; }
-.scratch-card.theme-gems .tone-rose { color: #ffe4e6; }
-
-.scratch-underlayer { display: grid; gap: var(--space-4); }
-.scratch-block { text-align: center; }
-.scratch-targets,
-.scratch-grid { margin-top: var(--space-2); }
-.scratch-targets { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); }
-.scratch-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
-
-.scratch-chip,
-.scratch-cell {
-  border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-}
-
-.scratch-chip {
-  min-width: 2.6rem;
-  min-height: 2.6rem;
-  padding: 0 0.45rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-}
-
-.scratch-cell { padding: var(--space-2); min-width: 0; text-align: center; }
-.scratch-value { display: block; color: #ffffff; font-weight: 800; }
-
-.scratch-card canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  border-radius: inherit;
-  touch-action: none;
-  cursor: crosshair;
-}
-
-/* After a reveal the coating stays, but it turns see-through. */
-.scratch-card.is-revealed canvas {
-  opacity: 0.28;
-  transition: opacity 0.45s ease;
-}
-
-.bingo-head,
-.bingo-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.25rem;
-}
-
-.bingo-head span,
-.bingo-cell {
-  min-height: 2.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-}
-
-.bingo-cell {
-  border-radius: 0.45rem;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-}
-
-.bingo-cell.is-called {
-  background: rgba(245, 197, 66, 0.45);
-  border-color: #f5c542;
-  color: #1a1404;
-}
-
-.reel-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-2);
-}
-
-.reel {
-  min-height: 4.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: 800;
-  border-radius: var(--radius);
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-}
-
-.scratch-result {
-  display: grid;
-  gap: var(--space-3);
-  justify-items: center;
-  text-align: center;
-  padding: var(--space-4);
-  border-radius: var(--radius);
-  border: 2px solid var(--line);
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  color: var(--text);
-}
-
 .disclaimer {
   margin: 0;
   padding: var(--space-3);
@@ -966,16 +835,6 @@ main.wrap {
 .pick-box { min-width: min(100%, 16rem); }
 html.lm-boards-off .pick-box { display: none !important; }
 
-#winner-banner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-  font-weight: 700;
-}
-
-.board { display: grid; gap: var(--space-2); margin: 0; padding-left: 1.2rem; }
-.board-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .avatar { width: 40px; height: 40px; border-radius: 999px; object-fit: cover; }
 
 /* --- Heatmap, chart, and history table --- */
@@ -1094,3 +953,37 @@ tbody tr + tr { border-top: 1px solid var(--line); }
     height: 2.2rem;
   }
 }
+
+/* --- AdSense slots and cookie note --- */
+.ad-slot { margin: 0; }
+.ad-slot:not([hidden]) {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 90px;
+}
+.ad-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ad-slot .adsbygoogle { min-height: 90px; }
+@media (max-width: 40rem) {
+  .ad-slot:not([hidden]),
+  .ad-slot .adsbygoogle { min-height: 70px; }
+}
+.ads-notice {
+  position: sticky;
+  bottom: 0;
+  z-index: 35;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.7rem 1rem;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+.ads-notice p { margin: 0; }

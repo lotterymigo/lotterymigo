@@ -9,8 +9,8 @@
 
 - **Dual-Game Architecture:** Instant switching between Powerball (1–69 + PB 1–26) and Mega Millions (1–70 + MB 1–25).
 - **Physics Ball Hopper:** Canvas-driven blower chamber. Ball motion follows the system reduced-motion setting and can be paused. The site does not play sound or confetti.
-- **Interactive Scratch-Off Cards:** Several free themes. About 1 in 4 cards wins virtual points only; losses show a try-again message. No cash value.
-- **Smart Combinatorial Ticket Generator:** Generates lines based on mathematical models (Harmonic 3/2 balance, Recent Frequency, Longest Gap Bias, and Quick Pick).
+- **Frequency stats:** Heatmap and chart of the most drawn and least drawn white-ball numbers.
+- **Smart Combinatorial Number Ideas:** Generates lines from a balanced mix, recent frequency, longest gap, or a quick pick. None of these change the odds.
 - **10-Year Historical Archive:** Instant searching, sorting, and CSV export for draws from 2016 through 2026.
 - **Decennial Heatmap & Charting:** Visualizes high-frequency vs. dormant numbers using Chart.js.
 
@@ -28,7 +28,7 @@
 
 ## Accounts
 
-The Firebase web config for project `lotterymigo` is in `assets/site-config.js`. Sign-in and the boards still need the authorized domains, a Firestore database, and the published rules in [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md). The rest of the site works without an account. Analytics is not loaded.
+The Firebase web config for project `lotterymigo` is in `assets/site-config.js`. Sign-in and saved picks still need the authorized domains, a Firestore database, and the published rules in [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md). The statistics work without an account. Analytics is not loaded. The points board is no longer on the site.
 
 ## Native app shell
 

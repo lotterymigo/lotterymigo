@@ -162,8 +162,7 @@ html.lm-contrast .panel,
 html.lm-contrast .inset,
 html.lm-contrast .line-card,
 html.lm-contrast .compliance,
-html.lm-contrast .lm-a11y-bar,
-html.lm-contrast .scratch-result {
+html.lm-contrast .lm-a11y-bar {
   background: #000000 !important;
   background-image: none !important;
   color: #ffffff !important;
@@ -254,30 +253,6 @@ html.lm-contrast .swatch.heat-low {
   background: #000000 !important;
   color: #ffffff !important;
   border-color: #ffffff !important;
-}
-
-html.lm-contrast .scratch-card,
-html.lm-contrast .scratch-cell,
-html.lm-contrast .scratch-chip {
-  background: #000000 !important;
-  background-image: none !important;
-  color: #ffffff !important;
-  border-color: #ffffff !important;
-}
-
-html.lm-contrast .bingo-cell.is-called {
-  background: #ffd000 !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
-}
-
-html.lm-contrast .scratch-card .kicker,
-html.lm-contrast .scratch-card .tone-gold,
-html.lm-contrast .scratch-card .tone-indigo,
-html.lm-contrast .scratch-card .tone-green,
-html.lm-contrast .scratch-card .tone-rose,
-html.lm-contrast .scratch-value {
-  color: #ffe566 !important;
 }
 
 html.lm-contrast .skip-link,

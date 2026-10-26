@@ -12,7 +12,13 @@
     { "source": "/games", "destination": "/#section-stats", "permanent": true },
     { "source": "/games.html", "destination": "/#section-stats", "permanent": true },
     { "source": "/mini-game", "destination": "/#section-stats", "permanent": true },
-    { "source": "/mini-game.html", "destination": "/#section-stats", "permanent": true }
+    { "source": "/mini-game.html", "destination": "/#section-stats", "permanent": true },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "lotterymigo.com" }],
+      "destination": "https://www.lotterymigo.com/:path*",
+      "permanent": true
+    }
   ],
   "headers": [
     {

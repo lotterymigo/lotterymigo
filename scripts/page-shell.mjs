@@ -1,3 +1,7 @@
+export const SITE = 'https://www.lotterymigo.com';
+export const OG_IMAGE = `${SITE}/icons/og-image.png`;
+const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,640&family=Outfit:wght@400;500;600;700&display=swap';
+const VERIFY = '<meta name="google-site-verification" content="mT-NZ9gT1zrEcQ4GcRFZ3N1Oo6bRwOL4S5UIhm1CUYk" />';
 const ADSENSE =
   '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4173178569579798" crossorigin="anonymous"></script>';
 
@@ -27,6 +31,65 @@ function navHtml(current) {
   }).join('\n        ');
 }
 
+function absolute(pathname) {
+  if (!pathname || pathname === '/') return `${SITE}/`;
+  return SITE + pathname;
+}
+
+function crumbsHtml(crumbs) {
+  if (!crumbs || !crumbs.length) return '';
+  const items = crumbs.map((crumb, index) => {
+    const last = index === crumbs.length - 1;
+    if (last) return `<li aria-current="page">${esc(crumb.name)}</li>`;
+    return `<li><a href="${esc(crumb.path)}">${esc(crumb.name)}</a></li>`;
+  }).join('');
+  return `<nav class="crumbs" aria-label="Breadcrumb"><ol>${items}</ol></nav>`;
+}
+
+function organizationGraph() {
+  return [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE}/#organization`,
+      name: 'LotteryMigo',
+      url: `${SITE}/`,
+      email: 'info@lotterymigo.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE}/icons/icon-512.png`,
+        width: 512,
+        height: 512
+      }
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE}/#website`,
+      url: `${SITE}/`,
+      name: 'LotteryMigo',
+      description: 'Powerball and Mega Millions statistics, results, and guides. Past draws do not predict future results.',
+      publisher: { '@id': `${SITE}/#organization` }
+    }
+  ];
+}
+
+function jsonLdScript(crumbs, extra) {
+  const graph = organizationGraph();
+  if (crumbs && crumbs.length) {
+    graph.push({
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map((crumb, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: crumb.name,
+        item: absolute(crumb.path)
+      }))
+    });
+  }
+  for (const node of extra || []) graph.push(node);
+  const payload = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c');
+  return `<script type="application/ld+json">${payload}</script>`;
+}
+
 export function renderPage({
   title,
   description,
@@ -35,9 +98,12 @@ export function renderPage({
   h1,
   lede = '',
   bodyHtml,
-  current = ''
+  current = '',
+  crumbs = null,
+  jsonLd = null,
+  ogType = 'website'
 }) {
-  const canonical = 'https://lotterymigo.com' + canonicalPath;
+  const canonical = absolute(canonicalPath);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,19 +111,35 @@ export function renderPage({
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="${esc(description)}" />
   <meta name="theme-color" content="#0c1220" />
+  ${VERIFY}
   <link rel="canonical" href="${esc(canonical)}" />
   <title>${esc(title)}</title>
+  <meta property="og:type" content="${esc(ogType)}" />
+  <meta property="og:site_name" content="LotteryMigo" />
+  <meta property="og:title" content="${esc(title)}" />
+  <meta property="og:description" content="${esc(description)}" />
+  <meta property="og:url" content="${esc(canonical)}" />
+  <meta property="og:image" content="${OG_IMAGE}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LotteryMigo, Powerball and Mega Millions statistics" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${esc(title)}" />
+  <meta name="twitter:description" content="${esc(description)}" />
+  <meta name="twitter:image" content="${OG_IMAGE}" />
   <link rel="icon" href="/icons/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/icons/favicon-32.png" sizes="32x32" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,640&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style" href="${FONT_HREF}" />
+  <link href="${FONT_HREF}" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/design.css" />
   <link rel="stylesheet" href="/assets/a11y.css" />
-  <script src="/assets/a11y.js"></script>
+  <script defer src="/assets/a11y.js"></script>
   ${ADSENSE}
+  ${jsonLdScript(crumbs, jsonLd)}
 </head>
 <body class="page page-narrow">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -81,6 +163,7 @@ export function renderPage({
   </header>
   <div class="wrap"><div class="ad-slot" data-ad-placement="below-header" hidden></div></div>
   <main id="main" class="wrap stack" tabindex="-1">
+    ${crumbsHtml(crumbs)}
     <div class="stack">
       <p class="kicker">${esc(kicker)}</p>
       <h1>${esc(h1)}</h1>
@@ -111,9 +194,9 @@ export function renderPage({
       <p>Entertainment only. Not gambling advice. No win is guaranteed. LotteryMigo is not affiliated with MUSL, the Mega Millions Consortium, or any state lottery. © 2026 LotteryMigo.com</p>
     </div>
   </footer>
-  <script src="/assets/site-config.js"></script>
-  <script src="/assets/tip.js"></script>
-  <script src="/assets/ads.js"></script>
+  <script defer src="/assets/site-config.js"></script>
+  <script defer src="/assets/tip.js"></script>
+  <script defer src="/assets/ads.js"></script>
 </body>
 </html>
 `;

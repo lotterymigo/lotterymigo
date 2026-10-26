@@ -3,26 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Powerball and Mega Millions statistics: draw history, frequencies, and hot and cold numbers. Past draws do not predict future results." />
+  <meta name="description" content="Powerball hot numbers, Mega Millions most common numbers, and recent results. Frequencies and gaps from past draws do not predict the next drawing." />
   <meta name="theme-color" content="#0c1220" />
-  <link rel="canonical" href="https://lotterymigo.com/" />
-  <title>LotteryMigo | Powerball and Mega Millions statistics</title>
+  <meta name="google-site-verification" content="mT-NZ9gT1zrEcQ4GcRFZ3N1Oo6bRwOL4S5UIhm1CUYk" />
+  <link rel="canonical" href="https://www.lotterymigo.com/" />
+  <title>Powerball Hot Numbers and Mega Millions Stats | LotteryMigo</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="LotteryMigo" />
+  <meta property="og:title" content="Powerball Hot Numbers and Mega Millions Stats | LotteryMigo" />
+  <meta property="og:description" content="Powerball hot numbers, Mega Millions most common numbers, and recent results. Frequencies and gaps from past draws do not predict the next drawing." />
+  <meta property="og:url" content="https://www.lotterymigo.com/" />
+  <meta property="og:image" content="https://www.lotterymigo.com/icons/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LotteryMigo, Powerball and Mega Millions statistics" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Powerball Hot Numbers and Mega Millions Stats | LotteryMigo" />
+  <meta name="twitter:description" content="Powerball hot numbers, Mega Millions most common numbers, and recent results. Frequencies and gaps from past draws do not predict the next drawing." />
+  <meta name="twitter:image" content="https://www.lotterymigo.com/icons/og-image.png" />
 
-  <!-- Brand icon -->
   <link rel="icon" href="icons/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="icons/favicon-32.png" sizes="32x32" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" sizes="180x180" />
   <link rel="manifest" href="manifest.webmanifest" />
 
-  <!-- Type. Inter when the network allows it, then the system font. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,640&family=Outfit:wght@400;500;600;700&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,640&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/design.css" />
   <link rel="stylesheet" href="assets/a11y.css" />
-  <script src="assets/a11y.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="assets/a11y.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="application/ld+json">
+    {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.lotterymigo.com/#organization","name":"LotteryMigo","url":"https://www.lotterymigo.com/","email":"info@lotterymigo.com","logo":{"@type":"ImageObject","url":"https://www.lotterymigo.com/icons/icon-512.png","width":512,"height":512}},{"@type":"WebSite","@id":"https://www.lotterymigo.com/#website","url":"https://www.lotterymigo.com/","name":"LotteryMigo","description":"Powerball and Mega Millions statistics, results, and guides. Past draws do not predict future results.","publisher":{"@id":"https://www.lotterymigo.com/#organization"}}]}
+  </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4173178569579798" crossorigin="anonymous"></script>
   <script>
     (function () {
@@ -89,11 +105,12 @@
       <p id="hero-badge" class="badge">Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.</p>
       <h1>Most Frequent and Longest Gap for <span id="hero-title-game" class="tone-pb">Powerball</span></h1>
       <p>Frequencies, the longest gaps, and the official draw list are the focus of this page. Written guides, recent results, and a page for each current number are linked from <a href="learn/index.html">Guides</a>. <strong class="tone-gold">For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
-      <p id="latest-draw-note">Loading official draw dates…</p>
+      <p id="latest-draw-note">Latest Powerball draw: October 24, 2026. White balls 4, 5, 15, 19, 55. Powerball 19.</p>
+      <p id="latest-mega-note">Latest Mega Millions draw: October 23, 2026. White balls 3, 7, 46, 49, 51. Mega Ball 5.</p>
       <div class="stats">
         <div class="panel">
           <span>Total draws</span>
-          <span id="stat-total-draws" class="stat-value">…</span>
+          <span id="stat-total-draws" class="stat-value">2,016</span>
           <p class="lm-help">How many drawings are in this list.</p>
         </div>
         <div class="panel">
@@ -103,15 +120,25 @@
         </div>
         <div class="panel">
           <span>Most Frequent</span>
-          <span id="stat-hottest-ball" class="stat-value tone-success">…</span>
+          <span id="stat-hottest-ball" class="stat-value tone-success">#28 (177x)</span>
           <p class="lm-help">The white-ball number drawn the most times in this list.</p>
         </div>
         <div class="panel">
           <span>Longest Gap</span>
-          <span id="stat-coldest-ball" class="stat-value tone-warn">…</span>
+          <span id="stat-coldest-ball" class="stat-value tone-warn">#43 (46 Draws)</span>
           <p class="lm-help">The white-ball number that has gone the most drawings without appearing. A long wait does not mean it is due next.</p>
         </div>
       </div>
+      <nav class="hub-links" aria-label="Number pages and guides">
+        <a href="powerball/numbers.html">Powerball number frequency</a>
+        <a href="powerball/results.html">Powerball results</a>
+        <a href="megamillions/numbers.html">Mega Millions most common numbers</a>
+        <a href="megamillions/results.html">Mega Millions results</a>
+        <a href="learn/hot-cold-overdue.html">Overdue Powerball numbers</a>
+        <a href="learn/lump-sum-annuity-taxes.html">Lump sum vs annuity</a>
+        <a id="home-hot-link" href="powerball/number/28.html">Powerball number 28 frequency</a>
+        <a id="home-gap-link" href="powerball/number/43.html">Longest Powerball gap, number 43</a>
+      </nav>
     </div>
   </section>
 
@@ -139,7 +166,7 @@
       <div id="heatmap-grid" class="heatmap"></div>
       <div class="rule stack">
         <h3>Ten most drawn and ten least drawn</h3>
-        <p id="chart-summary">The chart loads with the draw list. Green bars were drawn more often. Gold bars were drawn less often. This is history, not a forecast.</p>
+        <p id="chart-summary">Drawn most often: number 28 (177 times), number 23 (174 times), number 36 (174 times), number 21 (172 times), number 32 (171 times), number 39 (170 times), number 52 (166 times), number 59 (166 times), number 12 (163 times), number 33 (162 times). Drawn least often: number 65 (94 times), number 60 (95 times), number 68 (99 times), number 66 (102 times), number 67 (104 times), number 62 (113 times), number 69 (117 times), number 63 (117 times), number 64 (125 times), number 61 (126 times). These counts describe the past only.</p>
         <div class="chart-frame">
           <canvas id="frequencyChart" role="img" aria-labelledby="chart-summary"></canvas>
         </div>
@@ -153,7 +180,7 @@
       <div class="between">
         <div class="stack">
           <h2>Past winning numbers</h2>
-          <p id="history-blurb">Official winning numbers from NY Open Data.</p>
+          <p id="history-blurb">Powerball results from NY Open Data (d6yy-54nr), February 3, 2010 through October 24, 2026.</p>
           <p class="lm-help">The multiplier is Power Play or Megaplier when the official file lists one. A dash means it was not listed. On a phone, swipe the table sideways to see every column.</p>
         </div>
         <div class="row">
@@ -177,11 +204,20 @@
               <th scope="col" class="num">Odd and even</th>
             </tr>
           </thead>
-          <tbody id="history-table-body"></tbody>
+          <tbody id="history-table-body"><tr><td>2026-10-24</td><td><div class="balls"><a href="powerball/number/4.html"><span class="history-ball">4</span></a><a href="powerball/number/5.html"><span class="history-ball">5</span></a><a href="powerball/number/15.html"><span class="history-ball">15</span></a><a href="powerball/number/19.html"><span class="history-ball">19</span></a><a href="powerball/number/55.html"><span class="history-ball">55</span></a></div></td><td class="num"><a href="powerball/powerball/19.html"><span class="history-ball ball-pb">19</span></a></td><td class="num tone-gold">2x</td><td class="num">4 odd, 1 even</td></tr>
+<tr><td>2026-10-21</td><td><div class="balls"><a href="powerball/number/1.html"><span class="history-ball">1</span></a><a href="powerball/number/21.html"><span class="history-ball">21</span></a><a href="powerball/number/44.html"><span class="history-ball">44</span></a><a href="powerball/number/50.html"><span class="history-ball">50</span></a><a href="powerball/number/57.html"><span class="history-ball">57</span></a></div></td><td class="num"><a href="powerball/powerball/5.html"><span class="history-ball ball-pb">5</span></a></td><td class="num tone-gold">2x</td><td class="num">3 odd, 2 even</td></tr>
+<tr><td>2026-10-19</td><td><div class="balls"><a href="powerball/number/8.html"><span class="history-ball">8</span></a><a href="powerball/number/31.html"><span class="history-ball">31</span></a><a href="powerball/number/32.html"><span class="history-ball">32</span></a><a href="powerball/number/42.html"><span class="history-ball">42</span></a><a href="powerball/number/48.html"><span class="history-ball">48</span></a></div></td><td class="num"><a href="powerball/powerball/23.html"><span class="history-ball ball-pb">23</span></a></td><td class="num tone-gold">4x</td><td class="num">1 odd, 4 even</td></tr>
+<tr><td>2026-10-17</td><td><div class="balls"><a href="powerball/number/12.html"><span class="history-ball">12</span></a><a href="powerball/number/13.html"><span class="history-ball">13</span></a><a href="powerball/number/24.html"><span class="history-ball">24</span></a><a href="powerball/number/32.html"><span class="history-ball">32</span></a><a href="powerball/number/35.html"><span class="history-ball">35</span></a></div></td><td class="num"><a href="powerball/powerball/11.html"><span class="history-ball ball-pb">11</span></a></td><td class="num tone-gold">3x</td><td class="num">2 odd, 3 even</td></tr>
+<tr><td>2026-10-14</td><td><div class="balls"><a href="powerball/number/3.html"><span class="history-ball">3</span></a><a href="powerball/number/34.html"><span class="history-ball">34</span></a><a href="powerball/number/37.html"><span class="history-ball">37</span></a><a href="powerball/number/42.html"><span class="history-ball">42</span></a><a href="powerball/number/46.html"><span class="history-ball">46</span></a></div></td><td class="num"><a href="powerball/powerball/20.html"><span class="history-ball ball-pb">20</span></a></td><td class="num tone-gold">3x</td><td class="num">2 odd, 3 even</td></tr>
+<tr><td>2026-10-12</td><td><div class="balls"><a href="powerball/number/22.html"><span class="history-ball">22</span></a><a href="powerball/number/28.html"><span class="history-ball">28</span></a><a href="powerball/number/38.html"><span class="history-ball">38</span></a><a href="powerball/number/51.html"><span class="history-ball">51</span></a><a href="powerball/number/69.html"><span class="history-ball">69</span></a></div></td><td class="num"><a href="powerball/powerball/9.html"><span class="history-ball ball-pb">9</span></a></td><td class="num tone-gold">3x</td><td class="num">2 odd, 3 even</td></tr>
+<tr><td>2026-10-10</td><td><div class="balls"><a href="powerball/number/1.html"><span class="history-ball">1</span></a><a href="powerball/number/4.html"><span class="history-ball">4</span></a><a href="powerball/number/19.html"><span class="history-ball">19</span></a><a href="powerball/number/33.html"><span class="history-ball">33</span></a><a href="powerball/number/51.html"><span class="history-ball">51</span></a></div></td><td class="num"><a href="powerball/powerball/15.html"><span class="history-ball ball-pb">15</span></a></td><td class="num tone-gold">2x</td><td class="num">4 odd, 1 even</td></tr>
+<tr><td>2026-10-07</td><td><div class="balls"><a href="powerball/number/11.html"><span class="history-ball">11</span></a><a href="powerball/number/13.html"><span class="history-ball">13</span></a><a href="powerball/number/14.html"><span class="history-ball">14</span></a><a href="powerball/number/21.html"><span class="history-ball">21</span></a><a href="powerball/number/65.html"><span class="history-ball">65</span></a></div></td><td class="num"><a href="powerball/powerball/19.html"><span class="history-ball ball-pb">19</span></a></td><td class="num tone-gold">2x</td><td class="num">4 odd, 1 even</td></tr>
+<tr><td>2026-10-05</td><td><div class="balls"><a href="powerball/number/16.html"><span class="history-ball">16</span></a><a href="powerball/number/23.html"><span class="history-ball">23</span></a><a href="powerball/number/32.html"><span class="history-ball">32</span></a><a href="powerball/number/36.html"><span class="history-ball">36</span></a><a href="powerball/number/54.html"><span class="history-ball">54</span></a></div></td><td class="num"><a href="powerball/powerball/9.html"><span class="history-ball ball-pb">9</span></a></td><td class="num tone-gold">2x</td><td class="num">1 odd, 4 even</td></tr>
+<tr><td>2026-10-03</td><td><div class="balls"><a href="powerball/number/4.html"><span class="history-ball">4</span></a><a href="powerball/number/42.html"><span class="history-ball">42</span></a><a href="powerball/number/44.html"><span class="history-ball">44</span></a><a href="powerball/number/55.html"><span class="history-ball">55</span></a><a href="powerball/number/59.html"><span class="history-ball">59</span></a></div></td><td class="num"><a href="powerball/powerball/14.html"><span class="history-ball ball-pb">14</span></a></td><td class="num tone-gold">2x</td><td class="num">2 odd, 3 even</td></tr></tbody>
         </table>
       </div>
       <div id="history-pagination" class="pager">
-        <span id="history-count-label">Showing 1-10 of 1,042 draws</span>
+        <span id="history-count-label">Showing 1 to 10 of 2,016 drawings</span>
         <div class="row">
           <button type="button" class="btn btn-quiet" onclick="changeHistoryPage(-1)" aria-label="Previous page of drawings">Previous</button>
           <button type="button" class="btn btn-quiet" onclick="changeHistoryPage(1)" aria-label="Next page of drawings">Next</button>
@@ -352,6 +388,8 @@
           <a href="learn/index.html">Learn</a>
           <a href="powerball/results.html">Powerball results</a>
           <a href="megamillions/results.html">Mega Millions results</a>
+          <a href="powerball/numbers.html">Powerball numbers</a>
+          <a href="megamillions/numbers.html">Mega Millions numbers</a>
           <a href="faq.html">FAQ</a>
           <a href="about.html">About</a>
           <a href="privacy.html">Privacy Policy</a>
@@ -451,7 +489,7 @@
       let remote = null;
       if (native) {
         try {
-          remote = await fetchDrawFile('https://lotterymigo.com/data/draws.json');
+          remote = await fetchDrawFile('https://www.lotterymigo.com/data/draws.json');
         } catch (err) {
           console.warn('Hosted draw file unavailable. Using the copy saved in the app.', err);
         }
@@ -1143,14 +1181,16 @@
 
         slice.forEach(d => {
           const odds = d.whites.filter(n=>n%2!==0).length;
-          let ballsHtml = d.whites.map(n => '<span class="history-ball">' + n + '</span>').join('');
+          const whiteBase = currentGame === 'POWERBALL' ? 'powerball/number/' : 'megamillions/number/';
+          const specialBase = currentGame === 'POWERBALL' ? 'powerball/powerball/' : 'megamillions/megaball/';
+          let ballsHtml = d.whites.map(n => '<a href="' + whiteBase + n + '.html"><span class="history-ball">' + n + '</span></a>').join('');
           let specialClass = currentGame === 'POWERBALL' ? 'history-ball ball-pb' : 'history-ball ball-mm';
 
           tbody.innerHTML += `
             <tr>
               <td>${d.date}</td>
               <td><div class="balls">${ballsHtml}</div></td>
-              <td class="num"><span class="${specialClass}">${d.special}</span></td>
+              <td class="num"><a href="${specialBase}${d.special}.html"><span class="${specialClass}">${d.special}</span></a></td>
               <td class="num tone-gold">${d.multiplier == null ? '—' : d.multiplier + 'x'}</td>
               <td class="num">${odds} odd, ${5 - odds} even</td>
             </tr>

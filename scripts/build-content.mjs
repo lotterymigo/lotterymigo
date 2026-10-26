@@ -1,7 +1,7 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderPage } from './page-shell.mjs';
+import { renderPage, SITE, OG_IMAGE } from './page-shell.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT_DATE = '2026-10-26';
@@ -10,8 +10,8 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 const GUIDES = [
   {
     slug: 'how-powerball-works',
-    title: 'How Powerball works: rules, odds, and Power Play | LotteryMigo',
-    description: 'Powerball rules in plain language: the $2 play, 5/69 plus 1/26 matrix, nine prize tiers, Power Play, and how LotteryMigo counts drawings.',
+    title: 'Powerball Rules, Odds, and Power Play Guide | LotteryMigo',
+    description: 'Powerball rules in plain language: a $2 play, five white balls from 1–69, one red ball from 1–26, prize tiers, and Power Play. Not a forecast.',
     kicker: 'Guide',
     h1: 'How Powerball works',
     blurb: 'The matrix, the nine prize tiers, Power Play, Double Play, and which drawings this site treats as the current game.',
@@ -24,8 +24,8 @@ const GUIDES = [
   },
   {
     slug: 'how-mega-millions-works',
-    title: 'How Mega Millions works, including the 2025 rules | LotteryMigo',
-    description: 'Mega Millions after April 8, 2025: a $5 play, Mega Ball 1–24, the built-in multiplier, prize tiers, and how the archive splits older matrices.',
+    title: 'Mega Millions Rules, Odds, and 2025 Changes | LotteryMigo',
+    description: 'Mega Millions rules after April 8, 2025: a $5 play, Mega Ball 1–24, the built-in multiplier, and prize tiers. Older matrices are counted apart.',
     kicker: 'Guide',
     h1: 'How Mega Millions works',
     blurb: 'The $5 ticket, the 1–24 Mega Ball, the multiplier table, and why older drawings are counted separately.',
@@ -38,8 +38,8 @@ const GUIDES = [
   },
   {
     slug: 'understanding-the-odds',
-    title: 'Understanding Powerball and Mega Millions odds | LotteryMigo',
-    description: 'Where the jackpot odds 1 in 292,201,338 and 1 in 290,472,336 come from, and why buying more tickets scales the chance in a straight line.',
+    title: 'Powerball and Mega Millions Odds Explained | LotteryMigo',
+    description: 'How the Powerball jackpot odds of 1 in 292,201,338 and Mega Millions odds of 1 in 290,472,336 are counted, and why extra tickets scale that chance.',
     kicker: 'Guide',
     h1: 'Understanding the odds',
     blurb: 'A combination count for both games, the difference between any-prize odds and jackpot odds, and the limits of a jackpot expected-value shortcut.',
@@ -52,8 +52,8 @@ const GUIDES = [
   },
   {
     slug: 'hot-cold-overdue',
-    title: 'What hot, cold, and overdue lottery numbers mean | LotteryMigo',
-    description: 'Hot, cold, and overdue describe past drawings. A long gap does not change the chance a number is drawn next. Includes a live count from this archive.',
+    title: 'Powerball Hot Numbers and Overdue Numbers | LotteryMigo',
+    description: 'What Powerball hot numbers, cold numbers, and overdue numbers mean. A long gap does not change the next draw. Includes a count from this archive.',
     kicker: 'Guide',
     h1: 'What hot, cold, and overdue numbers really mean',
     blurb: 'How this site defines frequency and gaps, why all-time charts mix retired matrices, and a count taken from the current archive.',
@@ -67,8 +67,8 @@ const GUIDES = [
   },
   {
     slug: 'lump-sum-annuity-taxes',
-    title: 'Lottery lump sum, annuity, and taxes | LotteryMigo',
-    description: 'General information on Powerball and Mega Millions jackpot options, IRS Topic 419, and 24 percent federal withholding. Not tax advice.',
+    title: 'Lump Sum vs Annuity for Lottery Jackpots | LotteryMigo',
+    description: 'Lump sum versus annuity for Powerball and Mega Millions jackpots, plus IRS Topic 419 and 24 percent federal withholding. This is not tax advice.',
     kicker: 'Guide',
     h1: 'Lump sum, annuity, and taxes',
     blurb: 'What the advertised annuity and cash figures mean, and what the IRS says about reporting and withholding lottery winnings.',
@@ -81,8 +81,8 @@ const GUIDES = [
   },
   {
     slug: 'lottery-scams',
-    title: 'Lottery scams to avoid | LotteryMigo',
-    description: 'A real lottery prize is claimed from the lottery that sold the ticket. Requests for a fee, a gift card, or bank details are a scam. How to report one.',
+    title: 'Lottery Scams to Avoid Before You Pay a Fee | LotteryMigo',
+    description: 'A real lottery prize is claimed from the lottery that sold the ticket. A fee, a gift card, or a bank-details request is a scam. How to report one.',
     kicker: 'Guide',
     h1: 'Lottery scams to avoid',
     blurb: 'How a real claim works, the fee-and-bank-details pattern the FTC describes, and what this site will never ask you to send.',
@@ -103,6 +103,67 @@ function esc(value) {
     '"': '&quot;',
     "'": '&#39;'
   }[ch]));
+}
+
+function fitDescription(primary, extras = []) {
+  let text = primary.replace(/\s+/g, ' ').trim();
+  for (const extra of extras) {
+    if (text.length >= 140) break;
+    const next = `${text} ${extra.replace(/\s+/g, ' ').trim()}`;
+    if (next.length <= 160) text = next;
+  }
+  return text;
+}
+
+function articleLd({ headline, description, path, modified }) {
+  return {
+    '@type': 'Article',
+    headline,
+    description,
+    datePublished: CONTENT_DATE,
+    dateModified: modified,
+    image: OG_IMAGE,
+    mainEntityOfPage: SITE + path,
+    author: { '@id': `${SITE}/#organization` },
+    publisher: { '@id': `${SITE}/#organization` }
+  };
+}
+
+function faqEntities(html) {
+  return html.split(/<h2>/).slice(1).map((part) => {
+    const [question, rest] = part.split('</h2>');
+    const answer = String(rest || '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return {
+      '@type': 'Question',
+      name: question.replace(/<[^>]+>/g, '').trim(),
+      acceptedAnswer: { '@type': 'Answer', text: answer }
+    };
+  }).filter((item) => item.name && item.acceptedAnswer.text);
+}
+
+function relatedNumbers(game, pool, row) {
+  const items = [];
+  const push = (href, name) => {
+    if (items.some((item) => item.href === href)) return;
+    items.push({ href, name });
+  };
+  if (pool.analysis.rows.has(row.num - 1)) push(pool.href(row.num - 1), `${pool.ballLabel} ${row.num - 1}`);
+  if (pool.analysis.rows.has(row.num + 1)) push(pool.href(row.num + 1), `${pool.ballLabel} ${row.num + 1}`);
+  const companions = pool.kind === 'white' ? row.whiteCompanions : row.whiteCompanions;
+  for (const [num] of companions.slice(0, 2)) {
+    if (pool.kind === 'white') push(pool.href(num), `${pool.ballLabel} ${num}`);
+    else push(game.whiteHref(num), `${game.name} white ball ${num}`);
+  }
+  if (!items.length) return '';
+  return `<h2>Related numbers</h2><ul>${items.slice(0, 4).map((item) => `<li><a href="${item.href}">${esc(item.name)}</a></li>`).join('')}</ul>`;
 }
 
 function prettyDate(iso) {
@@ -431,8 +492,21 @@ function numberPage(game, pool, row, fullCount, firstDate) {
   const gapLabel = historical ? 'Drawings left in the old field' : 'Current gap';
   const lastText = row.last ? prettyDate(row.last.date) : 'No appearance';
   const description = historical
-    ? `Mega Ball 25 appeared ${comma(row.count)} times from ${prettyDate(pool.start)} through ${prettyDate(pool.end)}. It is not in the current 1–24 Mega Ball field.`
-    : `${label} appeared ${comma(row.count)} times in ${comma(pool.analysis.drawCount)} drawings since ${prettyDate(pool.start)}. Last drawn ${lastText}. The gap is history, not a forecast.`;
+    ? fitDescription(
+      `Mega Ball 25 appeared ${comma(row.count)} times from ${prettyDate(pool.start)} through ${prettyDate(pool.end)}. It is not in the current 1–24 Mega Ball field.`,
+      ['Counts come from NY Open Data.', 'A retired ball is not overdue.']
+    )
+    : fitDescription(
+      `${label} appeared ${comma(row.count)} times in ${comma(pool.analysis.drawCount)} drawings since ${prettyDate(pool.start)}. Last drawn ${lastText}.`,
+      ['A gap is history, not a forecast.', 'From NY Open Data.']
+    );
+  const title = pool.kind === 'white'
+    ? (game.id === 'powerball'
+      ? `Powerball Number ${row.num} Stats: Frequency, Last Drawn & Gap | LotteryMigo`
+      : `Mega Millions Number ${row.num}: Frequency and Gap | LotteryMigo`)
+    : (game.id === 'powerball'
+      ? `Powerball Red Ball ${row.num}: Frequency, Last Drawn & Gap | LotteryMigo`
+      : `Mega Ball ${row.num} Stats: Frequency, Last Drawn and Gap | LotteryMigo`);
   const lines = row.lines.map((hit) => `<li>${lineHtml(hit.draw, game)}</li>`).join('');
   const prevNum = pool.analysis.rows.has(row.num - 1) ? row.num - 1 : null;
   const nextNum = pool.analysis.rows.has(row.num + 1) ? row.num + 1 : null;
@@ -451,6 +525,7 @@ function numberPage(game, pool, row, fullCount, firstDate) {
     <h2>Recent drawings in this set</h2>
     ${lines ? `<ul>${lines}</ul>` : '<p>No drawings in this set include this number.</p>'}
     ${pager}
+    ${relatedNumbers(game, pool, row)}
     <h2>Where to go next</h2>
     <ul>
       <li><a href="${game.hub}">All ${esc(game.name)} number statistics</a></li>
@@ -459,13 +534,18 @@ function numberPage(game, pool, row, fullCount, firstDate) {
       <li><a href="/learn/hot-cold-overdue.html">What a hot or overdue label actually means</a></li>
     </ul>`;
   return renderPage({
-    title: `${label}: frequency, last draw, and gap | LotteryMigo`,
+    title,
     description,
     canonicalPath: pool.href(row.num),
     kicker: historical ? `${game.name} historical ball` : `${game.name} statistics`,
     h1: label,
     bodyHtml: body,
-    current: game.nav
+    current: game.nav,
+    crumbs: [
+      { name: 'Home', path: '/' },
+      { name: `${game.name} numbers`, path: game.hub },
+      { name: label, path: pool.href(row.num) }
+    ]
   });
 }
 
@@ -498,14 +578,33 @@ function hubPage(game, whitePool, specialPool, extraPool) {
     ${tableFor(specialPool, `${game.name} ${game.specialName}, current field`)}
     ${extraPool ? `<h2>Historical ${esc(game.specialName)} 25</h2><p><a href="${extraPool.href(25)}">Mega Ball 25</a> was part of the field from ${prettyDate(extraPool.start)} through ${prettyDate(extraPool.end)}. It appeared ${comma(extraPool.analysis.rows.get(25).count)} times in that window. It is not drawn under the current rules.</p>` : ''}
     <p>Recent drawings, with a link on every ball, are on the <a href="${game.results}">${esc(game.name)} results page</a>. The home page chart still uses the full file, which is why its order can differ from the rank on these pages.</p>`;
+  const hubDescription = game.id === 'powerball'
+    ? 'Powerball number frequency, last drawn date, and current gap for every white ball and Powerball since October 7, 2015. A gap is history, not a forecast.'
+    : 'Mega Millions most common numbers, last drawn dates, and gaps for the current matrix. Counts come from NY Open Data. A gap is not a forecast.';
+  const hubTitle = game.id === 'powerball'
+    ? 'Powerball Number Frequency and Hot Numbers | LotteryMigo'
+    : 'Mega Millions Most Common Numbers and Gaps | LotteryMigo';
   return renderPage({
-    title: `${game.name} number statistics | LotteryMigo`,
-    description: `Frequency, last drawn date, and current gap for every current ${game.name} number, counted from NY Open Data and split by matrix.`,
+    title: hubTitle,
+    description: hubDescription,
     canonicalPath: game.hub,
     kicker: `${game.name} statistics`,
     h1: `${game.name} number statistics`,
     bodyHtml: body,
-    current: game.nav
+    current: game.nav,
+    crumbs: [
+      { name: 'Home', path: '/' },
+      { name: `${game.name} numbers`, path: game.hub }
+    ],
+    jsonLd: [{
+      '@type': 'Dataset',
+      name: `${game.name} number frequency counts`,
+      description: hubDescription,
+      url: SITE + game.hub,
+      creator: { '@id': `${SITE}/#organization` },
+      dateModified: whitePool.fetched,
+      isBasedOn: game.id === 'powerball' ? 'https://data.ny.gov/d/d6yy-54nr' : 'https://data.ny.gov/d/5xaw-6ayf'
+    }]
   });
 }
 
@@ -530,14 +629,22 @@ function resultsPage(game, recent, archiveDraws) {
       </table>
     </div>
     <p>Prize rules and odds are in <a href="${game.guide}">${esc(game.guideLabel)}</a>. Counts for a single number, including the current gap, are in the <a href="${game.hub}">number statistics</a>.</p>`;
+  const resultsTitle = game.id === 'powerball'
+    ? 'Powerball Results: Latest Drawings and Numbers | LotteryMigo'
+    : 'Mega Millions Results: Latest Drawings Listed | LotteryMigo';
+  const resultsDescription = `The latest ${recent.length} ${game.name} drawings from the NY Open Data archive, with each number linked to its frequency and gap. A result is history, not a forecast.`;
   return renderPage({
-    title: `${game.name} results and recent drawings | LotteryMigo`,
-    description: `The latest ${recent.length} ${game.name} drawings from the NY Open Data archive, with each number linked to its frequency and gap.`,
+    title: resultsTitle,
+    description: resultsDescription,
     canonicalPath: game.results,
     kicker: `${game.name} results`,
     h1: `Recent ${game.name} results`,
     bodyHtml: body,
-    current: game.nav
+    current: game.nav,
+    crumbs: [
+      { name: 'Home', path: '/' },
+      { name: `${game.name} results`, path: game.results }
+    ]
   });
 }
 
@@ -566,13 +673,17 @@ function learnIndex(liveNote) {
     <ol class="guide-list">${items}</ol>
     <p>Shorter answers are on the <a href="/faq.html">FAQ</a>. The counting method is on the <a href="/about.html">about page</a>.</p>`;
   return renderPage({
-    title: 'Powerball and Mega Millions guides | LotteryMigo',
-    description: 'Guides to Powerball and Mega Millions rules, odds, hot and cold numbers, jackpot payouts, taxes, and lottery scams.',
+    title: 'Powerball and Mega Millions Rules and Odds | LotteryMigo',
+    description: 'Guides to Powerball and Mega Millions rules, odds, hot and overdue numbers, lump sum versus annuity, taxes, and scams. Past draws are not a forecast.',
     canonicalPath: '/learn/index.html',
     kicker: 'Guides',
     h1: 'Learn the games, then read the counts',
     bodyHtml: body,
-    current: 'guides'
+    current: 'guides',
+    crumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Guides', path: '/learn/index.html' }
+    ]
   });
 }
 
@@ -739,16 +850,30 @@ for (const guide of GUIDES) {
     body = body.replace('<!-- LIVE_EXAMPLE -->', example);
   }
   body += relatedBlock(guide.related);
+  const guidePath = `/learn/${guide.slug}.html`;
+  const guideModified = guide.live ? fetched : CONTENT_DATE;
   const html = renderPage({
     title: guide.title,
     description: guide.description,
-    canonicalPath: `/learn/${guide.slug}.html`,
+    canonicalPath: guidePath,
     kicker: guide.kicker,
     h1: guide.h1,
     bodyHtml: body,
-    current: 'guides'
+    current: 'guides',
+    ogType: 'article',
+    crumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Guides', path: '/learn/index.html' },
+      { name: guide.h1, path: guidePath }
+    ],
+    jsonLd: [articleLd({
+      headline: guide.h1,
+      description: guide.description,
+      path: guidePath,
+      modified: guideModified
+    })]
   });
-  await emit(`learn/${guide.slug}.html`, html, guide.live ? fetched : CONTENT_DATE);
+  await emit(`learn/${guide.slug}.html`, html, guideModified);
 }
 
 const learnHtml = learnIndex(`The hot-and-cold guide includes a count through ${prettyDate(pbWhite.endDate)}.`);
@@ -756,8 +881,8 @@ await emit('learn/index.html', learnHtml, fetched);
 
 const aboutBody = await readFile(path.join(root, 'content/about-body.html'), 'utf8');
 await emit('about.html', renderPage({
-  title: 'About LotteryMigo',
-  description: 'Who runs LotteryMigo, where the Powerball and Mega Millions draws come from, how number statistics are calculated, and when the archive updates.',
+  title: 'About LotteryMigo and How the Counts Work | LotteryMigo',
+  description: 'Who runs LotteryMigo, where Powerball and Mega Millions draws come from, how frequency and gaps are counted, and when the NY Open Data archive updates.',
   canonicalPath: '/about.html',
   kicker: 'About',
   h1: 'About LotteryMigo',
@@ -767,13 +892,17 @@ await emit('about.html', renderPage({
 
 const faqBody = await readFile(path.join(root, 'content/faq-body.html'), 'utf8');
 await emit('faq.html', renderPage({
-  title: 'Powerball and Mega Millions FAQ | LotteryMigo',
-  description: 'Answers about LotteryMigo’s draw archive, current Powerball and Mega Millions rules, odds, taxes, scams, and why gaps do not predict the next drawing.',
+  title: 'Powerball and Mega Millions Questions Answered | LotteryMigo',
+  description: 'Answers on Powerball and Mega Millions rules, odds, hot and overdue numbers, taxes, scams, and why a gap does not predict the next drawing on this site.',
   canonicalPath: '/faq.html',
   kicker: 'FAQ',
   h1: 'Frequently asked questions',
   bodyHtml: faqBody,
-  current: 'faq'
+  current: 'faq',
+  jsonLd: [{
+    '@type': 'FAQPage',
+    mainEntity: faqEntities(faqBody)
+  }]
 }), CONTENT_DATE);
 
 async function emitPool(pool, meta) {
@@ -795,6 +924,115 @@ await emit('megamillions/numbers.html', hubPage(mm, mmWhite, mmSpecial, mm25), f
 await emit('powerball/results.html', resultsPage(pb, gamesRaw.powerball.slice(0, 100), gamesRaw.powerball), fetched);
 await emit('megamillions/results.html', resultsPage(mm, gamesRaw.megamillions.slice(0, 100), gamesRaw.megamillions), fetched);
 
+await writeOut('404.html', renderPage({
+  title: 'The Page You Requested Is Not on LotteryMigo | LotteryMigo',
+  description: 'That address is not a LotteryMigo page. Open Powerball results, Mega Millions results, number statistics, or the guides. Past draws are not a forecast.',
+  canonicalPath: '/404.html',
+  kicker: '404',
+  h1: 'This page is not on LotteryMigo',
+  bodyHtml: `<p>The address you opened is not one of the statistics pages, guides, or results. These hubs are:</p>
+    <ul>
+      <li><a href="/">Powerball and Mega Millions statistics</a></li>
+      <li><a href="/powerball/results.html">Powerball results</a></li>
+      <li><a href="/megamillions/results.html">Mega Millions results</a></li>
+      <li><a href="/powerball/numbers.html">Powerball number frequency</a></li>
+      <li><a href="/megamillions/numbers.html">Mega Millions most common numbers</a></li>
+      <li><a href="/learn/index.html">Guides, including odds and lump sum versus annuity</a></li>
+      <li><a href="/faq.html">FAQ</a></li>
+    </ul>`,
+  crumbs: [
+    { name: 'Home', path: '/' },
+    { name: 'Page not found', path: '/404.html' }
+  ]
+}));
+
+function formatCount(value) {
+  return Math.round(value).toLocaleString('en-US');
+}
+
+function historyRows(draws) {
+  return draws.slice(0, 10).map((draw) => {
+    const whites = [...draw.whites].sort((a, b) => a - b);
+    const odds = whites.filter((num) => num % 2 !== 0).length;
+    const balls = whites.map((num) => `<a href="powerball/number/${num}.html"><span class="history-ball">${num}</span></a>`).join('');
+    const multiplier = draw.multiplier == null || draw.multiplier === '' ? '—' : `${draw.multiplier}x`;
+    return `<tr><td>${esc(draw.date)}</td><td><div class="balls">${balls}</div></td><td class="num"><a href="powerball/powerball/${draw.special}.html"><span class="history-ball ball-pb">${draw.special}</span></a></td><td class="num tone-gold">${esc(multiplier)}</td><td class="num">${odds} odd, ${5 - odds} even</td></tr>`;
+  }).join('\n');
+}
+
+function replaceElement(html, id, inner) {
+  const pattern = new RegExp(`(<([a-z0-9]+)[^>]*id="${id}"[^>]*>)[\\s\\S]*?(</\\2>)`);
+  if (!pattern.test(html)) throw new Error(`Home page is missing #${id}`);
+  return html.replace(pattern, `$1${inner}</$2>`);
+}
+
+async function refreshHome(powerballDraws, megaDraws) {
+  const sorted = [...powerballDraws].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const freq = new Map();
+  for (let num = 1; num <= 69; num += 1) freq.set(num, 0);
+  for (const draw of sorted) {
+    for (const ball of draw.whites) {
+      if (ball >= 1 && ball <= 69) freq.set(ball, freq.get(ball) + 1);
+    }
+  }
+  const gap = new Map();
+  for (let num = 1; num <= 69; num += 1) {
+    let streak = 0;
+    for (const draw of sorted) {
+      if (draw.whites.includes(num)) break;
+      streak += 1;
+    }
+    gap.set(num, streak);
+  }
+  let hot = 1;
+  let hotCount = -1;
+  let cold = 1;
+  let coldGap = -1;
+  for (let num = 1; num <= 69; num += 1) {
+    if (freq.get(num) > hotCount) { hotCount = freq.get(num); hot = num; }
+    if (gap.get(num) > coldGap) { coldGap = gap.get(num); cold = num; }
+  }
+  const ranked = [...freq.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
+  const top10 = ranked.slice(0, 10);
+  const bottom10 = ranked.slice(-10).reverse();
+  const newest = sorted[0];
+  const oldest = sorted[sorted.length - 1];
+  const megaNewest = [...megaDraws].sort((a, b) => (a.date < b.date ? 1 : -1))[0];
+  let html = await readFile(path.join(root, 'index.html'), 'utf8');
+  html = replaceElement(html, 'latest-draw-note', `Latest Powerball draw: ${prettyDate(newest.date)}. White balls ${newest.whites.join(', ')}. Powerball ${newest.special}.`);
+  html = replaceElement(html, 'stat-total-draws', formatCount(sorted.length));
+  html = replaceElement(html, 'stat-hottest-ball', `#${hot} (${hotCount}x)`);
+  html = replaceElement(html, 'stat-coldest-ball', `#${cold} (${coldGap} Draws)`);
+  html = replaceElement(html, 'history-blurb', `Powerball results from NY Open Data (d6yy-54nr), ${prettyDate(oldest.date)} through ${prettyDate(newest.date)}.`);
+  html = replaceElement(html, 'history-count-label', `Showing 1 to 10 of ${formatCount(sorted.length)} drawings`);
+  html = replaceElement(html, 'history-table-body', historyRows(sorted));
+  html = replaceElement(html, 'chart-summary', `Drawn most often: ${top10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. Drawn least often: ${bottom10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. These counts describe the past only.`);
+  html = html.replace(
+    /<a id="home-hot-link" href="[^"]*">[^<]*<\/a>/,
+    `<a id="home-hot-link" href="powerball/number/${hot}.html">Powerball number ${hot} frequency</a>`
+  );
+  html = html.replace(
+    /<a id="home-gap-link" href="[^"]*">[^<]*<\/a>/,
+    `<a id="home-gap-link" href="powerball/number/${cold}.html">Longest Powerball gap, number ${cold}</a>`
+  );
+  if (!html.includes('id="home-hot-link"') || !html.includes(`powerball/number/${hot}.html`)) {
+    throw new Error('Home page number links were not written.');
+  }
+  if (megaNewest) {
+    const megaSentence = `Latest Mega Millions draw: ${prettyDate(megaNewest.date)}. White balls ${megaNewest.whites.join(', ')}. Mega Ball ${megaNewest.special}.`;
+    if (html.includes('id="latest-mega-note"')) html = replaceElement(html, 'latest-mega-note', megaSentence);
+    else {
+      html = html.replace(
+        /(<p id="latest-draw-note">[\s\S]*?<\/p>)/,
+        `$1\n      <p id="latest-mega-note">${megaSentence}</p>`
+      );
+    }
+  }
+  await writeFile(path.join(root, 'index.html'), html);
+}
+
+await refreshHome(gamesRaw.powerball, gamesRaw.megamillions);
+
 const staticUrls = [
   ['/', CONTENT_DATE],
   ['/privacy.html', CONTENT_DATE],
@@ -814,7 +1052,18 @@ for (const [loc, lastmod] of urls) {
   unique.push([href, lastmod]);
 }
 unique.sort((a, b) => a[0].localeCompare(b[0]));
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${unique.map(([loc, lastmod]) => `  <url><loc>https://lotterymigo.com${loc === '/index.html' ? '/' : loc}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`;
+const excluded = new Set([
+  '/404.html',
+  '/google99b55d6bc9bdc9f7.html',
+  '/scratch.html',
+  '/scratcher.html',
+  '/bingo.html',
+  '/777.html',
+  '/games.html',
+  '/mini-game.html'
+]);
+const sitemapUrls = unique.filter(([loc]) => !excluded.has(loc) && !/\/(scratch|bingo|777|games|mini-game)(\/|$)/.test(loc));
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(([loc, lastmod]) => `  <url><loc>${SITE}${loc === '/index.html' ? '/' : loc}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`;
 await writeFile(path.join(root, 'sitemap.xml'), sitemap);
 
 const linkTargets = new Set(written.map((page) => `/${page.rel}`));
@@ -826,7 +1075,7 @@ const missing = [];
 for (const page of written) {
   const hrefs = page.html.match(/href="(\/[^"]+)"/g) || [];
   for (const raw of hrefs) {
-    const href = raw.slice(6, -1);
+    const href = raw.slice(6, -1).split('#')[0] || '/';
     if (href.startsWith('/assets/') || href.startsWith('/icons/') || href === '/manifest.webmanifest') continue;
     if (!linkTargets.has(href)) missing.push(`${page.rel} -> ${href}`);
   }
@@ -844,7 +1093,7 @@ function summarize(list) {
 }
 const report = {
   fetched,
-  sitemap: unique.length,
+  sitemap: sitemapUrls.length,
   guides: written.filter((page) => page.rel.startsWith('learn/') && page.rel !== 'learn/index.html').map((page) => ({ page: page.rel, words: page.words })),
   learnIndex: written.find((page) => page.rel === 'learn/index.html').words,
   about: written.find((page) => page.rel === 'about.html').words,
@@ -856,6 +1105,39 @@ const report = {
   hubs: written.filter((page) => page.rel.endsWith('numbers.html') || page.rel.endsWith('results.html')).map((page) => ({ page: page.rel, words: page.words }))
 };
 console.log(JSON.stringify(report, null, 2));
+
+function decodedMeta(html, kind) {
+  const match = kind === 'title'
+    ? html.match(/<title>([^<]*)<\/title>/)
+    : html.match(/<meta name="description" content="([^"]*)"/);
+  if (!match) return '';
+  return match[1]
+    .replace(/&amp;/g, '&')
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
+const metaProblems = [];
+for (const page of written) {
+  const title = decodedMeta(page.html, 'title');
+  const description = decodedMeta(page.html, 'description');
+  const h1s = page.html.match(/<h1[\s>]/g) || [];
+  if (h1s.length !== 1) metaProblems.push(`${page.rel} has ${h1s.length} h1`);
+  if (title.length < 50 || title.length > 70) metaProblems.push(`${page.rel} title ${title.length}: ${title}`);
+  if (description.length < 140 || description.length > 160) metaProblems.push(`${page.rel} description ${description.length}: ${description}`);
+  if (!page.html.includes('https://www.lotterymigo.com')) metaProblems.push(`${page.rel} missing www canonical host`);
+  if (page.html.includes('https://lotterymigo.com/')) metaProblems.push(`${page.rel} still canonicalizes the apex host`);
+  if (!page.html.includes('application/ld+json')) metaProblems.push(`${page.rel} missing JSON-LD`);
+  if ((page.rel.startsWith('learn/') || page.rel.endsWith('results.html') || /\/number\/|\/powerball\/|\/megaball\//.test(page.rel)) && !page.html.includes('class="crumbs"')) {
+    metaProblems.push(`${page.rel} missing breadcrumbs`);
+  }
+}
+if (metaProblems.length) {
+  console.error(metaProblems.slice(0, 30).join('\n'));
+  throw new Error(`${metaProblems.length} SEO checks failed.`);
+}
 
 const shortGuide = report.guides.find((guide) => guide.words < 800);
 if (shortGuide) throw new Error(`${shortGuide.page} is under 800 words (${shortGuide.words}).`);

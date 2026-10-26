@@ -1389,6 +1389,25 @@ tbody tr:hover td { background: var(--table-hover); }
 .ads-notice p { margin: 0; flex: 1 1 auto; min-width: 0; font-size: 0.85rem; line-height: 1.35; }
 .ads-notice .btn { flex: none; padding: 0.3rem 0.75rem; }
 
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.95rem;
+}
+.crumbs li { display: inline-flex; align-items: center; gap: 0.55rem; }
+.crumbs li:not(:last-child)::after { content: "/"; color: var(--muted); }
+.hub-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.1rem;
+  margin-top: 0.4rem;
+}
+.hub-links a { font-weight: 600; }
+
 /* --- Editorial luxury layer --- */
 body.page::after {
   content: "";

@@ -6,7 +6,8 @@ import * as esbuild from 'esbuild';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const www = path.join(root, 'www');
 
-const pages = ['index.html', 'about.html', 'privacy.html', 'terms.html', 'contact.html', 'robots.txt', 'sitemap.xml', 'manifest.webmanifest'];
+const pages = ['index.html', 'about.html', 'privacy.html', 'terms.html', 'contact.html', 'faq.html', 'robots.txt', 'sitemap.xml', 'manifest.webmanifest'];
+const pageDirs = ['learn', 'powerball', 'megamillions'];
 
 await esbuild.build({
   absWorkingDir: root,
@@ -27,19 +28,31 @@ await mkdir(www, { recursive: true });
 // on the website only and is not copied into www/.
 const adsenseScript = /<script async src="https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-4173178569579798" crossorigin="anonymous"><\/script>\r?\n?/g;
 
-for (const file of pages) {
-  const source = path.join(root, file);
-  if (file.endsWith('.html')) {
-    const html = await readFile(source, 'utf8');
-    const stripped = html.replace(adsenseScript, '');
-    if (stripped.includes('adsbygoogle') || stripped.includes('pagead2.googlesyndication.com')) {
-      throw new Error('AdSense script was still in ' + file + ' after the app build strip.');
-    }
-    await writeFile(path.join(www, file), stripped);
-  } else {
-    await cp(source, path.join(www, file));
+async function copyHtmlFile(rel) {
+  const html = await readFile(path.join(root, rel), 'utf8');
+  const stripped = html.replace(adsenseScript, '');
+  if (stripped.includes('adsbygoogle') || stripped.includes('pagead2.googlesyndication.com')) {
+    throw new Error('AdSense script was still in ' + rel + ' after the app build strip.');
+  }
+  const dest = path.join(www, rel);
+  await mkdir(path.dirname(dest), { recursive: true });
+  await writeFile(dest, stripped);
+}
+
+async function copyHtmlTree(relDir) {
+  const entries = await readdir(path.join(root, relDir), { withFileTypes: true });
+  for (const entry of entries) {
+    const rel = path.join(relDir, entry.name);
+    if (entry.isDirectory()) await copyHtmlTree(rel);
+    else if (entry.name.endsWith('.html')) await copyHtmlFile(rel);
   }
 }
+
+for (const file of pages) {
+  if (file.endsWith('.html')) await copyHtmlFile(file);
+  else await cp(path.join(root, file), path.join(www, file));
+}
+for (const dir of pageDirs) await copyHtmlTree(dir);
 await cp(path.join(root, 'assets'), path.join(www, 'assets'), { recursive: true });
 
 // Google Play does not allow an outside payment link for a non-charity tip.

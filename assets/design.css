@@ -938,7 +938,33 @@ tbody tr + tr { border-top: 1px solid var(--line); }
 }
 
 .prose { display: grid; gap: var(--space-4); }
-.prose h2 { font-size: 1.25rem; }
+.prose h2 { font-size: 1.35rem; line-height: 1.25; }
+.prose h3 { font-size: 1.08rem; line-height: 1.3; }
+.prose p,
+.prose li { max-width: 68ch; }
+.prose ul,
+.prose ol { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.45rem; }
+.prose .table-scroll table { min-width: 22rem; }
+.prose .table-scroll.compact table { min-width: 0; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: var(--space-3);
+}
+.stat-grid .panel { padding: var(--space-3); }
+.stat-grid .stat-value { font-size: 1.35rem; }
+
+.num-links { display: flex; flex-wrap: wrap; gap: 0.35rem 0.75rem; }
+.num-links a { font-variant-numeric: tabular-nums; }
+.guide-list { display: grid; gap: var(--space-4); }
+.guide-list h2 { font-size: 1.15rem; }
+.pager-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
 
 /* --- Small screens --- */
 @media (max-width: 22rem) {

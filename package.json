@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "LotteryMigo website plus a Capacitor shell for Android and iOS. Not store-ready.",
   "scripts": {
+    "build:content": "node scripts/build-content.mjs",
     "build:web": "node scripts/build-www.mjs",
     "cap:sync": "npm run build:web && cap sync",
     "cap:android": "npm run build:web && cap sync android",

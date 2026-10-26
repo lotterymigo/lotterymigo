@@ -44,7 +44,7 @@ export function renderPage({
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="${esc(description)}" />
-  <meta name="theme-color" content="#0c6e45" />
+  <meta name="theme-color" content="#0c1220" />
   <link rel="canonical" href="${esc(canonical)}" />
   <title>${esc(title)}</title>
   <link rel="icon" href="/icons/favicon.ico" sizes="any" />
@@ -53,7 +53,7 @@ export function renderPage({
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,640&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/design.css" />
   <link rel="stylesheet" href="/assets/a11y.css" />
   <script src="/assets/a11y.js"></script>

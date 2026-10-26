@@ -169,6 +169,8 @@ html.lm-contrast {
   --shadow: none;
 }
 
+html.lm-contrast body.page::after { display: none; }
+
 html.lm-contrast body,
 html.lm-contrast .site-header,
 html.lm-contrast .site-footer,

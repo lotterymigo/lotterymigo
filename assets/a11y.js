@@ -254,7 +254,10 @@
     enhanceHeader();
     if (!document.getElementById("lm-font-down")) {
       layoutNav();
+      enhanceFaq();
+      markNumberPage();
       buildToc();
+      armMotion();
       return;
     }
 
@@ -284,7 +287,10 @@
     applyContrast(safeGet(CONTRAST_KEY) === "on");
     applyMotion();
     layoutNav();
+    enhanceFaq();
+    markNumberPage();
     buildToc();
+    armMotion();
   }
 
   document.addEventListener("click", function (event) {
@@ -316,9 +322,88 @@
     document.fonts.ready.then(layoutNav);
   }
 
+  function enhanceFaq() {
+    if (!/faq\.html$/.test(location.pathname)) return;
+    var article = document.querySelector("article.prose");
+    if (!article || article.querySelector(".faq-item")) return;
+    var nodes = Array.prototype.slice.call(article.children);
+    var current = null;
+    nodes.forEach(function (node) {
+      if (node.tagName === "H2") {
+        current = document.createElement("details");
+        current.className = "faq-item";
+        var summary = document.createElement("summary");
+        article.insertBefore(current, node);
+        summary.appendChild(node);
+        current.appendChild(summary);
+        var body = document.createElement("div");
+        body.className = "faq-body";
+        current.appendChild(body);
+      } else if (current) {
+        current.querySelector(".faq-body").appendChild(node);
+      }
+    });
+    var first = article.querySelector(".faq-item");
+    if (first) first.open = true;
+  }
+
+  function markNumberPage() {
+    var h1 = document.querySelector("main h1");
+    if (!h1 || document.querySelector(".number-mark")) return;
+    var path = location.pathname;
+    var numbered = /\/number\/|\/powerball\/powerball\/|\/megaball\//.test(path);
+    if (!numbered) return;
+    var match = (h1.textContent || "").match(/(\d+)\s*$/);
+    if (!match) return;
+    var ball = document.createElement("span");
+    ball.className = "ball number-mark";
+    ball.setAttribute("aria-hidden", "true");
+    ball.textContent = match[1];
+    if (/\/powerball\/powerball\//.test(path)) ball.classList.add("ball-pb");
+    if (/\/megaball\//.test(path)) ball.classList.add("ball-mm");
+    h1.parentNode.insertBefore(ball, h1);
+  }
+
+  function armMotion() {
+    if (!motionAllowed()) return;
+    var nodes = document.querySelectorAll(".hero-inner > *, main .card, .stat-grid .panel, .guide-list > li, .faq-item");
+    if (!nodes.length || !("IntersectionObserver" in window)) return;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-in");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.14 });
+    Array.prototype.forEach.call(nodes, function (node, index) {
+      node.classList.add("lm-reveal");
+      node.style.animationDelay = Math.min(index, 8) * 0.05 + "s";
+      var rect = node.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.94 && rect.bottom > 0) node.classList.add("is-in");
+      else observer.observe(node);
+    });
+    document.querySelectorAll(".stat-value").forEach(function (el) {
+      var text = (el.textContent || "").trim();
+      if (!/^\d+(\.\d+)?$/.test(text)) return;
+      var target = parseFloat(text);
+      var decimals = (text.split(".")[1] || "").length;
+      var start = 0;
+      function tick(now) {
+        if (!start) start = now;
+        var t = Math.min(1, (now - start) / 800);
+        var eased = 1 - Math.pow(1 - t, 3);
+        var value = target * eased;
+        el.textContent = decimals ? value.toFixed(decimals) : String(Math.round(value));
+        if (t < 1 && motionAllowed()) requestAnimationFrame(tick);
+        else el.textContent = text;
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
   function buildToc() {
     var article = document.querySelector("article.prose");
-    if (!article || article.querySelector(".toc")) return;
+    if (!article || article.querySelector(".toc") || /faq\.html$/.test(location.pathname)) return;
     var heads = article.querySelectorAll("h2");
     if (heads.length < 3) return;
     var nav = document.createElement("nav");

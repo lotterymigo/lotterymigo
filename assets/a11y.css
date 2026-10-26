@@ -62,15 +62,30 @@ a[href^="mailto:"],
 }
 
 .lm-a11y-bar {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+  width: min(18.5rem, calc(100vw - 1.25rem));
+  padding: 0.7rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  box-shadow: var(--shadow);
+}
+
+.lm-a11y-bar[hidden] { display: none !important; }
+
+.lm-a11y-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
   align-items: center;
-  justify-content: center;
-  padding: 0.45rem 0.75rem;
-  background: var(--surface-2);
-  color: var(--text);
-  border-bottom: 1px solid var(--line);
 }
 
 .lm-a11y-bar button,
@@ -95,9 +110,10 @@ a[href^="mailto:"],
 }
 
 .lm-a11y-note {
-  flex-basis: 100%;
-  text-align: center;
+  margin: 0;
+  text-align: left;
   color: var(--muted);
+  font-size: 0.85rem;
 }
 
 #heatmap-grid > div {
@@ -162,7 +178,9 @@ html.lm-contrast .panel,
 html.lm-contrast .inset,
 html.lm-contrast .line-card,
 html.lm-contrast .compliance,
-html.lm-contrast .lm-a11y-bar {
+html.lm-contrast .guarantee-bar,
+html.lm-contrast .lm-a11y-bar,
+html.lm-contrast .nav-results-panel {
   background: #000000 !important;
   background-image: none !important;
   color: #ffffff !important;
@@ -209,6 +227,10 @@ html.lm-contrast .seg,
 html.lm-contrast .seg-btn,
 html.lm-contrast .chip,
 html.lm-contrast .field,
+html.lm-contrast .display-toggle,
+html.lm-contrast .nav-menu-btn,
+html.lm-contrast .nav-results > summary,
+html.lm-contrast .nav-results-panel,
 html.lm-contrast .lm-a11y-bar button,
 html.lm-contrast .lm-a11y-bar a {
   background: #000000 !important;

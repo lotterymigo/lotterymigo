@@ -1,0 +1,36 @@
+<p>LotteryMigo is an independent website about Powerball and Mega Millions. It publishes a draw archive, a page of statistics for each number in the current games, and written guides to the rules. It does not sell tickets, run a drawing, or pay prizes. It is not affiliated with the Multi-State Lottery Association, the Mega Millions Consortium, the New York Lottery, or any other state lottery. Powerball and Mega Millions are trademarks of their owners.</p>
+<p>There is no lottery desk behind the site and no staff member who can look at a ticket and declare it a winner. Questions about the site go to <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a>. Questions about a prize go to the lottery that sold the ticket.</p>
+
+<h2>Why these pages exist</h2>
+<p>Official results are public, but they are spread across weekly press pages, state sites, and a large open-data file. The file is the right raw material and a poor thing to read by hand. LotteryMigo turns that file into pages a person can open: the latest drawings, the count for a single number, and a guide that says what the count can and cannot mean.</p>
+<p>The home page is the chart. It loads the full file and shows frequencies, a history table, a number generator, and a practice drum. The guides are the explanation. The number pages are the reference. Nothing in that set is a pick. Past drawings do not change the chance of the next one, and the site does not guarantee a win.</p>
+
+<h2>Where the drawings come from</h2>
+<p>The archive is <code>data/draws.json</code> in the site project. A scheduled job reads two New York Open Data datasets and rewrites that file:</p>
+<ul>
+  <li>Powerball, dataset <a href="https://data.ny.gov/d/d6yy-54nr">d6yy-54nr</a>. The copy used for these pages starts in February 2010.</li>
+  <li>Mega Millions, dataset <a href="https://data.ny.gov/d/5xaw-6ayf">5xaw-6ayf</a>. The copy starts in May 2002.</li>
+</ul>
+<p>Each row stores a draw date, five white balls, the special ball, and a multiplier when the dataset includes one. Powerball rows usually include the Power Play multiplier. Mega Millions rows from the $5 game, beginning April 8, 2025, do not include the built-in multiplier in this dataset. The results pages leave that cell blank and say so. A blank is not a 1×.</p>
+<p>The job runs at 12:00 UTC on Tuesday, Thursday, and Sunday. Those times fall after the Monday, Wednesday, and Saturday Powerball drawings (10:59 p.m. Eastern) and after the Tuesday and Friday Mega Millions drawings (11:00 p.m. Eastern). A drawing can sit for about a day before the next run. This is not an official results wire. For a ticket, use the selling lottery’s site.</p>
+
+<h2>How a number page is calculated</h2>
+<p>The generator is <code>scripts/build-content.mjs</code>. It reads the archive and writes static HTML, so each number has a real page in the sitemap rather than a view that only appears after a script runs in the browser.</p>
+<p>Counts are split by matrix, because the file mixes games:</p>
+<ul>
+  <li>Powerball’s current matrix is every drawing on or after October 7, 2015. In this file that is the first drawing with a white ball above 59, and from then on the Powerball stays in 1 through 26. White balls and the Powerball are both rated on that set. The published game is 5 from 69 and 1 from 26.</li>
+  <li>Mega Millions white balls 1 through 70 are rated on drawings on or after October 31, 2017, the first drawing in this file of the 70-ball field still in use.</li>
+  <li>Mega Balls 1 through 24 are rated on drawings on or after April 8, 2025, when the gold ball became 1 through 24.</li>
+  <li>Mega Ball 25 is a historical page for the previous 1–25 field, from October 31, 2017 through April 4, 2025. It is not drawn in the current game.</li>
+</ul>
+<p>Frequency is the number of drawings in the set where the ball appeared. The even-split, or expected, count is the number of drawings times 5 divided by the size of the white-ball field, or times 1 divided by the size of the special-ball field. Rank is by that frequency, and ties share a rank.</p>
+<p>The current gap is the number of drawings since the ball last appeared in the set. It is zero when the ball is in the latest drawing. The longest gap is the longest run of missed drawings in the set, whether that run is at the start, between two hits, or still open. The average distance is the mean number of drawings from one appearance to the next, counted only when the ball has appeared at least twice, and it includes the later appearance.</p>
+<p>Companion numbers are the other white balls that showed up most often in the same drawing. Recent lines are the latest drawings in the set that included the ball. Year notes skip a partial first year and the unfinished current year when they name a busiest or quietest year. The full-file count is also shown. It is not a rate, because the older rows used different fields.</p>
+<p>None of these figures is a probability for the next drawing. The probability is on the prize chart: each legal combination is equally likely. The <a href="/learn/hot-cold-overdue.html">hot, cold, and overdue guide</a> says that at more length.</p>
+
+<h2>Accounts, ads, and the app</h2>
+<p>You can use the statistics without an account. If sign-in is enabled, Google sign-in can store number picks you choose to save. The site does not show a points leaderboard. Details are in the <a href="/privacy.html">privacy policy</a>.</p>
+<p>The website loads Google AdSense. Empty boxes stay hidden until advertising slots are configured. The Android and iOS app is built from the same pages with the AdSense script removed. A voluntary coffee link may appear on the website. It does not buy a ticket or a better chance. The <a href="/terms.html">terms</a> say the same thing in the form of a usage agreement.</p>
+
+<h2>What the site asks of you</h2>
+<p>Use it if you are 18 or older, and 21 or older where that is the local age. If gambling is causing harm, call 1-800-GAMBLER (1-800-426-2537) or 1-800-522-4700. Do not send a ticket photo and expect a ruling. Do not treat a guide as legal, tax, or gambling advice. The guides cite the official pages they rely on, and those pages remain the authority when a rule changes.</p>

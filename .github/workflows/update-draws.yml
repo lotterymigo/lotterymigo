@@ -30,14 +30,17 @@ jobs:
       - name: Fetch NY Open Data draws
         run: node scripts/fetch-draws.mjs
 
+      - name: Rebuild guides, number pages, and sitemap
+        run: node scripts/build-content.mjs
+
       - name: Commit archive when draws changed
         run: |
-          if git diff --quiet -- data/draws.json; then
+          if git diff --quiet -- data/draws.json sitemap.xml about.html faq.html learn powerball megamillions; then
             echo "No draw changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/draws.json
+          git add data/draws.json sitemap.xml about.html faq.html learn powerball megamillions
           git commit -m "Update Powerball and Mega Millions draw archive"
           git push

@@ -68,6 +68,7 @@
         <a href="#section-history">Past draws</a>
         <a href="#section-generator">Number ideas</a>
         <a href="#section-account">Account</a>
+        <a href="learn/index.html">Guides</a>
         <a href="#section-about">About</a>
       </nav>
     </div>
@@ -76,6 +77,7 @@
       <a href="#section-history">Past draws</a>
       <a href="#section-generator">Number ideas</a>
       <a href="#section-account">Account</a>
+      <a href="learn/index.html">Guides</a>
       <a href="#section-about">About</a>
     </nav>
   </header>
@@ -97,7 +99,7 @@
     <div class="wrap hero-inner">
       <p id="hero-badge" class="badge">Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.</p>
       <h1>Most Frequent and Longest Gap for <span id="hero-title-game" class="tone-pb">Powerball</span></h1>
-      <p>Frequencies, the longest gaps, and the official draw list are the focus of this page. <strong class="tone-gold">For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
+      <p>Frequencies, the longest gaps, and the official draw list are the focus of this page. Written guides, recent results, and a page for each current number are linked from <a href="learn/index.html">Guides</a>. <strong class="tone-gold">For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
       <p id="latest-draw-note">Loading official draw dates…</p>
       <div class="stats">
         <div class="panel">
@@ -302,7 +304,7 @@
     <section id="section-about" class="card stack">
       <p class="kicker">About LotteryMigo</p>
       <h2>What this site shows</h2>
-      <p>LotteryMigo is a free look at Powerball and Mega Millions. Official winning numbers come from NY Open Data. The site counts how often each number appeared and how long it has been missing. <strong>Past draws do not predict future results. This is not gambling advice, and it does not guarantee any win.</strong></p>
+      <p>LotteryMigo is a free look at Powerball and Mega Millions. Official winning numbers come from NY Open Data. The site counts how often each number appeared and how long it has been missing. The counts on this page use the full loaded archive, which mixes older matrices. The <a href="powerball/numbers.html">Powerball</a> and <a href="megamillions/numbers.html">Mega Millions</a> number pages separate the current game, and the <a href="learn/index.html">guides</a> explain the rules. <strong>Past draws do not predict future results. This is not gambling advice, and it does not guarantee any win.</strong></p>
       <div class="feature-grid">
         <div class="panel stack">
           <p class="tone-pb"><strong>1. How often</strong></p>
@@ -353,6 +355,10 @@
           <span class="muted block">Free number tools. Not a place to buy tickets.</span>
         </div>
         <nav class="nav" aria-label="Site pages">
+          <a href="learn/index.html">Guides</a>
+          <a href="powerball/results.html">Powerball results</a>
+          <a href="megamillions/results.html">Mega Millions results</a>
+          <a href="faq.html">FAQ</a>
           <a href="about.html">About</a>
           <a href="privacy.html">Privacy Policy</a>
           <a href="terms.html">Terms</a>
@@ -377,8 +383,8 @@
       MEGAMILLIONS: {
         name: 'Mega Millions',
         maxWhite: 70,
-        maxSpecial: 25,
-        odds: '1 in 302.6 Million'
+        maxSpecial: 24,
+        odds: '1 in 290.5 Million'
       }
     };
 
@@ -641,7 +647,7 @@
       if (badge) {
         badge.textContent = isPB
           ? 'Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.'
-          : 'Mega Millions uses 5 numbers from 1 to 70, plus 1 Mega Ball from 1 to 25.';
+          : 'Mega Millions uses 5 numbers from 1 to 70, plus 1 Mega Ball from 1 to 24.';
       }
       document.getElementById('history-special-header').innerText = isPB ? 'Powerball' : 'Mega Ball';
 

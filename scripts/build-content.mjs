@@ -17,6 +17,7 @@ const GUIDES = [
     blurb: 'The matrix, the nine prize tiers, Power Play, Double Play, and which drawings this site treats as the current game.',
     file: 'how-powerball-works.html',
     related: [
+      ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/powerball/numbers.html', 'Powerball number statistics'],
       ['/powerball/results.html', 'Recent Powerball results']
@@ -31,6 +32,7 @@ const GUIDES = [
     blurb: 'The $5 ticket, the 1–24 Mega Ball, the multiplier table, and why older drawings are counted separately.',
     file: 'how-mega-millions-works.html',
     related: [
+      ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/megamillions/numbers.html', 'Mega Millions number statistics'],
       ['/megamillions/results.html', 'Recent Mega Millions results']
@@ -74,9 +76,26 @@ const GUIDES = [
     blurb: 'What the advertised annuity and cash figures mean, and what the IRS says about reporting and withholding lottery winnings.',
     file: 'lump-sum-annuity-taxes.html',
     related: [
+      ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/lottery-scams.html', 'Lottery scams to avoid'],
       ['/learn/how-powerball-works.html', 'How Powerball works'],
       ['/faq.html', 'FAQ']
+    ]
+  },
+  {
+    slug: 'biggest-lottery-jackpots',
+    title: 'Biggest Powerball and Mega Millions Jackpots | LotteryMigo',
+    description: 'Record Powerball and Mega Millions jackpots, with the draw date, annuity, cash option, and where each ticket was sold. A past jackpot is not a forecast.',
+    kicker: 'Guide',
+    h1: 'The biggest lottery jackpots in history',
+    blurb: 'The largest Powerball and Mega Millions annuities, the cash option beside each one, where the tickets were sold, and why a jackpot grows when nobody wins.',
+    file: 'biggest-lottery-jackpots.html',
+    related: [
+      ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
+      ['/learn/how-powerball-works.html', 'How Powerball works'],
+      ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
+      ['/powerball/results.html', 'Recent Powerball results'],
+      ['/megamillions/results.html', 'Recent Mega Millions results']
     ]
   },
   {

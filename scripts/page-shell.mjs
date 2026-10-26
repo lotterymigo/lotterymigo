@@ -2,13 +2,12 @@ const ADSENSE =
   '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4173178569579798" crossorigin="anonymous"></script>';
 
 const NAV = [
-  { id: 'home', href: '/', label: 'Home' },
-  { id: 'guides', href: '/learn/index.html', label: 'Guides' },
-  { id: 'powerball', href: '/powerball/results.html', label: 'Powerball' },
-  { id: 'megamillions', href: '/megamillions/results.html', label: 'Mega Millions' },
+  { id: 'stats', href: '/#section-stats', label: 'Stats' },
+  { id: 'powerball', href: '/powerball/results.html', label: 'Powerball results' },
+  { id: 'megamillions', href: '/megamillions/results.html', label: 'Mega Millions results' },
+  { id: 'guides', href: '/learn/index.html', label: 'Learn' },
   { id: 'faq', href: '/faq.html', label: 'FAQ' },
-  { id: 'about', href: '/about.html', label: 'About' },
-  { id: 'contact', href: '/contact.html', label: 'Contact' }
+  { id: 'about', href: '/about.html', label: 'About' }
 ];
 
 function esc(value) {
@@ -45,7 +44,7 @@ export function renderPage({
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="${esc(description)}" />
-  <meta name="theme-color" content="#067A38" />
+  <meta name="theme-color" content="#0c6e45" />
   <link rel="canonical" href="${esc(canonical)}" />
   <title>${esc(title)}</title>
   <link rel="icon" href="/icons/favicon.ico" sizes="any" />
@@ -95,7 +94,10 @@ export function renderPage({
     <div class="wrap stack">
       <div class="ad-slot" data-ad-placement="footer" hidden></div>
       <nav class="nav" aria-label="More pages">
-        <a href="/learn/index.html">Guides</a>
+        <a href="/#section-stats">Stats</a>
+        <a href="/powerball/results.html">Powerball results</a>
+        <a href="/megamillions/results.html">Mega Millions results</a>
+        <a href="/learn/index.html">Learn</a>
         <a href="/powerball/numbers.html">Powerball numbers</a>
         <a href="/megamillions/numbers.html">Mega Millions numbers</a>
         <a href="/faq.html">FAQ</a>

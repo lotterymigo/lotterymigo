@@ -132,6 +132,36 @@
     applyFont(readFont());
     applyContrast(safeGet(CONTRAST_KEY) === "on");
     applyMotion();
+    buildToc();
+  }
+
+  function buildToc() {
+    var article = document.querySelector("article.prose");
+    if (!article || article.querySelector(".toc")) return;
+    var heads = article.querySelectorAll("h2");
+    if (heads.length < 3) return;
+    var nav = document.createElement("nav");
+    nav.className = "toc";
+    nav.setAttribute("aria-label", "On this page");
+    var label = document.createElement("strong");
+    label.textContent = "On this page";
+    var list = document.createElement("ol");
+    Array.prototype.forEach.call(heads, function (heading, index) {
+      if (!heading.id) {
+        var slug = heading.textContent.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        heading.id = slug || "section-" + (index + 1);
+      }
+      if (document.getElementById(heading.id) !== heading) heading.id = heading.id + "-" + (index + 1);
+      var item = document.createElement("li");
+      var link = document.createElement("a");
+      link.href = "#" + heading.id;
+      link.textContent = heading.textContent;
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+    nav.appendChild(label);
+    nav.appendChild(list);
+    article.insertBefore(nav, article.firstChild);
   }
 
   if (document.readyState === "loading") {

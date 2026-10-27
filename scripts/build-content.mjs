@@ -17,6 +17,7 @@ const GUIDES = [
     blurb: 'The matrix, the nine prize tiers, Power Play, Double Play, and which drawings this site treats as the current game.',
     file: 'how-powerball-works.html',
     related: [
+      ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/powerball/numbers.html', 'Powerball number statistics'],
@@ -32,6 +33,7 @@ const GUIDES = [
     blurb: 'The $5 ticket, the 1–24 Mega Ball, the multiplier table, and why older drawings are counted separately.',
     file: 'how-mega-millions-works.html',
     related: [
+      ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/megamillions/numbers.html', 'Mega Millions number statistics'],
@@ -76,6 +78,7 @@ const GUIDES = [
     blurb: 'What the advertised annuity and cash figures mean, and what the IRS says about reporting and withholding lottery winnings.',
     file: 'lump-sum-annuity-taxes.html',
     related: [
+      ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/lottery-scams.html', 'Lottery scams to avoid'],
       ['/learn/how-powerball-works.html', 'How Powerball works'],
@@ -91,6 +94,7 @@ const GUIDES = [
     blurb: 'The largest Powerball and Mega Millions annuities, the cash option beside each one, where the tickets were sold, and why a jackpot grows when nobody wins.',
     file: 'biggest-lottery-jackpots.html',
     related: [
+      ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
       ['/learn/how-powerball-works.html', 'How Powerball works'],
       ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
@@ -107,9 +111,26 @@ const GUIDES = [
     blurb: 'How a real claim works, the fee-and-bank-details pattern the FTC describes, and what this site will never ask you to send.',
     file: 'lottery-scams.html',
     related: [
+      ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
       ['/contact.html', 'Contact LotteryMigo'],
       ['/faq.html', 'FAQ']
+    ]
+  },
+  {
+    slug: 'what-to-do-if-you-win-the-lottery',
+    title: 'What to Do If You Win Powerball or Mega Millions | LotteryMigo',
+    description: 'Sign the ticket, stay quiet, and claim Powerball or Mega Millions where you bought it. Deadlines, lump sum versus annuity, and which states allow anonymity.',
+    kicker: 'Guide',
+    h1: 'What to do if you win the lottery',
+    blurb: 'Secure the ticket, claim Powerball or Mega Millions where it was sold, choose cash or annuity on that state’s clock, and read the anonymity rule before you sign.',
+    file: 'what-to-do-if-you-win-the-lottery.html',
+    related: [
+      ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
+      ['/learn/lottery-scams.html', 'Lottery scams to avoid'],
+      ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
+      ['/learn/how-powerball-works.html', 'How Powerball works'],
+      ['/learn/how-mega-millions-works.html', 'How Mega Millions works']
     ]
   }
 ];

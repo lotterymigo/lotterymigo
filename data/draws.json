@@ -1,14 +1,26 @@
 {
   "source": "NY Open Data (data.ny.gov)",
-  "fetchedAt": "2026-10-27T12:34:11.219Z",
+  "fetchedAt": "2026-10-29T12:39:43.628Z",
   "games": {
     "POWERBALL": {
       "datasetId": "d6yy-54nr",
       "name": "Lottery Powerball Winning Numbers: Beginning 2010",
       "sourceUrl": "https://data.ny.gov/d/d6yy-54nr",
-      "latestDrawDate": "2026-10-26",
-      "drawCount": 2017,
+      "latestDrawDate": "2026-10-28",
+      "drawCount": 2018,
       "draws": [
+        {
+          "date": "2026-10-28",
+          "whites": [
+            11,
+            13,
+            16,
+            47,
+            60
+          ],
+          "special": 13,
+          "multiplier": 2
+        },
         {
           "date": "2026-10-26",
           "whites": [
@@ -24219,9 +24231,21 @@
       "datasetId": "5xaw-6ayf",
       "name": "Lottery Mega Millions Winning Numbers: Beginning 2002",
       "sourceUrl": "https://data.ny.gov/d/5xaw-6ayf",
-      "latestDrawDate": "2026-10-23",
-      "drawCount": 2551,
+      "latestDrawDate": "2026-10-27",
+      "drawCount": 2552,
       "draws": [
+        {
+          "date": "2026-10-27",
+          "whites": [
+            14,
+            19,
+            21,
+            45,
+            67
+          ],
+          "special": 3,
+          "multiplier": null
+        },
         {
           "date": "2026-10-23",
           "whites": [

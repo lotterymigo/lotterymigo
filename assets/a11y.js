@@ -442,4 +442,14 @@
       if (safeGet(MOTION_KEY) !== "on" && safeGet(MOTION_KEY) !== "off") applyMotion();
     });
   }
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      var register = function () {
+        navigator.serviceWorker.register("/sw.js").catch(function () {});
+      };
+      if ("requestIdleCallback" in window) requestIdleCallback(register, { timeout: 5000 });
+      else setTimeout(register, 2000);
+    });
+  }
 })();

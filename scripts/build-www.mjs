@@ -6,7 +6,7 @@ import * as esbuild from 'esbuild';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const www = path.join(root, 'www');
 
-const pages = ['index.html', 'about.html', 'privacy.html', 'terms.html', 'contact.html', 'faq.html', '404.html', 'google99b55d6bc9bdc9f7.html', 'robots.txt', 'sitemap.xml', 'manifest.webmanifest'];
+const pages = ['index.html', 'about.html', 'privacy.html', 'terms.html', 'contact.html', 'faq.html', '404.html', 'offline.html', 'google99b55d6bc9bdc9f7.html', 'robots.txt', 'sitemap.xml', 'manifest.webmanifest', 'sw.js'];
 const pageDirs = ['learn', 'powerball', 'megamillions'];
 
 await esbuild.build({

@@ -41,6 +41,14 @@ html {
 
 button,
 select,
+input,
+textarea {
+  font-size: max(16px, 1rem);
+  touch-action: manipulation;
+}
+
+button,
+select,
 input[type="text"],
 input[type="search"],
 input[type="email"],

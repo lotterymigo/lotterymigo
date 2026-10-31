@@ -17,6 +17,7 @@ const GUIDES = [
     blurb: 'The matrix, the nine prize tiers, Power Play, Double Play, and which drawings this site treats as the current game.',
     file: 'how-powerball-works.html',
     related: [
+      ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
@@ -33,10 +34,28 @@ const GUIDES = [
     blurb: 'The $5 ticket, the 1–24 Mega Ball, the multiplier table, and why older drawings are counted separately.',
     file: 'how-mega-millions-works.html',
     related: [
+      ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/megamillions/numbers.html', 'Mega Millions number statistics'],
+      ['/megamillions/results.html', 'Recent Mega Millions results']
+    ]
+  },
+  {
+    slug: 'powerball-vs-mega-millions',
+    title: 'Powerball vs Mega Millions Rules, Odds, and Price | LotteryMigo',
+    description: 'Side-by-side Powerball and Mega Millions rules: price, matrix, jackpot odds, draw nights, add-ons, and starting jackpots. Not a tip, and not a forecast.',
+    kicker: 'Guide',
+    h1: 'Powerball vs Mega Millions',
+    blurb: 'Price, matrix, jackpot odds, draw nights, add-ons, starting jackpots, and cash versus annuity, set next to each other from the official game pages.',
+    file: 'powerball-vs-mega-millions.html',
+    related: [
+      ['/learn/how-powerball-works.html', 'How Powerball works'],
+      ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
+      ['/learn/understanding-the-odds.html', 'Understanding the odds'],
+      ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
+      ['/powerball/results.html', 'Recent Powerball results'],
       ['/megamillions/results.html', 'Recent Mega Millions results']
     ]
   },
@@ -49,6 +68,7 @@ const GUIDES = [
     blurb: 'A combination count for both games, the difference between any-prize odds and jackpot odds, and the limits of a jackpot expected-value shortcut.',
     file: 'understanding-the-odds.html',
     related: [
+      ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
       ['/learn/hot-cold-overdue.html', 'Hot, cold, and overdue numbers'],
       ['/learn/how-powerball-works.html', 'How Powerball works'],
       ['/learn/how-mega-millions-works.html', 'How Mega Millions works']

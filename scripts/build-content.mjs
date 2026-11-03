@@ -17,6 +17,7 @@ const GUIDES = [
     blurb: 'The matrix, the nine prize tiers, Power Play, Double Play, and which drawings this site treats as the current game.',
     file: 'how-powerball-works.html',
     related: [
+      ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
@@ -34,6 +35,7 @@ const GUIDES = [
     blurb: 'The $5 ticket, the 1–24 Mega Ball, the multiplier table, and why older drawings are counted separately.',
     file: 'how-mega-millions-works.html',
     related: [
+      ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
@@ -53,6 +55,7 @@ const GUIDES = [
     related: [
       ['/learn/how-powerball-works.html', 'How Powerball works'],
       ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
+      ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
       ['/powerball/results.html', 'Recent Powerball results'],
@@ -98,6 +101,7 @@ const GUIDES = [
     blurb: 'What the advertised annuity and cash figures mean, and what the IRS says about reporting and withholding lottery winnings.',
     file: 'lump-sum-annuity-taxes.html',
     related: [
+      ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/lottery-scams.html', 'Lottery scams to avoid'],
@@ -114,10 +118,29 @@ const GUIDES = [
     blurb: 'The largest Powerball and Mega Millions annuities, the cash option beside each one, where the tickets were sold, and why a jackpot grows when nobody wins.',
     file: 'biggest-lottery-jackpots.html',
     related: [
+      ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
       ['/learn/how-powerball-works.html', 'How Powerball works'],
       ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
+      ['/powerball/results.html', 'Recent Powerball results'],
+      ['/megamillions/results.html', 'Recent Mega Millions results']
+    ]
+  },
+  {
+    slug: 'how-lottery-jackpots-grow',
+    title: 'How Powerball and Mega Millions Jackpots Grow | LotteryMigo',
+    description: 'How Powerball and Mega Millions jackpots are funded: the share of each ticket, how rollovers add to the pool, and how interest rates set the 30-payment annuity.',
+    kicker: 'Guide',
+    h1: 'How lottery jackpots grow and are funded',
+    blurb: 'The share of each ticket that reaches the jackpot, how a missed drawing rolls that money forward, and why interest rates change the 30-payment annuity.',
+    file: 'how-lottery-jackpots-grow.html',
+    related: [
+      ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
+      ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
+      ['/learn/how-powerball-works.html', 'How Powerball works'],
+      ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
+      ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
       ['/powerball/results.html', 'Recent Powerball results'],
       ['/megamillions/results.html', 'Recent Mega Millions results']
     ]

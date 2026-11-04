@@ -1,4 +1,4 @@
-var CACHE = "lotterymigo-shell-v2";
+var CACHE = "lotterymigo-shell-v3";
 var PRECACHE = [
   "/offline.html",
   "/assets/design.css",

@@ -366,7 +366,7 @@
 
   function armMotion() {
     if (!motionAllowed()) return;
-    var nodes = document.querySelectorAll(".hero-inner > *, main .card, .stat-grid .panel, .guide-list > li, .faq-item");
+    var nodes = document.querySelectorAll("main .card, .stat-grid .panel, .guide-list > li, .faq-item");
     if (!nodes.length || !("IntersectionObserver" in window)) return;
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {

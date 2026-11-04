@@ -1,6 +1,7 @@
 export const SITE = 'https://www.lotterymigo.com';
 export const OG_IMAGE = `${SITE}/icons/og-image.png`;
-const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,640&family=Outfit:wght@400;500;600;700&display=swap';
+const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap';
+const FONT_FILE = 'https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtqUYLknw.woff2';
 const VERIFY = '<meta name="google-site-verification" content="mT-NZ9gT1zrEcQ4GcRFZ3N1Oo6bRwOL4S5UIhm1CUYk" />';
 const ADSENSE =
   '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4173178569579798" crossorigin="anonymous"></script>';
@@ -110,7 +111,7 @@ export function renderPage({
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="description" content="${esc(description)}" />
-  <meta name="theme-color" content="#0c1220" />
+  <meta name="theme-color" content="#070908" />
   ${VERIFY}
   <link rel="canonical" href="${esc(canonical)}" />
   <title>${esc(title)}</title>
@@ -133,6 +134,7 @@ export function renderPage({
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="${FONT_FILE}" />
   <link rel="preload" as="style" href="${FONT_HREF}" />
   <link href="${FONT_HREF}" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/design.css" />

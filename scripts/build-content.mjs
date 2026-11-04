@@ -46,7 +46,7 @@ const GUIDES = [
   },
   {
     slug: 'powerball-vs-mega-millions',
-    title: 'Powerball vs Mega Millions Rules, Odds, and Price | LotteryMigo',
+    title: 'Powerball vs Mega Millions Rules and Odds | LotteryMigo',
     description: 'Side-by-side Powerball and Mega Millions rules: price, matrix, jackpot odds, draw nights, add-ons, and starting jackpots. Not a tip, and not a forecast.',
     kicker: 'Guide',
     h1: 'Powerball vs Mega Millions',
@@ -117,6 +117,7 @@ const GUIDES = [
     h1: 'The biggest lottery jackpots in history',
     blurb: 'The largest Powerball and Mega Millions annuities, the cash option beside each one, where the tickets were sold, and why a jackpot grows when nobody wins.',
     file: 'biggest-lottery-jackpots.html',
+    published: '2026-11-03',
     related: [
       ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
@@ -162,7 +163,7 @@ const GUIDES = [
   },
   {
     slug: 'what-to-do-if-you-win-the-lottery',
-    title: 'What to Do If You Win Powerball or Mega Millions | LotteryMigo',
+    title: 'If You Win Powerball or Mega Millions | LotteryMigo',
     description: 'Sign the ticket, stay quiet, and claim Powerball or Mega Millions where you bought it. Deadlines, lump sum versus annuity, and which states allow anonymity.',
     kicker: 'Guide',
     h1: 'What to do if you win the lottery',
@@ -198,12 +199,12 @@ function fitDescription(primary, extras = []) {
   return text;
 }
 
-function articleLd({ headline, description, path, modified }) {
+function articleLd({ headline, description, path, published, modified }) {
   return {
     '@type': 'Article',
     headline,
     description,
-    datePublished: CONTENT_DATE,
+    datePublished: published,
     dateModified: modified,
     image: OG_IMAGE,
     mainEntityOfPage: SITE + path,
@@ -233,20 +234,19 @@ function faqEntities(html) {
 }
 
 function relatedNumbers(game, pool, row) {
-  const items = [];
+  const items = [{ href: '/learn/hot-cold-overdue.html', name: 'Hot, cold, and overdue numbers' }];
   const push = (href, name) => {
     if (items.some((item) => item.href === href)) return;
     items.push({ href, name });
   };
   if (pool.analysis.rows.has(row.num - 1)) push(pool.href(row.num - 1), `${pool.ballLabel} ${row.num - 1}`);
   if (pool.analysis.rows.has(row.num + 1)) push(pool.href(row.num + 1), `${pool.ballLabel} ${row.num + 1}`);
-  const companions = pool.kind === 'white' ? row.whiteCompanions : row.whiteCompanions;
+  const companions = row.whiteCompanions || [];
   for (const [num] of companions.slice(0, 2)) {
     if (pool.kind === 'white') push(pool.href(num), `${pool.ballLabel} ${num}`);
     else push(game.whiteHref(num), `${game.name} white ball ${num}`);
   }
-  if (!items.length) return '';
-  return `<h2>Related numbers</h2><ul>${items.slice(0, 4).map((item) => `<li><a href="${item.href}">${esc(item.name)}</a></li>`).join('')}</ul>`;
+  return `<h2>Related</h2><ul>${items.slice(0, 5).map((item) => `<li><a href="${item.href}">${esc(item.name)}</a></li>`).join('')}</ul>`;
 }
 
 function prettyDate(iso) {
@@ -585,11 +585,12 @@ function numberPage(game, pool, row, fullCount, firstDate) {
     );
   const title = pool.kind === 'white'
     ? (game.id === 'powerball'
-      ? `Powerball Number ${row.num} Stats: Frequency, Last Drawn & Gap | LotteryMigo`
-      : `Mega Millions Number ${row.num}: Frequency and Gap | LotteryMigo`)
+      ? `Powerball Number ${row.num}: Frequency & Last Drawn | LotteryMigo`
+      : `Mega Millions ${row.num}: Frequency & Last Drawn | LotteryMigo`)
     : (game.id === 'powerball'
-      ? `Powerball Red Ball ${row.num}: Frequency, Last Drawn & Gap | LotteryMigo`
-      : `Mega Ball ${row.num} Stats: Frequency, Last Drawn and Gap | LotteryMigo`);
+      ? `Powerball red ball ${row.num}: Frequency & Last Drawn | LotteryMigo`
+      : `Mega Ball number ${row.num}: Frequency & Last Drawn | LotteryMigo`);
+  if (title.length > 60) throw new Error(`Title is ${title.length} characters: ${title}`);
   const lines = row.lines.map((hit) => `<li>${lineHtml(hit.draw, game)}</li>`).join('');
   const prevNum = pool.analysis.rows.has(row.num - 1) ? row.num - 1 : null;
   const nextNum = pool.analysis.rows.has(row.num + 1) ? row.num + 1 : null;
@@ -632,6 +633,40 @@ function numberPage(game, pool, row, fullCount, firstDate) {
   });
 }
 
+function namedBalls(pool, rows) {
+  return rows.map((row) => `<a href="${pool.href(row.num)}">${esc(pool.noun)} ${row.num}</a>`).join(' and ');
+}
+
+function poolLeaders(pool) {
+  const rows = pool.analysis.list;
+  const maxCount = Math.max(...rows.map((row) => row.count));
+  const maxGap = Math.max(...rows.map((row) => row.currentGap));
+  return {
+    hot: rows.filter((row) => row.count === maxCount).sort((a, b) => a.num - b.num),
+    quiet: rows.filter((row) => row.currentGap === maxGap).sort((a, b) => a.num - b.num),
+    maxCount,
+    maxGap
+  };
+}
+
+function keyFactsInner(game, whitePool, specialPool, latest) {
+  const white = poolLeaders(whitePool);
+  const special = poolLeaders(specialPool);
+  const latestText = `${prettyDate(latest.date)}. White balls ${latest.whites.join(', ')}. ${game.specialName} ${latest.special}.`;
+  return `<h2>${esc(game.name)} key facts</h2>
+    <ul>
+      <li>Most common white ball: ${namedBalls(whitePool, white.hot)}, drawn ${comma(white.maxCount)} times in the current matrix.</li>
+      <li>Most common ${esc(game.specialName)}: ${namedBalls(specialPool, special.hot)}, drawn ${comma(special.maxCount)} times in the current field.</li>
+      <li>Most overdue white ball: ${namedBalls(whitePool, white.quiet)}, missing for ${comma(white.maxGap)} drawings. A gap is not a forecast.</li>
+      <li>Latest draw: ${esc(latestText)}</li>
+    </ul>
+    <p>Verified ${prettyDate(whitePool.fetched)}, source: NY Open Data.</p>`;
+}
+
+function keyFactsSection(game, whitePool, specialPool, latest) {
+  return `<section class="key-facts stack" id="key-facts">${keyFactsInner(game, whitePool, specialPool, latest)}</section>`;
+}
+
 function hubPage(game, whitePool, specialPool, extraPool) {
   const tableFor = (pool, caption) => {
     const rows = [...pool.analysis.list].sort((a, b) => b.count - a.count || a.num - b.num);
@@ -651,6 +686,7 @@ function hubPage(game, whitePool, specialPool, extraPool) {
   const longest = [...whitePool.analysis.list].sort((a, b) => b.currentGap - a.currentGap || a.num - b.num).slice(0, 5);
   const longestSentenceBits = longest.map((row) => `<a href="${whitePool.href(row.num)}">white ball ${row.num}</a> (${comma(row.currentGap)} drawings${row.last ? ` since ${prettyDate(row.last.date)}` : ''})`);
   const body = `
+    ${keyFactsSection(game, whitePool, specialPool, gamesRaw[game.id][0])}
     <p>${esc(game.name)} number pages on LotteryMigo are counts from the NY Open Data archive, split so the current matrix is not averaged together with retired ones. The white-ball table below uses ${comma(whitePool.analysis.drawCount)} drawings from ${prettyDate(whitePool.start)} through ${prettyDate(whitePool.endDate)}. The even-split column is the count each number would have if those drawings had been shared perfectly evenly: ${comma(whitePool.analysis.drawCount)} drawings times 5, divided by ${whitePool.poolSize}.</p>
     <p>The gap column is how many drawings have passed since the number last appeared in that same set. A gap of zero means the number was in the latest drawing. A long gap is a fact about the list. It does not raise the chance that the number is drawn next. White balls are still 5 out of ${whitePool.poolSize} on the next drawing. Read the <a href="/learn/hot-cold-overdue.html">hot, cold, and overdue guide</a> before treating a rank as a tip, and the <a href="${game.guide}">rules guide</a> for the prize chart behind the odds.</p>
     <p>The five longest current white-ball gaps in this set are ${longestSentenceBits.join(', ')}. They are listed so you can open the draw dates, not so you can treat them as due.</p>
@@ -660,7 +696,8 @@ function hubPage(game, whitePool, specialPool, extraPool) {
     <p>The ${esc(game.specialName)} table uses ${comma(specialPool.analysis.drawCount)} drawings from ${prettyDate(specialPool.start)} through ${prettyDate(specialPool.endDate)}. ${game.specialNote}</p>
     ${tableFor(specialPool, `${game.name} ${game.specialName}, current field`)}
     ${extraPool ? `<h2>Historical ${esc(game.specialName)} 25</h2><p><a href="${extraPool.href(25)}">Mega Ball 25</a> was part of the field from ${prettyDate(extraPool.start)} through ${prettyDate(extraPool.end)}. It appeared ${comma(extraPool.analysis.rows.get(25).count)} times in that window. It is not drawn under the current rules.</p>` : ''}
-    <p>Recent drawings, with a link on every ball, are on the <a href="${game.results}">${esc(game.name)} results page</a>. The home page chart still uses the full file, which is why its order can differ from the rank on these pages.</p>`;
+    <p>Recent drawings, with a link on every ball, are on the <a href="${game.results}">${esc(game.name)} results page</a>. The home page chart uses this same current matrix, so its most common white ball should match the top of this table.</p>
+    ${hubFaq(game, whitePool, specialPool).html}`;
   const hubDescription = game.id === 'powerball'
     ? 'Powerball number frequency, last drawn date, and current gap for every white ball and Powerball since October 7, 2015. A gap is history, not a forecast.'
     : 'Mega Millions most common numbers, last drawn dates, and gaps for the current matrix. Counts come from NY Open Data. A gap is not a forecast.';
@@ -679,19 +716,46 @@ function hubPage(game, whitePool, specialPool, extraPool) {
       { name: 'Home', path: '/' },
       { name: `${game.name} numbers`, path: game.hub }
     ],
-    jsonLd: [{
-      '@type': 'Dataset',
-      name: `${game.name} number frequency counts`,
-      description: hubDescription,
-      url: SITE + game.hub,
-      creator: { '@id': `${SITE}/#organization` },
-      dateModified: whitePool.fetched,
-      isBasedOn: game.id === 'powerball' ? 'https://data.ny.gov/d/d6yy-54nr' : 'https://data.ny.gov/d/5xaw-6ayf'
-    }]
+    jsonLd: [
+      {
+        '@type': 'Dataset',
+        name: `${game.name} number frequency counts`,
+        description: hubDescription,
+        url: SITE + game.hub,
+        creator: { '@id': `${SITE}/#organization` },
+        dateModified: whitePool.fetched,
+        isBasedOn: game.id === 'powerball' ? 'https://data.ny.gov/d/d6yy-54nr' : 'https://data.ny.gov/d/5xaw-6ayf'
+      },
+      hubFaq(game, whitePool, specialPool).jsonLd
+    ]
   });
 }
 
-function resultsPage(game, recent, archiveDraws) {
+function hubFaq(game, whitePool, specialPool) {
+  const verified = `Verified ${prettyDate(whitePool.fetched)}, source: NY Open Data.`;
+  const counted = `The white-ball table uses ${comma(whitePool.analysis.drawCount)} drawings from ${prettyDate(whitePool.start)} through ${prettyDate(whitePool.endDate)}. Retired matrices are not averaged into that table.`;
+  const gap = 'A long gap is a fact about the list. It does not raise the chance that the number is drawn next.';
+  const source = `These counts come from the NY Open Data archive. ${verified}`;
+  const questions = [
+    ['Which drawings are counted?', counted],
+    ['Does a long gap mean a number is due?', gap],
+    ['Where do these counts come from?', source]
+  ];
+  const html = `<h2>Questions</h2>${questions.map(([q, a]) => `<h3>${esc(q)}</h3><p>${a}</p>`).join('')}`;
+  return {
+    html,
+    jsonLd: {
+      '@type': 'FAQPage',
+      mainEntity: questions.map(([name, text]) => ({
+        '@type': 'Question',
+        name,
+        acceptedAnswer: { '@type': 'Answer', text: text.replace(/<[^>]+>/g, '') }
+      }))
+    }
+  };
+}
+
+function resultsPage(game, recent, archiveDraws, whitePool, specialPool) {
   const oldest = archiveDraws[archiveDraws.length - 1].date;
   const newest = archiveDraws[0].date;
   const rows = recent.map((draw) => {
@@ -701,9 +765,10 @@ function resultsPage(game, recent, archiveDraws) {
     return `<tr><td>${esc(draw.date)}</td><td class="num">${whites}</td><td class="num">${special}</td><td class="num">${multiplier}</td></tr>`;
   }).join('');
   const body = `
+    ${keyFactsSection(game, whitePool, specialPool, recent[0])}
     <p>These are the ${comma(recent.length)} most recent ${esc(game.name)} drawings in the NY Open Data file LotteryMigo copies, from ${prettyDate(recent[recent.length - 1].date)} through ${prettyDate(recent[0].date)}. The full file currently holds ${comma(archiveDraws.length)} drawings, from ${prettyDate(oldest)} through ${prettyDate(newest)}. Every number links to its statistics page.</p>
     <p>${game.resultsNote}</p>
-    <p>The list is rebuilt when the archive job runs, at 12:00 UTC on Tuesday, Thursday, and Sunday. A drawing can be missing here for a day after it happens. Check a ticket on the lottery that sold it, or on the official ${esc(game.name)} site. LotteryMigo does not validate tickets and does not guarantee a win.</p>
+    <p>The list is rebuilt when the archive job runs, daily at 10:00 UTC. A drawing can be missing here for a day after it happens. Check a ticket on the lottery that sold it, or on the official ${esc(game.name)} site. LotteryMigo does not validate tickets and does not guarantee a win.</p>
     <div class="table-scroll">
       <table>
         <caption>Recent ${esc(game.name)} drawings</caption>
@@ -727,7 +792,16 @@ function resultsPage(game, recent, archiveDraws) {
     crumbs: [
       { name: 'Home', path: '/' },
       { name: `${game.name} results`, path: game.results }
-    ]
+    ],
+    jsonLd: [{
+      '@type': 'Dataset',
+      name: `${game.name} draw results`,
+      description: resultsDescription,
+      url: SITE + game.results,
+      creator: { '@id': `${SITE}/#organization` },
+      dateModified: recent[0].date,
+      isBasedOn: game.id === 'powerball' ? 'https://data.ny.gov/d/d6yy-54nr' : 'https://data.ny.gov/d/5xaw-6ayf'
+    }]
   });
 }
 
@@ -934,7 +1008,9 @@ for (const guide of GUIDES) {
   }
   body += relatedBlock(guide.related);
   const guidePath = `/learn/${guide.slug}.html`;
-  const guideModified = guide.live ? fetched : CONTENT_DATE;
+  const guideModified = guide.published || (guide.live ? fetched : CONTENT_DATE);
+  const guidePublished = guide.published || CONTENT_DATE;
+  body = `<p class="updated-line">Updated ${prettyDate(guideModified)}.</p>\n${body}`;
   const html = renderPage({
     title: guide.title,
     description: guide.description,
@@ -953,6 +1029,7 @@ for (const guide of GUIDES) {
       headline: guide.h1,
       description: guide.description,
       path: guidePath,
+      published: guidePublished,
       modified: guideModified
     })]
   });
@@ -1004,15 +1081,16 @@ await emitPool(mmSpecial, mm);
 await emitPool(mm25, mm);
 await emit('powerball/numbers.html', hubPage(pb, pbWhite, pbSpecial, null), fetched);
 await emit('megamillions/numbers.html', hubPage(mm, mmWhite, mmSpecial, mm25), fetched);
-await emit('powerball/results.html', resultsPage(pb, gamesRaw.powerball.slice(0, 100), gamesRaw.powerball), fetched);
-await emit('megamillions/results.html', resultsPage(mm, gamesRaw.megamillions.slice(0, 100), gamesRaw.megamillions), fetched);
+await emit('powerball/results.html', resultsPage(pb, gamesRaw.powerball.slice(0, 100), gamesRaw.powerball, pbWhite, pbSpecial), fetched);
+await emit('megamillions/results.html', resultsPage(mm, gamesRaw.megamillions.slice(0, 100), gamesRaw.megamillions, mmWhite, mmSpecial), fetched);
 
 await writeOut('404.html', renderPage({
-  title: 'The Page You Requested Is Not on LotteryMigo | LotteryMigo',
+  title: 'Page not found | LotteryMigo',
   description: 'That address is not a LotteryMigo page. Open Powerball results, Mega Millions results, number statistics, or the guides. Past draws are not a forecast.',
   canonicalPath: '/404.html',
   kicker: '404',
   h1: 'This page is not on LotteryMigo',
+  noindex: true,
   bodyHtml: `<p>The address you opened is not one of the statistics pages, guides, or results. These hubs are:</p>
     <ul>
       <li><a href="/">Powerball and Mega Millions statistics</a></li>
@@ -1050,7 +1128,7 @@ function replaceElement(html, id, inner) {
 }
 
 async function refreshHome(powerballDraws, megaDraws) {
-  const sorted = [...powerballDraws].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const sorted = [...powerballDraws].filter((draw) => draw.date >= '2015-10-07').sort((a, b) => (a.date < b.date ? 1 : -1));
   const freq = new Map();
   for (let num = 1; num <= 69; num += 1) freq.set(num, 0);
   for (const draw of sorted) {
@@ -1081,15 +1159,28 @@ async function refreshHome(powerballDraws, megaDraws) {
   const newest = sorted[0];
   const oldest = sorted[sorted.length - 1];
   const megaNewest = [...megaDraws].sort((a, b) => (a.date < b.date ? 1 : -1))[0];
+  const facts = `${keyFactsInner(pb, pbWhite, pbSpecial, newest)}${keyFactsInner(mm, mmWhite, mmSpecial, megaNewest)}`;
+  const dataset = {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'Powerball and Mega Millions draw archive',
+    description: 'Current-matrix Powerball and Mega Millions frequencies, gaps, and recent drawings copied from NY Open Data. Past draws do not predict the next drawing.',
+    url: `${SITE}/`,
+    creator: { '@id': `${SITE}/#organization` },
+    dateModified: [newest?.date, megaNewest?.date].filter(Boolean).sort().at(-1),
+    isBasedOn: ['https://data.ny.gov/d/d6yy-54nr', 'https://data.ny.gov/d/5xaw-6ayf']
+  };
   let html = await readFile(path.join(root, 'index.html'), 'utf8');
   html = replaceElement(html, 'latest-draw-note', `Latest Powerball draw: ${prettyDate(newest.date)}. White balls ${newest.whites.join(', ')}. Powerball ${newest.special}.`);
   html = replaceElement(html, 'stat-total-draws', formatCount(sorted.length));
   html = replaceElement(html, 'stat-hottest-ball', `#${hot} (${hotCount}x)`);
   html = replaceElement(html, 'stat-coldest-ball', `#${cold} (${coldGap} Draws)`);
-  html = replaceElement(html, 'history-blurb', `Powerball results from NY Open Data (d6yy-54nr), ${prettyDate(oldest.date)} through ${prettyDate(newest.date)}.`);
+  html = replaceElement(html, 'history-blurb', `Powerball results from NY Open Data (d6yy-54nr), current 5/69 matrix, ${prettyDate(oldest.date)} through ${prettyDate(newest.date)}.`);
   html = replaceElement(html, 'history-count-label', `Showing 1 to 10 of ${formatCount(sorted.length)} drawings`);
   html = replaceElement(html, 'history-table-body', historyRows(sorted));
-  html = replaceElement(html, 'chart-summary', `Drawn most often: ${top10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. Drawn least often: ${bottom10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. These counts describe the past only.`);
+  html = replaceElement(html, 'chart-summary', `Drawn most often in the current matrix: ${top10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. Drawn least often: ${bottom10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. These counts describe the past only.`);
+  html = replaceElement(html, 'key-facts', facts);
+  html = replaceElement(html, 'home-dataset', JSON.stringify(dataset));
   html = html.replace(
     /<a id="home-hot-link" href="[^"]*">[^<]*<\/a>/,
     `<a id="home-hot-link" href="powerball/number/${hot}.html">Powerball number ${hot} frequency</a>`
@@ -1117,7 +1208,7 @@ async function refreshHome(powerballDraws, megaDraws) {
 await refreshHome(gamesRaw.powerball, gamesRaw.megamillions);
 
 const staticUrls = [
-  ['/', CONTENT_DATE],
+  ['/', [gamesRaw.powerball[0]?.date, gamesRaw.megamillions[0]?.date].filter(Boolean).sort().at(-1) || fetched],
   ['/privacy.html', CONTENT_DATE],
   ['/terms.html', CONTENT_DATE],
   ['/contact.html', CONTENT_DATE]

@@ -1,0 +1,23 @@
+# LotteryMigo
+
+LotteryMigo publishes Powerball and Mega Millions statistics from the NY Open Data draw archive. Counts, gaps, and results describe past drawings. They do not predict the next drawing, and the site does not guarantee a win.
+
+## Key pages
+
+- Home: https://www.lotterymigo.com/
+- Powerball number statistics: https://www.lotterymigo.com/powerball/numbers.html
+- Mega Millions number statistics: https://www.lotterymigo.com/megamillions/numbers.html
+- Powerball results: https://www.lotterymigo.com/powerball/results.html
+- Mega Millions results: https://www.lotterymigo.com/megamillions/results.html
+- Guides: https://www.lotterymigo.com/learn/index.html
+- Hot, cold, and overdue numbers: https://www.lotterymigo.com/learn/hot-cold-overdue.html
+- FAQ: https://www.lotterymigo.com/faq.html
+- About the counts: https://www.lotterymigo.com/about.html
+
+## Data
+
+Official drawings are copied from NY Open Data: Powerball dataset d6yy-54nr and Mega Millions dataset 5xaw-6ayf. Number pages use the current matrix only. Powerball white balls and the red Powerball are counted from October 7, 2015. Mega Millions white balls are counted from October 31, 2017. The current Mega Ball field of 1 through 24 is counted from April 8, 2025.
+
+## No guarantees
+
+Past frequencies and gaps do not change the odds. LotteryMigo does not sell tickets, does not validate tickets, and does not promise a prize.

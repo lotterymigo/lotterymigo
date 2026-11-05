@@ -130,8 +130,8 @@ assert(queued === false, "revoke during gtag.js load left no queued page_view");
 const afterRevoke = net.hits.length;
 await page.goto(BASE + "/learn/index.html?token=still-secret", { waitUntil: "domcontentloaded" });
 await new Promise((resolve) => setTimeout(resolve, 300));
-assert(net.hits.length === afterRevoke, "revoked preference sent analytics on a later page");
-assert(!(await page.$("#analytics-allow")), "later page showed the initial dialog after revoke");
+assert(net.hits.length === afterRevoke, "a later page after revoke made no analytics request");
+assert(!(await page.$("#analytics-allow")), "a later page after revoke did not reopen the initial dialog");
 
 await page.evaluate(() => localStorage.removeItem("lotterymigo_analytics"));
 await page.goto(BASE + "/privacy.html?email=person@example.com", { waitUntil: "domcontentloaded" });
@@ -163,15 +163,15 @@ assert(params.page_referrer === "http://127.0.0.1:8772/privacy.html", "page_refe
 assert(!JSON.stringify(seen).includes("person@example.com"), "analytics commands omit the email query");
 assert(!JSON.stringify(seen).includes("token="), "analytics commands omit token queries");
 const collectUrls = net.hits.slice(beforeAllow).filter((url) => url.includes("collect"));
-assert(collectUrls.length === 1, "collect requests after allow: " + collectUrls.length);
-assert(!collectUrls.some((url) => url.includes("auto=1")), "an automatic page_view collect was sent");
-assert(!collectUrls.some((url) => url.includes("email") || url.includes("secret")), "collect URL contained a query secret");
-assert(net.hits.filter((url) => url.includes("/gtag/js")).length === 2, "gtag.js request count drifted");
+assert(collectUrls.length === 1, "one collect request after allow");
+assert(!collectUrls.some((url) => url.includes("auto=1")), "no automatic page_view collect");
+assert(!collectUrls.some((url) => url.includes("email") || url.includes("secret")), "collect URL has no query secret");
+assert(net.hits.filter((url) => url.includes("/gtag/js")).length === 2, "gtag.js was requested only for the two allow attempts");
 
 await page.click("#analytics-manage");
 await page.waitForSelector("#analytics-allow");
 await page.click("#analytics-allow");
-assert((await calls(page)).filter((entry) => entry[0] === "event" && entry[1] === "page_view").length === 1, "re-allowing on the same page sent another page_view");
+assert((await calls(page)).filter((entry) => entry[0] === "event" && entry[1] === "page_view").length === 1, "re-allowing on the same page did not send another page_view");
 
 const native = await browser.newPage();
 const nativeHold = { gtag: false };
@@ -181,8 +181,8 @@ await native.evaluateOnNewDocument(() => {
 });
 await native.goto(BASE + "/", { waitUntil: "domcontentloaded" });
 await new Promise((resolve) => setTimeout(resolve, 300));
-assert(nativeNet.hits.length === 0, "native shell made an analytics request");
-assert(!(await native.$("#analytics-manage")), "native shell showed analytics choices");
+assert(nativeNet.hits.length === 0, "native shell made no analytics request");
+assert(!(await native.$("#analytics-manage")), "native shell showed no analytics choices");
 
 await browser.close();
 console.log(results.join("\n"));

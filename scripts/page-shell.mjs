@@ -199,6 +199,7 @@ export function renderPage({
     </div>
   </footer>
   <script defer src="/assets/site-config.js"></script>
+  <script defer src="/assets/analytics.js"></script>
   <script defer src="/assets/tip.js"></script>
   <script defer src="/assets/ads.js"></script>
 </body>

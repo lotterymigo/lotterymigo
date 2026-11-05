@@ -27,12 +27,16 @@ await mkdir(www, { recursive: true });
 // so the app copy of each page must not include the AdSense script. ads.txt stays
 // on the website only and is not copied into www/.
 const adsenseScript = /<script async src="https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-4173178569579798" crossorigin="anonymous"><\/script>\r?\n?/g;
+const analyticsScript = /<script(?: defer)? src="(?:\/)?assets\/analytics\.js"><\/script>\r?\n?/g;
 
 async function copyHtmlFile(rel) {
   const html = await readFile(path.join(root, rel), 'utf8');
-  const stripped = html.replace(adsenseScript, '');
+  const stripped = html.replace(adsenseScript, '').replace(analyticsScript, '');
   if (stripped.includes('adsbygoogle') || stripped.includes('pagead2.googlesyndication.com')) {
     throw new Error('AdSense script was still in ' + rel + ' after the app build strip.');
+  }
+  if (stripped.includes('assets/analytics.js') || stripped.includes('googletagmanager.com/gtag/js')) {
+    throw new Error('Analytics script was still in ' + rel + ' after the app build strip.');
   }
   const dest = path.join(www, rel);
   await mkdir(path.dirname(dest), { recursive: true });
@@ -54,6 +58,7 @@ for (const file of pages) {
 }
 for (const dir of pageDirs) await copyHtmlTree(dir);
 await cp(path.join(root, 'assets'), path.join(www, 'assets'), { recursive: true });
+await rm(path.join(www, 'assets', 'analytics.js'), { force: true });
 
 // Google Play does not allow an outside payment link for a non-charity tip.
 // The website keeps tipUrl. The app copy must not.

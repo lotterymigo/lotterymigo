@@ -2,9 +2,10 @@
    LotteryMigo site config — the only place for these keys
    ------------------------------------------------------------
    The Firebase block is the public web config for project
-   lotterymigo. measurementId is listed so it matches the
-   Firebase console. This site does not load Firebase Analytics.
-   tipUrl is the website tip link. The app build clears it.
+   lotterymigo. measurementId is the GA4 web stream. The website
+   loads it only after a visitor allows analytics. The app build
+   removes that script. tipUrl is the website tip link. The app
+   build clears it.
    Setup that is still manual: docs/FIREBASE_SETUP.md
    ============================================================ */
 window.LOTTERYMIGO_CONFIG = {

@@ -28,7 +28,7 @@
 
 ## Accounts
 
-The Firebase web config for project `lotterymigo` is in `assets/site-config.js`. Sign-in and saved picks still need the authorized domains, a Firestore database, and the published rules in [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md). The statistics work without an account. Analytics is not loaded. The points board is no longer on the site.
+The Firebase web config for project `lotterymigo` is in `assets/site-config.js`. Sign-in and saved picks still need the authorized domains, a Firestore database, and the published rules in [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md). The statistics work without an account. Google Analytics loads on the website only after the visitor allows it. The points board is no longer on the site.
 
 ## Native app shell
 

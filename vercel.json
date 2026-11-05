@@ -1,5 +1,16 @@
 {
   "redirects": [
+    { "source": "/powerball", "destination": "/powerball/numbers.html", "permanent": true },
+    { "source": "/megamillions", "destination": "/megamillions/numbers.html", "permanent": true },
+    { "source": "/learn", "destination": "/learn/index.html", "permanent": true },
+    { "source": "/learn/:slug([^.]*)", "destination": "/learn/:slug.html", "permanent": true },
+    { "source": "/:page(about|faq|privacy|terms|contact|offline)", "destination": "/:page.html", "permanent": true },
+    { "source": "/powerball/:page(numbers|results)", "destination": "/powerball/:page.html", "permanent": true },
+    { "source": "/megamillions/:page(numbers|results)", "destination": "/megamillions/:page.html", "permanent": true },
+    { "source": "/powerball/number/:n([^.]*)", "destination": "/powerball/number/:n.html", "permanent": true },
+    { "source": "/powerball/powerball/:n([^.]*)", "destination": "/powerball/powerball/:n.html", "permanent": true },
+    { "source": "/megamillions/number/:n([^.]*)", "destination": "/megamillions/number/:n.html", "permanent": true },
+    { "source": "/megamillions/megaball/:n([^.]*)", "destination": "/megamillions/megaball/:n.html", "permanent": true },
     { "source": "/scratch", "destination": "/#section-stats", "permanent": true },
     { "source": "/scratch.html", "destination": "/#section-stats", "permanent": true },
     { "source": "/scratcher", "destination": "/#section-stats", "permanent": true },
@@ -21,6 +32,12 @@
     }
   ],
   "headers": [
+    {
+      "source": "/content/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [

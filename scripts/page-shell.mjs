@@ -102,7 +102,8 @@ export function renderPage({
   current = '',
   crumbs = null,
   jsonLd = null,
-  ogType = 'website'
+  ogType = 'website',
+  noindex = false
 }) {
   const canonical = absolute(canonicalPath);
   return `<!DOCTYPE html>
@@ -111,6 +112,7 @@ export function renderPage({
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="description" content="${esc(description)}" />
+  ${noindex ? '<meta name="robots" content="noindex" />' : ''}
   <meta name="theme-color" content="#070908" />
   ${VERIFY}
   <link rel="canonical" href="${esc(canonical)}" />

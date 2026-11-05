@@ -2,10 +2,10 @@ name: Update lottery draws
 
 # Powerball draws Monday, Wednesday, and Saturday nights. Mega Millions draws
 # Tuesday and Friday nights (about 11pm US Eastern, early the next UTC day).
-# These three runs are after those nights and refresh the full archive.
+# A daily run at 10:00 UTC picks up the previous night's drawing.
 on:
   schedule:
-    - cron: '0 12 * * 2,4,0'
+    - cron: '0 10 * * *'
   workflow_dispatch:
 
 permissions:
@@ -34,13 +34,20 @@ jobs:
         run: node scripts/build-content.mjs
 
       - name: Commit archive when draws changed
+        id: commit
         run: |
-          if git diff --quiet -- data/draws.json sitemap.xml about.html faq.html learn powerball megamillions; then
+          if git diff --quiet -- data/draws.json sitemap.xml about.html faq.html learn powerball megamillions index.html; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No draw changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/draws.json sitemap.xml about.html faq.html learn powerball megamillions
+          git add data/draws.json sitemap.xml about.html faq.html learn powerball megamillions index.html
           git commit -m "Update Powerball and Mega Millions draw archive"
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Ping IndexNow
+        if: steps.commit.outputs.changed == 'true'
+        run: node scripts/indexnow.mjs --since HEAD~1

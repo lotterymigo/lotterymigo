@@ -33,50 +33,83 @@
     } catch (err) {}
   }
 
+  function sanitizedReferrer() {
+    if (!document.referrer) return "";
+    try {
+      var url = new URL(document.referrer);
+      return url.origin + url.pathname;
+    } catch (err) {
+      return "";
+    }
+  }
+
   function pageViewParams() {
     return {
       page_title: document.title,
       page_path: location.pathname,
-      page_location: location.origin + location.pathname
+      page_location: location.origin + location.pathname,
+      page_referrer: sanitizedReferrer()
     };
   }
 
   var sent = false;
+  var cancelled = false;
+  var scriptEl = null;
 
   function disableCollection(id) {
     if (id) window["ga-disable-" + id] = true;
   }
 
-  function sendPageView(id) {
-    if (sent || readChoice() !== "granted") return;
+  function clearQueue() {
+    if (window.dataLayer && window.dataLayer.length) window.dataLayer.length = 0;
+  }
+
+  function flushPageView(id) {
+    if (sent || cancelled || readChoice() !== "granted" || window["ga-disable-" + id]) return;
     sent = true;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    var params = pageViewParams();
     window.gtag("js", new Date());
     window.gtag("config", id, {
       send_page_view: false,
+      page_location: params.page_location,
+      page_referrer: params.page_referrer,
       allow_google_signals: false,
       allow_ad_personalization_signals: false
     });
-    var params = pageViewParams();
     window.gtag("event", "page_view", params);
-    if (document.querySelector('script[data-lm-analytics="gtag"]')) return;
-    var script = document.createElement("script");
-    script.async = true;
-    script.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(id);
-    script.setAttribute("data-lm-analytics", "gtag");
-    document.head.appendChild(script);
+  }
+
+  function sendPageView(id) {
+    if (sent || cancelled || readChoice() !== "granted") return;
+    if (scriptEl) {
+      flushPageView(id);
+      return;
+    }
+    scriptEl = document.createElement("script");
+    scriptEl.async = true;
+    scriptEl.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(id);
+    scriptEl.setAttribute("data-lm-analytics", "gtag");
+    scriptEl.addEventListener("load", function () {
+      flushPageView(id);
+    });
+    document.head.appendChild(scriptEl);
   }
 
   function applyGranted() {
     var id = measurementId();
     if (!id || readChoice() !== "granted") return;
+    cancelled = false;
     window["ga-disable-" + id] = false;
     sendPageView(id);
   }
 
   function applyDenied() {
-    disableCollection(measurementId());
+    var id = measurementId();
+    cancelled = true;
+    disableCollection(id);
+    clearQueue();
   }
 
   var dialog = null;

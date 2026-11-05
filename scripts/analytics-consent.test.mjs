@@ -2,48 +2,75 @@ import puppeteer from "/home/ubuntu/.npm/_npx/8003d8991b0d346b/node_modules/pupp
 
 const BASE = process.env.ANALYTICS_TEST_ORIGIN || "http://127.0.0.1:8772";
 const ID = "G-YN21YZ62BC";
+const results = [];
 
 function assert(cond, message) {
-  if (!cond) throw new Error(message);
+  if (!cond) {
+    results.push("FAIL " + message);
+    throw new Error(message);
+  }
+  results.push("ok " + message);
 }
 
-async function instrument(page) {
+const GTAG_STUB = `
+window.__lmGtagJsLoads=(window.__lmGtagJsLoads||0)+1;
+window.__lmGtagCalls=window.__lmGtagCalls||[];
+var disabled=window["ga-disable-${ID}"]===true;
+function emit(list){
+  if(window["ga-disable-${ID}"]===true) return;
+  window.__lmGtagCalls.push(list);
+  if(list[0]==="config" && list[2] && list[2].send_page_view!==false){
+    fetch("https://www.google-analytics.com/g/collect?en=page_view&auto=1&dl="+encodeURIComponent(location.href));
+  }
+  if(list[0]==="event" && list[1]==="page_view"){
+    var p=list[2]||{};
+    fetch("https://www.google-analytics.com/g/collect?en=page_view&dl="+encodeURIComponent(p.page_location||"")+"&dr="+encodeURIComponent(p.page_referrer||""));
+  }
+}
+window.gtag=function(){ emit(Array.from(arguments)); };
+if(!disabled){
+  (window.dataLayer||[]).forEach(function(entry){ emit(Array.from(entry)); });
+}
+`;
+
+function isAnalytics(url) {
+  return /googletagmanager\.com\/gtag\/js|google-analytics\.com|analytics\.google\.com/.test(url);
+}
+
+async function instrument(page, hold) {
   const hits = [];
+  const waiting = [];
   await page.setRequestInterception(true);
   page.on("request", (req) => {
     const url = req.url();
-    if (/googletagmanager\.com\/gtag\/js|google-analytics\.com|analytics\.google\.com/.test(url)) {
-      hits.push(url);
-      if (url.includes("/gtag/js")) {
-        req.respond({
-          status: 200,
-          contentType: "application/javascript",
-          body: "window.__lmGtagJsLoads=(window.__lmGtagJsLoads||0)+1;"
-        });
-        return;
-      }
-      req.abort();
+    if (!isAnalytics(url)) {
+      req.continue();
       return;
     }
-    req.continue();
+    hits.push(url);
+    if (url.includes("/gtag/js")) {
+      if (hold.gtag) {
+        waiting.push(req);
+        return;
+      }
+      req.respond({ status: 200, contentType: "application/javascript", body: GTAG_STUB });
+      return;
+    }
+    req.abort();
   });
-  return hits;
+  return {
+    hits,
+    release() {
+      hold.gtag = false;
+      while (waiting.length) {
+        waiting.shift().respond({ status: 200, contentType: "application/javascript", body: GTAG_STUB });
+      }
+    }
+  };
 }
 
-async function pageViews(page) {
-  return page.evaluate(() => {
-    const layer = window.dataLayer || [];
-    let count = 0;
-    layer.forEach((entry) => {
-      const list = Array.from(entry);
-      if (list[0] === "event" && list[1] === "page_view") count += 1;
-    });
-    return count;
-  });
-}
-
-async function choice(page) {
-  return page.evaluate(() => localStorage.getItem("lotterymigo_analytics"));
+async function calls(page) {
+  return page.evaluate(() => (window.__lmGtagCalls || []).map((entry) => Array.from(entry)));
 }
 
 const browser = await puppeteer.launch({
@@ -52,82 +79,112 @@ const browser = await puppeteer.launch({
   args: ["--no-sandbox", "--disable-dev-shm-usage"]
 });
 
+const hold = { gtag: false };
 const page = await browser.newPage();
-const hits = await instrument(page);
+const net = await instrument(page, hold);
+
 await page.goto(BASE + "/?email=person@example.com&pick=1-2-3", { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForSelector("#analytics-allow");
-assert(hits.length === 0, "analytics requests fired before a choice");
-assert(await choice(page) === null, "a choice was stored before the visitor picked one");
-assert(await page.$("#analytics-reject"), "reject button missing");
+assert(net.hits.length === 0, "no analytics request before a choice");
+assert(await page.evaluate(() => localStorage.getItem("lotterymigo_analytics")) === null, "no analytics choice stored before a click");
 
 const adsButton = await page.$(".ads-notice button");
 if (adsButton) await adsButton.click();
-assert(await page.evaluate(() => localStorage.getItem("lotterymigo_ads_notice")) === "ok", "ads notice was not dismissed");
-assert(await choice(page) === null, "dismissing the advertising note was treated as analytics consent");
-assert(hits.length === 0, "analytics requests fired after the advertising notice");
+assert(await page.evaluate(() => localStorage.getItem("lotterymigo_ads_notice")) === "ok", "advertising notice can still be dismissed");
+assert(await page.evaluate(() => localStorage.getItem("lotterymigo_analytics")) === null, "advertising dismissal is not analytics consent");
+assert(net.hits.length === 0, "no analytics request after the advertising notice");
 
 await page.click("#analytics-reject");
 await page.waitForFunction(() => localStorage.getItem("lotterymigo_analytics") === "denied");
-assert(hits.length === 0, "analytics requests fired after reject");
-assert(!(await page.$("#analytics-allow")), "choice dialog stayed open after reject");
+assert(net.hits.length === 0, "reject does not load analytics");
 await page.reload({ waitUntil: "domcontentloaded" });
-assert(await choice(page) === "denied", "reject was not saved");
-assert(!(await page.$("#analytics-allow")), "dialog returned after a saved reject");
-assert(hits.length === 0, "analytics requests fired on a later visit after reject");
+assert(await page.evaluate(() => localStorage.getItem("lotterymigo_analytics")) === "denied", "reject is saved");
+assert(!(await page.$("#analytics-allow")), "saved reject does not show the initial dialog");
+assert(net.hits.length === 0, "a later load after reject makes no analytics request");
 
+hold.gtag = true;
 await page.evaluate(() => localStorage.removeItem("lotterymigo_analytics"));
-await page.goto(BASE + "/learn/index.html?token=secret", { waitUntil: "domcontentloaded" });
-await page.waitForSelector("#analytics-allow");
-const beforeAllow = hits.length;
-await page.click("#analytics-allow");
-await page.waitForFunction(() => (window.dataLayer || []).length > 0);
-const views = await pageViews(page);
-const params = await page.evaluate(() => {
-  const layer = window.dataLayer || [];
-  for (const entry of layer) {
-    const list = Array.from(entry);
-    if (list[0] === "event" && list[1] === "page_view") return list[2];
-  }
-  return null;
+await page.goto(BASE + "/powerball/number/21.html?token=secret&email=person@example.com", {
+  waitUntil: "domcontentloaded",
+  referer: "https://example.com/from?email=person@example.com&pick=9"
 });
-assert(views === 1, "expected one page_view after allow, got " + views);
-assert(params && params.page_path === "/learn/index.html", "page_path was not the pathname");
-assert(params.page_location === BASE.replace(/\/$/, "") + "/learn/index.html" || params.page_location.endsWith("/learn/index.html"), "page_location kept a query string: " + params.page_location);
-assert(!JSON.stringify(params).includes("secret"), "query string was sent to analytics");
-assert(!JSON.stringify(params).includes("@"), "an email-like value was sent to analytics");
-const gtagLoads = hits.filter((url) => url.includes("/gtag/js")).length;
-assert(gtagLoads === 1, "gtag.js loaded " + gtagLoads + " times");
-assert(hits[hits.length - 1].includes("id=" + ID) || hits.some((url) => url.includes("id=" + ID)), "measurement id was not requested");
-assert(hits.length - beforeAllow >= 1, "no analytics request after allow");
-
-await page.click("#analytics-manage");
 await page.waitForSelector("#analytics-allow");
 await page.click("#analytics-allow");
-assert(await pageViews(page) === 1, "allowing again sent a second page_view");
-assert(hits.filter((url) => url.includes("/gtag/js")).length === 1, "gtag.js was added twice");
-
+await page.waitForFunction(() => document.querySelectorAll('script[data-lm-analytics="gtag"]').length === 1);
+assert(net.hits.some((url) => url.includes("/gtag/js?id=" + ID)), "allow starts one gtag.js request for the existing id");
+assert(!net.hits.some((url) => url.includes("/g/collect") || url.includes("google-analytics.com/g/collect")), "no collect while gtag.js is still loading");
 await page.click("#analytics-manage");
 await page.waitForSelector("#analytics-reject");
-const hitsBeforeRevoke = hits.length;
 await page.click("#analytics-reject");
-await page.waitForFunction(() => localStorage.getItem("lotterymigo_analytics") === "denied");
-assert(await page.evaluate((id) => window["ga-disable-" + id] === true, ID), "revoke did not disable collection");
-assert(hits.length === hitsBeforeRevoke, "revoke sent another analytics request");
-await page.reload({ waitUntil: "domcontentloaded" });
-assert(hits.filter((url) => url.includes("/gtag/js")).length === 1, "a revoked browser loaded gtag.js again");
+await page.waitForFunction((id) => localStorage.getItem("lotterymigo_analytics") === "denied" && window["ga-disable-" + id] === true, {}, ID);
+net.release();
+await new Promise((resolve) => setTimeout(resolve, 400));
+const collectDuringRace = net.hits.filter((url) => url.includes("collect"));
+assert(collectDuringRace.length === 0, "revoke during gtag.js load produced no collect request");
+const queued = await page.evaluate(() => {
+  const layer = window.dataLayer || [];
+  return layer.some((entry) => Array.from(entry)[1] === "page_view");
+});
+assert(queued === false, "revoke during gtag.js load left no queued page_view");
+
+const afterRevoke = net.hits.length;
+await page.goto(BASE + "/learn/index.html?token=still-secret", { waitUntil: "domcontentloaded" });
+await new Promise((resolve) => setTimeout(resolve, 300));
+assert(net.hits.length === afterRevoke, "revoked preference sent analytics on a later page");
+assert(!(await page.$("#analytics-allow")), "later page showed the initial dialog after revoke");
+
+await page.evaluate(() => localStorage.removeItem("lotterymigo_analytics"));
+await page.goto(BASE + "/privacy.html?email=person@example.com", { waitUntil: "domcontentloaded" });
+await page.evaluate(() => {
+  const link = document.createElement("a");
+  link.id = "leak-link";
+  link.href = "/megamillions/number/10.html?email=person@example.com";
+  link.textContent = "Open number";
+  document.body.appendChild(link);
+});
+await Promise.all([
+  page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+  page.click("#leak-link")
+]);
+await page.waitForSelector("#analytics-allow");
+const beforeAllow = net.hits.length;
+await page.click("#analytics-allow");
+await page.waitForFunction(() => (window.__lmGtagCalls || []).length > 0);
+const seen = await calls(page);
+const configs = seen.filter((entry) => entry[0] === "config");
+const views = seen.filter((entry) => entry[0] === "event" && entry[1] === "page_view");
+assert(configs.length === 1, "config ran " + configs.length + " times");
+assert(configs[0][2] && configs[0][2].send_page_view === false, "config did not disable the automatic page_view");
+assert(views.length === 1, "explicit page_view count was " + views.length);
+const params = views[0][2];
+assert(params.page_path === "/megamillions/number/10.html", "page_path was " + params.page_path);
+assert(params.page_location === "http://127.0.0.1:8772/megamillions/number/10.html", "page_location is path only");
+assert(params.page_referrer === "http://127.0.0.1:8772/privacy.html", "page_referrer drops the query string");
+assert(!JSON.stringify(seen).includes("person@example.com"), "analytics commands omit the email query");
+assert(!JSON.stringify(seen).includes("token="), "analytics commands omit token queries");
+const collectUrls = net.hits.slice(beforeAllow).filter((url) => url.includes("collect"));
+assert(collectUrls.length === 1, "collect requests after allow: " + collectUrls.length);
+assert(!collectUrls.some((url) => url.includes("auto=1")), "an automatic page_view collect was sent");
+assert(!collectUrls.some((url) => url.includes("email") || url.includes("secret")), "collect URL contained a query secret");
+assert(net.hits.filter((url) => url.includes("/gtag/js")).length === 2, "gtag.js request count drifted");
+
+await page.click("#analytics-manage");
+await page.waitForSelector("#analytics-allow");
+await page.click("#analytics-allow");
+assert((await calls(page)).filter((entry) => entry[0] === "event" && entry[1] === "page_view").length === 1, "re-allowing on the same page sent another page_view");
 
 const native = await browser.newPage();
-const nativeHits = await instrument(native);
+const nativeHold = { gtag: false };
+const nativeNet = await instrument(native, nativeHold);
 await native.evaluateOnNewDocument(() => {
   window.Capacitor = { isNativePlatform: function () { return true; } };
 });
 await native.goto(BASE + "/", { waitUntil: "domcontentloaded" });
 await new Promise((resolve) => setTimeout(resolve, 300));
-assert(nativeHits.length === 0, "native shell loaded analytics");
-assert(!(await native.$("#analytics-allow")), "native shell showed the analytics choice");
+assert(nativeNet.hits.length === 0, "native shell made an analytics request");
 assert(!(await native.$("#analytics-manage")), "native shell showed analytics choices");
 
 await browser.close();
+console.log(results.join("\n"));
 console.log("analytics consent tests passed");
-console.log("gtag requests intercepted:", hits.filter((url) => url.includes("/gtag/js")).length);
-console.log("page_view events after opt-in: 1; before choice and after reject: 0");
+console.log("collect URLs after the successful opt-in:", collectUrls.length);

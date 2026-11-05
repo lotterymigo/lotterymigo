@@ -38,18 +38,22 @@ if (!urls.length) {
 }
 
 const { key, location } = keyFile();
-const response = await fetch('https://api.indexnow.org/indexnow', {
-  method: 'POST',
-  headers: { 'content-type': 'application/json; charset=utf-8' },
-  body: JSON.stringify({
-    host: HOST,
-    key,
-    keyLocation: location,
-    urlList: urls
-  })
-});
-const text = await response.text();
-console.log(`IndexNow ${response.status} for ${urls.length} URL${urls.length === 1 ? '' : 's'}. ${text}`.trim());
-if (!response.ok) {
-  console.warn('IndexNow did not accept the ping. The draw archive commit is kept.');
+try {
+  const response = await fetch('https://api.indexnow.org/indexnow', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json; charset=utf-8' },
+    body: JSON.stringify({
+      host: HOST,
+      key,
+      keyLocation: location,
+      urlList: urls
+    })
+  });
+  const text = await response.text();
+  console.log(`IndexNow ${response.status} for ${urls.length} URL${urls.length === 1 ? '' : 's'}. ${text}`.trim());
+  if (!response.ok) {
+    console.warn('IndexNow did not accept the ping. The draw archive commit is kept.');
+  }
+} catch (err) {
+  console.warn(`IndexNow request failed (${err && err.message ? err.message : err}). The draw archive commit is kept.`);
 }

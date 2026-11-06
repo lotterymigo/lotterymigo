@@ -6,6 +6,7 @@ import { GAMES, newestFirst, poolView, sortRows, summarize, tableCaption } from 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archive = JSON.parse(await readFile(path.join(root, "data/draws.json"), "utf8"));
 const html = await readFile(path.join(root, "preview/dashboard.html"), "utf8");
+const home = await readFile(path.join(root, "index.html"), "utf8");
 const results = [];
 
 function assert(cond, message) {
@@ -65,6 +66,16 @@ assert(tableCaption("Powerball", "White balls") === "Powerball White balls in th
 assert(tableCaption("Mega Millions", "Mega Ball") === "Mega Millions Mega Ball in the selected window", "Mega Ball caption keeps both names");
 assert(html.includes("float-bounds") && html.includes("motion-toggle"), "preview reserves a decorative ball strip and a motion control");
 assert(!html.includes("analytics.js") && !html.includes("gtag"), "preview still has no analytics loader");
+assert(!home.includes("noindex"), "homepage stays indexable");
+assert(home.includes("https://www.lotterymigo.com/"), "homepage canonical host is present");
+assert(home.includes("Powerball and Mega Millions Statistics: Hot, Most Common and Overdue Numbers"), "homepage keeps the production H1");
+assert(home.includes('content="mT-NZ9gT1zrEcQ4GcRFZ3N1Oo6bRwOL4S5UIhm1CUYk"'), "homepage keeps the Search Console meta");
+assert((home.match(/ca-pub-4173178569579798/g) || []).length === 1, "homepage has one AdSense client id");
+assert((home.match(/assets\/analytics\.js/g) || []).length === 1, "homepage loads analytics.js once");
+assert(home.includes('id="section-stats"') && home.includes('id="section-account"') && home.includes('id="btn-export-csv"'), "homepage keeps stats, account, and CSV hooks");
+assert(home.includes('id="key-facts"') && home.includes('id="home-dataset"'), "homepage keeps key facts and dataset schema");
+assert(home.includes("float-bounds") && home.includes("Moving balls"), "homepage includes the decorative balls");
+assert(!home.includes("Design preview"), "homepage does not use the preview label");
 
 console.log(results.join("\n"));
 console.log("preview dashboard tests passed");

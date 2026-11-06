@@ -85,11 +85,11 @@ function render() {
 
 function metrics(game, white, bonus, hot, cold, bonusHot) {
   const wrap = el("div", "bento");
-  wrap.appendChild(card("card card-lead", "Most frequent white ball", hot ? String(hot.n) : "—", hot ? hot.count + " of " + white.total + " drawings" : "No drawings", game.label));
-  wrap.appendChild(card("card card-count", "Drawings in the white-ball window", String(white.total), formatDate(white.oldest) + " – " + formatDate(white.newest)));
-  wrap.appendChild(card("card card-range", "Bonus-ball window", String(bonus.total), game.bonus.name + ", " + formatDate(bonus.oldest) + " – " + formatDate(bonus.newest)));
-  wrap.appendChild(card("card card-overdue", "Longest white-ball wait", cold ? String(cold.gap) : "—", cold ? "drawings since ball " + cold.n + (cold.count ? ", last " + formatDate(cold.lastDate) : ". Not drawn in this window.") : "No drawings"));
-  wrap.appendChild(card("card card-bonus", "Most frequent " + game.bonus.name, bonusHot ? String(bonusHot.n) : "—", bonusHot ? bonusHot.count + " of " + bonus.total + " drawings" : "No drawings"));
+  wrap.appendChild(card("metric metric-lead", "Most frequent white ball", hot ? String(hot.n) : "—", hot ? hot.count + " of " + white.total + " drawings" : "No drawings", game.label));
+  wrap.appendChild(card("metric metric-count", "Drawings in the white-ball window", String(white.total), formatDate(white.oldest) + " – " + formatDate(white.newest)));
+  wrap.appendChild(card("metric metric-range", "Bonus-ball window", String(bonus.total), game.bonus.name + ", " + formatDate(bonus.oldest) + " – " + formatDate(bonus.newest)));
+  wrap.appendChild(card("metric metric-overdue", "Longest white-ball wait", cold ? String(cold.gap) : "—", cold ? "drawings since ball " + cold.n + (cold.count ? ", last " + formatDate(cold.lastDate) : ". Not drawn in this window.") : "No drawings"));
+  wrap.appendChild(card("metric metric-bonus", "Most frequent " + game.bonus.name, bonusHot ? String(bonusHot.n) : "—", bonusHot ? bonusHot.count + " of " + bonus.total + " drawings" : "No drawings"));
   return wrap;
 }
 
@@ -123,7 +123,7 @@ function grid(rows, pool, game) {
   const wrap = el("div", "grid" + (pool === "bonus" ? " bonus-grid" : ""));
   const top = leader(rows, "count");
   rows.slice().sort((a, b) => a.n - b.n).forEach((row) => {
-    const button = el("button", "ball" + (top && row.n === top.n && row.count ? " is-top" : ""));
+    const button = el("button", "count-ball" + (top && row.n === top.n && row.count ? " is-top" : ""));
     button.type = "button";
     button.appendChild(el("span", "ball-n", String(row.n)));
     button.appendChild(el("span", "ball-c", String(row.count)));
@@ -269,11 +269,22 @@ dialog.addEventListener("close", () => {
   }, 0);
 });
 
+function syncEngine() {
+  if (typeof window.switchGame !== "function" || typeof window.lmGetDrawAlertSnapshot !== "function" || !window.lmGetDrawAlertSnapshot()) return;
+  const header = document.getElementById("history-special-header");
+  if (!header) return;
+  const engineIsPowerball = header.textContent.trim() === "Powerball";
+  if (engineIsPowerball === (state.game === "POWERBALL")) return;
+  window.switchGame(state.game);
+}
+
+document.addEventListener("lm-draws-ready", syncEngine);
 document.querySelectorAll("[data-game]").forEach((button) => {
   button.addEventListener("click", () => {
     state.game = button.getAttribute("data-game");
     document.querySelectorAll("[data-game]").forEach((item) => item.classList.toggle("is-on", item === button));
     render();
+    syncEngine();
   });
 });
 document.querySelectorAll("[data-window]").forEach((button) => {
@@ -284,16 +295,22 @@ document.querySelectorAll("[data-window]").forEach((button) => {
   });
 });
 
+const sharedDraws = fetch("/data/draws.json").then(async (response) => {
+  if (!response.ok) throw new Error("The draw archive returned status " + response.status + ".");
+  return response.json();
+});
+window.__lmSharedDraws = sharedDraws;
+
 async function boot() {
   try {
-    const response = await fetch("/data/draws.json");
-    if (!response.ok) throw new Error("The draw archive returned status " + response.status + ".");
-    archive = await response.json();
+    archive = await sharedDraws;
     if (!archive.games || !archive.games.POWERBALL || !archive.games.MEGAMILLIONS) {
       throw new Error("The archive does not include both games.");
     }
     const fetched = archive.fetchedAt ? formatDate(String(archive.fetchedAt).slice(0, 10)) : "the file date";
-    sourceLine.textContent = "Counts use " + (archive.source || "the NY Open Data archive") + ", fetched " + fetched + ". Powerball dataset " + archive.games.POWERBALL.datasetId + ". Mega Millions dataset " + archive.games.MEGAMILLIONS.datasetId + ".";
+    if (sourceLine) {
+      sourceLine.textContent = "Counts use " + (archive.source || "the NY Open Data archive") + ", fetched " + fetched + ". Powerball dataset " + archive.games.POWERBALL.datasetId + ". Mega Millions dataset " + archive.games.MEGAMILLIONS.datasetId + ".";
+    }
     render();
   } catch (err) {
     showError(err && err.message ? err.message : "The draw archive could not be read.");

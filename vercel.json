@@ -24,6 +24,7 @@
     { "source": "/games.html", "destination": "/#section-stats", "permanent": true },
     { "source": "/mini-game", "destination": "/#section-stats", "permanent": true },
     { "source": "/mini-game.html", "destination": "/#section-stats", "permanent": true },
+    { "source": "/preview", "destination": "/preview/dashboard.html", "permanent": false },
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "lotterymigo.com" }],
@@ -34,6 +35,18 @@
   "headers": [
     {
       "source": "/content/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    },
+    {
+      "source": "/preview",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    },
+    {
+      "source": "/preview/(.*)",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex" }
       ]

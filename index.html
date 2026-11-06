@@ -34,6 +34,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/design.css" />
+  <link rel="stylesheet" href="assets/preview-dashboard.css" />
   <link rel="stylesheet" href="assets/a11y.css" />
   <script defer src="assets/a11y.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -49,7 +50,7 @@
     })();
   </script>
 </head>
-<body class="page">
+<body class="page home-dash">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- Compliance -->
@@ -59,21 +60,14 @@
     <span>Need help with gambling? Call <a href="tel:18004262537">1-800-GAMBLER</a></span>
   </div>
 
-  <!-- Header -->
   <header class="site-header">
-    <div class="wrap header-bar">
-      <div class="header-top">
-        <div class="brand">
-          <img src="icons/logo.svg" width="44" height="44" alt="" />
-          <span>
-            <span class="brand-name">LotteryMigo</span>
-            <span class="brand-tag">Number tools for fun</span>
-          </span>
-        </div>
+    <div class="nav-wrap">
+      <nav class="dash-nav" aria-label="Site pages">
+        <a class="brand" href="/">
+          <img src="icons/logo.svg" width="36" height="36" alt="" />
+          <span>LotteryMigo</span>
+        </a>
         <a class="tip-chip hidden" data-tip="header" hidden></a>
-      </div>
-
-      <nav class="nav" aria-label="Site pages">
         <a href="#section-stats" aria-current="page">Stats</a>
         <a href="powerball/results.html">Powerball results</a>
         <a href="megamillions/results.html">Mega Millions results</a>
@@ -82,31 +76,46 @@
         <a href="about.html">About</a>
         <a href="#section-generator">Number ideas</a>
         <a href="#section-account">Account</a>
+        <a href="privacy.html">Privacy</a>
       </nav>
     </div>
   </header>
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-orbs" aria-hidden="true">
-      <span class="ball">12</span>
-      <span class="ball">27</span>
-      <span class="ball ball-pb">7</span>
-      <span class="ball">44</span>
-      <span class="ball ball-mm">9</span>
-    </div>
-    <div class="wrap hero-inner">
-      <div id="game-toggle" class="seg" role="group" aria-label="Choose a lottery">
-        <button id="btn-toggle-pb" type="button" onclick="switchGame('POWERBALL')" aria-pressed="true" class="seg-btn is-pb">
-          <span class="dot" aria-hidden="true"></span> Powerball
-        </button>
-        <button id="btn-toggle-mm" type="button" onclick="switchGame('MEGAMILLIONS')" aria-pressed="false" class="seg-btn">
-          <span class="dot" aria-hidden="true"></span> Mega Millions
-        </button>
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="kicker">Current-game archive</p>
+        <h1>Powerball and Mega Millions Statistics: Hot, Most Common and Overdue Numbers</h1>
+        <p class="lede">Hot, most common, and overdue numbers here are counts from the current Powerball and Mega Millions formats. A frequent number is not more likely next, and an overdue number is not due. Written guides and a page for each current number are linked below. <strong>For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
       </div>
-      <p id="hero-badge" class="badge">Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.</p>
-      <h1>Powerball and Mega Millions Statistics: Hot, Most Common and Overdue Numbers</h1>
-      <p>Hot, most common, and overdue numbers here are counts from the current Powerball and Mega Millions formats. A frequent number is not more likely next, and an overdue number is not due. Written guides and a page for each current number are linked below. <strong class="tone-gold">For fun only. Past draws do not predict the next one, and this site does not promise a win.</strong></p>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Choose a lottery">
+          <button type="button" class="seg-btn is-on" data-game="POWERBALL" id="game-pb">Powerball</button>
+          <button type="button" class="seg-btn" data-game="MEGAMILLIONS" id="game-mm">Mega Millions</button>
+        </div>
+        <div class="seg" role="group" aria-label="Draw window">
+          <button type="button" class="seg-btn is-on" data-window="current">Current field</button>
+          <button type="button" class="seg-btn" data-window="last30">Last 30</button>
+          <button type="button" class="seg-btn" data-window="last100">Last 100</button>
+        </div>
+        <p id="hero-badge" class="window-note">Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.</p>
+        <p id="window-note" class="window-note">Loading the draw archive…</p>
+      </div>
+      <div class="float-stage" id="float-stage">
+        <div class="float-head">
+          <p id="float-note">Decorative only. Not picks, prizes, or a prediction, and they do not change the counts.</p>
+          <button type="button" id="motion-toggle" aria-pressed="true" aria-describedby="float-note">Moving balls on</button>
+        </div>
+        <div class="float-bounds" id="float-bounds"></div>
+      </div>
+    </div>
+
+  <div id="legal-alert-banner" class="guarantee-bar">
+    <p class="wrap guarantee-line"><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or number ideas <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions. This website uses Google AdSense, which may store cookies to show and measure ads. <a href="terms.html">Terms</a> <a href="privacy.html">Privacy</a> <button type="button" class="btn btn-gold" onclick="dismissLegalAlert()">OK, hide this note</button></p>
+  </div>
+
+  <main id="main" tabindex="-1">
+    <section id="section-stats" class="sheet">
+      <p id="live" class="sr" aria-live="polite"></p>
+      <div id="stage"><p class="loading" id="loading">Loading drawings from the public archive.</p></div>
       <section id="key-facts" class="key-facts card stack"><h2>Powerball key facts</h2>
     <ul>
       <li>Most common white ball: <a href="/powerball/number/21.html">White ball 21</a>, drawn 128 times in the current matrix.</li>
@@ -156,19 +165,14 @@
         <a id="home-hot-link" href="powerball/number/21.html">Powerball number 21 frequency</a>
         <a id="home-gap-link" href="powerball/number/43.html">Longest Powerball gap, number 43</a>
       </nav>
-    </div>
-  </section>
+    </section>
 
-  <div id="legal-alert-banner" class="guarantee-bar">
-    <p class="wrap guarantee-line"><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or number ideas <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions. This website uses Google AdSense, which may store cookies to show and measure ads. <a href="terms.html">Terms</a> <a href="privacy.html">Privacy</a> <button type="button" class="btn btn-gold" onclick="dismissLegalAlert()">OK, hide this note</button></p>
-  </div>
-
-  <main id="main" class="wrap stack" tabindex="-1">
+    <div class="wrap stack">
 
     <div class="ad-slot" data-ad-placement="below-header" hidden></div>
 
     <!-- How often -->
-    <section id="section-stats" class="card stack">
+    <section id="section-heatmap" class="card stack">
       <div class="between">
         <div class="stack">
           <h2>How often each number was drawn</h2>
@@ -389,7 +393,21 @@
         </div>
       </div>
     </section>
+    </div>
   </main>
+
+  <dialog id="detail" aria-labelledby="detail-title">
+    <div class="detail-card">
+      <button type="button" class="btn" id="detail-close">Close</button>
+      <p id="detail-kicker" class="kicker"></p>
+      <h2 id="detail-title"></h2>
+      <dl class="detail-facts" id="detail-facts"></dl>
+      <h3>Recent appearances in this window</h3>
+      <ol id="detail-recent"></ol>
+      <p id="detail-empty" hidden>This ball has not appeared in the selected window.</p>
+      <a class="btn btn-dark" id="detail-link" href="powerball/number/1.html">Open the full number page</a>
+    </div>
+  </dialog>
 
   <!-- Footer -->
   <footer class="site-footer">
@@ -499,10 +517,20 @@
     async function loadOfficialDraws() {
       const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
       let bundled = null;
-      try {
-        bundled = await fetchDrawFile(new URL('data/draws.json', document.baseURI).href);
-      } catch (err) {
-        console.warn('Local draw file unavailable.', err);
+      if (window.__lmSharedDraws) {
+        try {
+          const shared = await window.__lmSharedDraws;
+          if (drawFileIsComplete(shared)) bundled = shared;
+        } catch (err) {
+          console.warn('Shared draw file unavailable.', err);
+        }
+      }
+      if (!bundled) {
+        try {
+          bundled = await fetchDrawFile(new URL('data/draws.json', document.baseURI).href);
+        } catch (err) {
+          console.warn('Local draw file unavailable.', err);
+        }
       }
 
       let remote = null;
@@ -687,10 +715,15 @@
 
       const pbBtn = document.getElementById('btn-toggle-pb');
       const mmBtn = document.getElementById('btn-toggle-mm');
-      pbBtn.className = isPB ? 'seg-btn is-pb' : 'seg-btn';
-      mmBtn.className = !isPB ? 'seg-btn is-mm' : 'seg-btn';
-      pbBtn.setAttribute('aria-pressed', isPB ? 'true' : 'false');
-      mmBtn.setAttribute('aria-pressed', isPB ? 'false' : 'true');
+      if (pbBtn && mmBtn) {
+        pbBtn.className = isPB ? 'seg-btn is-pb' : 'seg-btn';
+        mmBtn.className = !isPB ? 'seg-btn is-mm' : 'seg-btn';
+        pbBtn.setAttribute('aria-pressed', isPB ? 'true' : 'false');
+        mmBtn.setAttribute('aria-pressed', isPB ? 'false' : 'true');
+      }
+      document.querySelectorAll('[data-game]').forEach((button) => {
+        button.classList.toggle('is-on', button.getAttribute('data-game') === game);
+      });
 
       const badge = document.getElementById('hero-badge');
       if (badge) {
@@ -705,6 +738,7 @@
       generateTickets(5);
       renderFavorites();
     }
+    window.switchGame = switchGame;
 
     // --- 1. REALISTIC STUDIO DRUM ENGINE (BIGGER BALLS, SMOOTH TUMBLING) ---
     let hopperCanvas, ctx;
@@ -1392,6 +1426,7 @@
     });
   </script>
   <script src="assets/site-config.js"></script>
+  <script type="module" src="assets/preview-dashboard.js"></script>
   <script src="assets/analytics.js"></script>
   <script src="assets/tip.js"></script>
   <script src="assets/ads.js"></script>

@@ -125,3 +125,8 @@ export function leader(rows, key) {
   if (!rows.length) return null;
   return sortRows(rows, key, "desc")[0];
 }
+
+export function tableCaption(gameLabel, poolName) {
+  if (gameLabel === poolName) return poolName + " in the selected window";
+  return gameLabel + " " + poolName + " in the selected window";
+}

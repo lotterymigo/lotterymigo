@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Experimental LotteryMigo statistics preview. Current-game Powerball and Mega Millions counts from the public draw archive. Not a prediction." />
+  <title>Statistics preview | LotteryMigo</title>
+  <link rel="canonical" href="https://www.lotterymigo.com/preview/dashboard.html" />
+  <link rel="icon" href="/icons/favicon.ico" sizes="any" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtqUYLknw.woff2" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/preview-dashboard.css" />
+</head>
+<body>
+  <a class="skip" href="#stats">Skip to statistics</a>
+  <p class="compliance">18+ / 21+. Entertainment only. These counts do not predict a drawing or sell a ticket. Help: <a href="tel:18004262537">1-800-GAMBLER</a></p>
+  <div class="nav-wrap">
+    <nav class="nav" aria-label="Preview">
+      <a class="brand" href="/preview/dashboard.html">
+        <img src="/icons/logo.svg" width="36" height="36" alt="" />
+        <span>LotteryMigo</span>
+      </a>
+      <span class="preview-tag">Design preview</span>
+      <a href="/">Live site</a>
+      <a href="/#section-stats">Chart and CSV</a>
+      <a href="/#section-account">Account</a>
+      <a href="/about.html">How counts work</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="kicker">Current-game archive</p>
+      <h1>Which numbers have shown up, and which are still waiting.</h1>
+      <p class="lede">Each drawing is its own event. A number that appears often is not due, and a quiet number is not more likely on the next draw.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Game">
+        <button type="button" class="seg-btn is-on" data-game="POWERBALL" id="game-pb">Powerball</button>
+        <button type="button" class="seg-btn" data-game="MEGAMILLIONS" id="game-mm">Mega Millions</button>
+      </div>
+      <div class="seg" role="group" aria-label="Draw window">
+        <button type="button" class="seg-btn is-on" data-window="current">Current field</button>
+        <button type="button" class="seg-btn" data-window="last30">Last 30</button>
+        <button type="button" class="seg-btn" data-window="last100">Last 100</button>
+      </div>
+      <p id="window-note" class="window-note">Loading the draw archive…</p>
+    </div>
+  </header>
+
+  <main id="stats" class="sheet">
+    <p id="live" class="sr" aria-live="polite"></p>
+    <div id="stage">
+      <p class="loading" id="loading">Loading drawings from the public archive.</p>
+    </div>
+    <section class="method" aria-labelledby="method-title">
+      <h2 id="method-title">Where these numbers come from</h2>
+      <p id="source-line">Source line appears after the archive loads.</p>
+      <p>Powerball’s current field starts October 7, 2015: five white balls from 1 through 69 and a Powerball from 1 through 26. Mega Millions white balls start October 31, 2017, from 1 through 70. The Mega Ball field of 1 through 24 starts April 8, 2025. Mega Ball 25 is retired and is not counted here; its historical page remains on the live site.</p>
+      <p>Last 30 and Last 100 are the newest drawings inside that pool, not calendar days. White balls and the bonus ball keep separate date ranges when the rules changed on different days. Frequency is the number of drawings in the window that included the ball. Gap is how many drawings in the window have happened since that appearance. A ball that has not appeared is missing for the whole window.</p>
+      <p>The published matrix rules are on <a href="/about.html">How counts work</a>. Saved picks and the CSV download stay on the <a href="/#section-account">account</a> and <a href="/#section-stats">live chart</a>. This page is an experiment and is not linked from the live navigation.</p>
+    </section>
+  </main>
+
+  <dialog id="detail" aria-labelledby="detail-title">
+    <div class="detail-card">
+      <button type="button" class="btn" id="detail-close" autofocus>Close</button>
+      <p id="detail-kicker" class="kicker"></p>
+      <h2 id="detail-title"></h2>
+      <dl class="detail-facts" id="detail-facts"></dl>
+      <h3>Recent appearances in this window</h3>
+      <ol id="detail-recent"></ol>
+      <p id="detail-empty" hidden>This ball has not appeared in the selected window.</p>
+      <a class="btn btn-dark" id="detail-link" href="/powerball/number/1.html">Open the full number page</a>
+    </div>
+  </dialog>
+
+  <script type="module" src="/assets/preview-dashboard.js"></script>
+</body>
+</html>

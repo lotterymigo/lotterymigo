@@ -248,26 +248,24 @@
     }
     var choice = readChoice();
     dialog = document.createElement("div");
-    dialog.className = "analytics-choice card";
+    dialog.className = "analytics-choice";
     dialog.setAttribute("role", "dialog");
     dialog.setAttribute("aria-labelledby", "analytics-choice-title");
     dialog.setAttribute("aria-describedby", "analytics-choice-text");
     dialog.tabIndex = -1;
-    var status = choice === "granted"
-      ? "Analytics is currently allowed on this browser."
-      : choice === "denied"
-        ? "Analytics is currently off on this browser."
-        : "";
+    var status = choice === "granted" ? "Currently allowed." : choice === "denied" ? "Currently off." : "";
     dialog.innerHTML =
       '<h2 id="analytics-choice-title">Optional analytics</h2>' +
-      '<p id="analytics-choice-text">LotteryMigo can send anonymous page views to Google Analytics so we can see which public pages are used. This is separate from advertising. Allow loads that script. Hits use the page path and title, not the query string, referrer query, your email, your sign-in, or saved picks. Reject leaves it unloaded, clears this site’s Google Analytics cookies, and applies in other open tabs. <a href="/privacy.html">Privacy</a></p>' +
-      '<p class="analytics-status">' + status + '</p>' +
+      '<p id="analytics-choice-text">May we use Google Analytics to understand which pages are used? It loads only if you allow it. You can change your choice anytime. <a href="/privacy.html">Privacy</a></p>' +
+      (status ? '<p class="analytics-status">' + status + '</p>' : '') +
       '<div class="analytics-choice-actions">' +
         '<button type="button" class="btn btn-primary" id="analytics-allow">Allow analytics</button>' +
         '<button type="button" class="btn btn-quiet" id="analytics-reject">Reject analytics</button>' +
       '</div>';
+    var header = document.querySelector(".site-header");
     var anchor = document.querySelector(".compliance");
-    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(dialog, anchor.nextSibling);
+    if (header && header.parentNode) header.parentNode.insertBefore(dialog, header.nextSibling);
+    else if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(dialog, anchor.nextSibling);
     else document.body.insertBefore(dialog, document.body.firstChild);
     dialog.querySelector("#analytics-allow").addEventListener("click", function () {
       writeChoice("granted");

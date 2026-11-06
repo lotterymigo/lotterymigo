@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { GAMES, newestFirst, poolView, sortRows, summarize } from "../assets/preview-model.mjs";
+import { GAMES, newestFirst, poolView, sortRows, summarize, tableCaption } from "../assets/preview-model.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archive = JSON.parse(await readFile(path.join(root, "data/draws.json"), "utf8"));
@@ -60,6 +60,11 @@ assert(!html.includes("adsbygoogle") && !html.includes("ca-pub-"), "preview does
 assert(!html.includes("analytics.js") && !html.includes("gtag") && !html.includes("G-YN21YZ62BC"), "preview does not load Analytics");
 assert(html.includes("preview-dashboard.js") && html.includes("preview-dashboard.css"), "preview uses its own assets");
 assert(html.includes('href="/#section-account"') && html.includes('href="/#section-stats"'), "preview links to the existing account and CSV controls");
+assert(tableCaption("Powerball", "Powerball") === "Powerball in the selected window", "caption does not repeat Powerball");
+assert(tableCaption("Powerball", "White balls") === "Powerball White balls in the selected window", "white-ball caption keeps the game name");
+assert(tableCaption("Mega Millions", "Mega Ball") === "Mega Millions Mega Ball in the selected window", "Mega Ball caption keeps both names");
+assert(html.includes("float-bounds") && html.includes("motion-toggle"), "preview reserves a decorative ball strip and a motion control");
+assert(!html.includes("analytics.js") && !html.includes("gtag"), "preview still has no analytics loader");
 
 console.log(results.join("\n"));
 console.log("preview dashboard tests passed");

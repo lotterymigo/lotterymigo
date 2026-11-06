@@ -1,4 +1,4 @@
-import { GAMES, poolView, sortRows, leader } from "./preview-model.mjs";
+import { GAMES, poolView, sortRows, leader, tableCaption } from "./preview-model.mjs";
 
 const stage = document.getElementById("stage");
 const note = document.getElementById("window-note");
@@ -162,7 +162,7 @@ function bars(rows, maxCount, poolName) {
 function table(rows, maxCount, game, pool) {
   const scroll = el("div", "table-scroll");
   const tableNode = document.createElement("table");
-  const caption = el("caption", "", game.label + " " + pool.name + " in the selected window");
+  const caption = el("caption", "", tableCaption(game.label, pool.name));
   tableNode.appendChild(caption);
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
@@ -301,3 +301,165 @@ async function boot() {
 }
 
 boot();
+
+const MOTION_KEY = "lotterymigo_preview_motion";
+const FLOATERS = [
+  { n: 21, kind: "white", name: "white ball", home: [0.08, 0.42] },
+  { n: 7, kind: "white", name: "white ball", home: [0.28, 0.18] },
+  { n: 14, kind: "pb", name: "Powerball", home: [0.48, 0.48] },
+  { n: 12, kind: "mm", name: "Mega Ball", home: [0.68, 0.16] },
+  { n: 44, kind: "white", name: "white ball", home: [0.84, 0.46] }
+];
+const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+const bounds = document.getElementById("float-bounds");
+const motionButton = document.getElementById("motion-toggle");
+let motionWanted = localStorage.getItem(MOTION_KEY) !== "off";
+let stageVisible = true;
+let pageVisible = document.visibilityState !== "hidden";
+let rafId = 0;
+let lastTick = 0;
+let boxW = 0;
+let boxH = 0;
+const floaters = FLOATERS.map((spec, index) => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "float-ball kind-" + spec.kind;
+  button.setAttribute("aria-label", "Decorative " + spec.name + " " + spec.n + ". Not a pick or a prediction. Activating it only bounces this decoration.");
+  const face = document.createElement("span");
+  face.className = "float-face";
+  face.textContent = String(spec.n);
+  button.appendChild(face);
+  bounds.appendChild(button);
+  const ball = { ...spec, el: button, x: 0, y: 0, vx: 0, vy: 0, mode: "drift", phase: index * 1.3, size: 64 };
+  button.addEventListener("click", () => impulse(ball));
+  button.addEventListener("focus", () => { ball.focused = true; });
+  button.addEventListener("blur", () => { ball.focused = false; });
+  return ball;
+});
+
+function motionAllowed() {
+  return motionWanted && !motionQuery.matches && stageVisible && pageVisible;
+}
+
+function paintMotionButton() {
+  document.documentElement.classList.toggle("preview-motion-off", !motionWanted);
+  document.documentElement.classList.toggle("preview-reduced", motionQuery.matches);
+  motionButton.setAttribute("aria-pressed", motionWanted ? "true" : "false");
+  motionButton.textContent = motionWanted ? "Moving balls on" : "Moving balls off";
+}
+
+function placeHomes() {
+  boxW = bounds.clientWidth;
+  boxH = bounds.clientHeight;
+  const width = boxW;
+  const height = boxH;
+  floaters.forEach((ball) => {
+    ball.size = ball.el.offsetWidth || (width < 860 ? 48 : 64);
+    const maxX = Math.max(0, width - ball.size);
+    const maxY = Math.max(0, height - ball.size);
+    ball.homeX = ball.home[0] * maxX;
+    ball.homeY = ball.home[1] * maxY;
+    ball.x = Math.min(maxX, Math.max(0, ball.homeX));
+    ball.y = Math.min(maxY, Math.max(0, ball.homeY));
+    ball.el.style.transform = "translate3d(" + ball.x + "px," + ball.y + "px,0)";
+  });
+}
+
+function impulse(ball) {
+  if (!motionAllowed() || ball.focused && motionQuery.matches) {
+    ball.el.classList.add("is-lit");
+    return;
+  }
+  if (ball.focused) {
+    ball.el.classList.add("is-lit");
+  }
+  ball.mode = "bounce";
+  ball.vx = (Math.random() * 2 - 1) * 320;
+  ball.vy = (Math.random() * 2 - 1) * 260;
+  if (Math.abs(ball.vx) < 80) ball.vx = ball.vx < 0 ? -160 : 160;
+  syncLoop();
+}
+
+function tick(now) {
+  rafId = requestAnimationFrame(tick);
+  const dt = Math.min(0.032, (now - lastTick) / 1000 || 0.016);
+  lastTick = now;
+  const maxX = Math.max(0, boxW - (floaters[0] ? floaters[0].size : 64));
+  const maxY = Math.max(0, boxH - (floaters[0] ? floaters[0].size : 64));
+  let bouncing = false;
+  floaters.forEach((ball) => {
+    if (ball.el.offsetParent === null) return;
+    if (ball.focused && ball.mode !== "bounce") return;
+    if (ball.mode === "bounce") {
+      bouncing = true;
+      ball.x += ball.vx * dt;
+      ball.y += ball.vy * dt;
+      if (ball.x < 0) { ball.x = 0; ball.vx = Math.abs(ball.vx) * 0.82; }
+      if (ball.y < 0) { ball.y = 0; ball.vy = Math.abs(ball.vy) * 0.82; }
+      if (ball.x > maxX) { ball.x = maxX; ball.vx = -Math.abs(ball.vx) * 0.82; }
+      if (ball.y > maxY) { ball.y = maxY; ball.vy = -Math.abs(ball.vy) * 0.82; }
+      ball.vx *= 0.985;
+      ball.vy *= 0.985;
+      if (Math.hypot(ball.vx, ball.vy) < 22) {
+        ball.mode = "drift";
+        ball.homeX = ball.x;
+        ball.homeY = ball.y;
+        ball.vx = 0;
+        ball.vy = 0;
+      }
+    } else {
+      const t = now / 1000;
+      ball.x = Math.min(maxX, Math.max(0, ball.homeX + Math.sin(t * 0.9 + ball.phase) * 14));
+      ball.y = Math.min(maxY, Math.max(0, ball.homeY + Math.cos(t * 0.7 + ball.phase) * 9));
+    }
+    ball.el.style.transform = "translate3d(" + ball.x.toFixed(1) + "px," + ball.y.toFixed(1) + "px,0)";
+  });
+  if (!bouncing && !motionAllowed()) stopLoop();
+}
+
+function syncLoop() {
+  if (motionAllowed() || floaters.some((ball) => ball.mode === "bounce")) {
+    if (!rafId) {
+      lastTick = 0;
+      rafId = requestAnimationFrame(tick);
+    }
+  } else stopLoop();
+}
+
+function stopLoop() {
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = 0;
+  placeHomes();
+}
+
+motionButton.addEventListener("click", () => {
+  motionWanted = !motionWanted;
+  try { localStorage.setItem(MOTION_KEY, motionWanted ? "on" : "off"); } catch (err) {}
+  floaters.forEach((ball) => { ball.mode = "drift"; ball.vx = 0; ball.vy = 0; });
+  paintMotionButton();
+  if (motionWanted) syncLoop();
+  else stopLoop();
+});
+motionQuery.addEventListener("change", () => {
+  paintMotionButton();
+  floaters.forEach((ball) => { ball.mode = "drift"; });
+  if (motionAllowed()) syncLoop();
+  else stopLoop();
+});
+document.addEventListener("visibilitychange", () => {
+  pageVisible = document.visibilityState !== "hidden";
+  if (motionAllowed()) syncLoop();
+  else if (!floaters.some((ball) => ball.mode === "bounce")) stopLoop();
+});
+if ("IntersectionObserver" in window) {
+  const watcher = new IntersectionObserver((entries) => {
+    stageVisible = entries[0].isIntersecting;
+    if (motionAllowed()) syncLoop();
+    else if (!floaters.some((ball) => ball.mode === "bounce")) stopLoop();
+  }, { threshold: 0.05 });
+  watcher.observe(document.getElementById("float-stage"));
+}
+window.addEventListener("resize", () => { placeHomes(); });
+paintMotionButton();
+placeHomes();
+syncLoop();

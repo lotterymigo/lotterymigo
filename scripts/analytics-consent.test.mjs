@@ -1,7 +1,12 @@
-import puppeteer from "/home/ubuntu/.npm/_npx/8003d8991b0d346b/node_modules/puppeteer-core/lib/esm/puppeteer/puppeteer-core.js";
+import { createServer } from "node:http";
+import { readFile, access } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import puppeteer from "puppeteer-core";
 
-const BASE = process.env.ANALYTICS_TEST_ORIGIN || "http://127.0.0.1:8772";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ID = "G-YN21YZ62BC";
+const QUERY = "email=test-only&q=test-only";
 const results = [];
 
 function assert(cond, message) {
@@ -12,179 +17,318 @@ function assert(cond, message) {
   results.push("ok " + message);
 }
 
-const GTAG_STUB = `
-window.__lmGtagJsLoads=(window.__lmGtagJsLoads||0)+1;
-window.__lmGtagCalls=window.__lmGtagCalls||[];
-var disabled=window["ga-disable-${ID}"]===true;
-function emit(list){
-  if(window["ga-disable-${ID}"]===true) return;
-  window.__lmGtagCalls.push(list);
-  if(list[0]==="config" && list[2] && list[2].send_page_view!==false){
-    fetch("https://www.google-analytics.com/g/collect?en=page_view&auto=1&dl="+encodeURIComponent(location.href));
+async function chromePath() {
+  const candidates = [
+    process.env.CHROME_PATH,
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser"
+  ].filter(Boolean);
+  for (const candidate of candidates) {
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {}
   }
-  if(list[0]==="event" && list[1]==="page_view"){
-    var p=list[2]||{};
-    fetch("https://www.google-analytics.com/g/collect?en=page_view&dl="+encodeURIComponent(p.page_location||"")+"&dr="+encodeURIComponent(p.page_referrer||""));
-  }
-}
-window.gtag=function(){ emit(Array.from(arguments)); };
-if(!disabled){
-  (window.dataLayer||[]).forEach(function(entry){ emit(Array.from(entry)); });
-}
-`;
-
-function isAnalytics(url) {
-  return /googletagmanager\.com\/gtag\/js|google-analytics\.com|analytics\.google\.com/.test(url);
+  throw new Error("Set CHROME_PATH to a Chrome or Chromium binary");
 }
 
-async function instrument(page, hold) {
-  const hits = [];
-  const waiting = [];
-  await page.setRequestInterception(true);
-  page.on("request", (req) => {
-    const url = req.url();
-    if (!isAnalytics(url)) {
-      req.continue();
-      return;
-    }
-    hits.push(url);
-    if (url.includes("/gtag/js")) {
-      if (hold.gtag) {
-        waiting.push(req);
+function contentType(file) {
+  if (file.endsWith(".js")) return "text/javascript; charset=utf-8";
+  if (file.endsWith(".css")) return "text/css; charset=utf-8";
+  if (file.endsWith(".svg")) return "image/svg+xml";
+  if (file.endsWith(".json")) return "application/json";
+  if (file.endsWith(".webmanifest")) return "application/manifest+json";
+  return "text/html; charset=utf-8";
+}
+
+function startServer() {
+  const server = createServer(async (req, res) => {
+    try {
+      const url = new URL(req.url, "http://127.0.0.1");
+      let rel = decodeURIComponent(url.pathname).replace(/^\/+/, "");
+      if (!rel || rel.endsWith("/")) rel += "index.html";
+      const file = path.resolve(ROOT, rel);
+      if (file !== ROOT && !file.startsWith(ROOT + path.sep)) {
+        res.writeHead(403);
+        res.end();
         return;
       }
-      req.respond({ status: 200, contentType: "application/javascript", body: GTAG_STUB });
+      try {
+        const body = await readFile(file);
+        res.writeHead(200, { "content-type": contentType(file) });
+        res.end(body);
+      } catch {
+        const missing = await readFile(path.join(ROOT, "404.html"));
+        res.writeHead(404, { "content-type": "text/html; charset=utf-8" });
+        res.end(missing);
+      }
+    } catch (err) {
+      res.writeHead(500);
+      res.end(String(err));
+    }
+  });
+  return new Promise((resolve) => {
+    server.listen(0, "127.0.0.1", () => {
+      const { port } = server.address();
+      resolve({
+        server,
+        origin: "http://127.0.0.1:" + port,
+        close: () => new Promise((done) => server.close(() => done()))
+      });
+    });
+  });
+}
+
+function isLibrary(url) {
+  return url.includes("googletagmanager.com/gtag/js");
+}
+
+function isCollect(url) {
+  return /google-analytics\.com|analytics\.google\.com|stats\.g\.doubleclick\.net|\/g\/collect/i.test(url);
+}
+
+async function watch(page, gate) {
+  const collects = [];
+  await page.evaluateOnNewDocument(() => {
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.register = () => Promise.reject(new Error("disabled"));
+    }
+  });
+  const client = await page.createCDPSession();
+  await client.send("Fetch.enable", {
+    patterns: [
+      { urlPattern: "*google-analytics.com*", requestStage: "Request" },
+      { urlPattern: "*analytics.google.com*", requestStage: "Request" },
+      { urlPattern: "*stats.g.doubleclick.net*", requestStage: "Request" },
+      { urlPattern: "*google.com/g/collect*", requestStage: "Request" },
+      { urlPattern: "*googletagmanager.com/gtag/js*", requestStage: "Request" }
+    ]
+  });
+  client.on("Fetch.requestPaused", (event) => {
+    const url = event.request.url;
+    const done = (method, params) => client.send(method, params).catch(() => {});
+    if (isCollect(url)) {
+      collects.push({ url, post: event.request.postData || "" });
+      done("Fetch.fulfillRequest", {
+        requestId: event.requestId,
+        responseCode: 204,
+        responseHeaders: [{ name: "Content-Type", value: "text/plain" }]
+      });
       return;
     }
-    req.abort();
-  });
-  return {
-    hits,
-    release() {
-      hold.gtag = false;
-      while (waiting.length) {
-        waiting.shift().respond({ status: 200, contentType: "application/javascript", body: GTAG_STUB });
-      }
+    if (gate && gate.hold && isLibrary(url)) {
+      gate.pending.push({ client, requestId: event.requestId });
+      return;
     }
-  };
+    done("Fetch.continueRequest", { requestId: event.requestId });
+  });
+  return collects;
 }
 
-async function calls(page) {
-  return page.evaluate(() => (window.__lmGtagCalls || []).map((entry) => Array.from(entry)));
+function release(gate) {
+  gate.hold = false;
+  while (gate.pending.length) {
+    const item = gate.pending.shift();
+    item.client.send("Fetch.continueRequest", { requestId: item.requestId }).catch(() => {});
+  }
 }
 
+function decodeCollect(entry) {
+  const parsed = new URL(entry.url);
+  const lines = entry.post.split(/\r?\n/).filter(Boolean);
+  if (!lines.length) lines.push("");
+  return lines.map((line) => {
+    const params = new URLSearchParams(line);
+    const event = { en: parsed.searchParams.get("en") || "" };
+    parsed.searchParams.forEach((value, key) => { event[key] = value; });
+    params.forEach((value, key) => { event[key] = value; });
+    if (!event.en && params.get("en")) event.en = params.get("en");
+    return event;
+  });
+}
+
+function eventsOf(collects) {
+  return collects.flatMap(decodeCollect);
+}
+
+function assertClean(events, label) {
+  events.forEach((event) => {
+    ["dl", "dr"].forEach((key) => {
+      if (!event[key]) return;
+      if (event[key].includes("?") || event[key].includes("email") || event[key].includes("test-only")) {
+        assert(false, label + " " + key + " was not limited to the path: " + event[key]);
+      }
+    });
+    Object.entries(event).forEach(([key, value]) => {
+      if (/search_term/i.test(key) || String(value).includes("email=test-only") || String(value).includes("q=test-only")) {
+        assert(false, label + " leaked the test query in " + key + "=" + value);
+      }
+    });
+  });
+  assert(true, label + " collection payloads omit the query, email, and search term");
+}
+
+async function allow(page) {
+  await page.waitForSelector("#analytics-allow", { timeout: 10000 });
+  await page.evaluate(() => document.querySelector("#analytics-allow").click());
+}
+
+async function rejectFromFooter(page) {
+  await page.waitForSelector("#analytics-manage", { timeout: 10000 });
+  await page.evaluate(() => document.querySelector("#analytics-manage").click());
+  await page.waitForSelector("#analytics-reject");
+  await page.evaluate(() => document.querySelector("#analytics-reject").click());
+  await page.waitForFunction(() => localStorage.getItem("lotterymigo_analytics") === "denied");
+}
+
+const server = await startServer();
 const browser = await puppeteer.launch({
-  executablePath: "/usr/bin/google-chrome",
+  executablePath: await chromePath(),
   headless: true,
+  protocolTimeout: 25000,
   args: ["--no-sandbox", "--disable-dev-shm-usage"]
 });
 
-const hold = { gtag: false };
-const page = await browser.newPage();
-const net = await instrument(page, hold);
+try {
+  const gate = { hold: true, pending: [] };
+  const slow = await browser.newPage();
+  const slowHits = await watch(slow, gate);
+  await slow.goto(server.origin + "/?" + QUERY, { waitUntil: "domcontentloaded" });
+  await allow(slow);
+  await slow.waitForFunction(() => document.querySelector('script[data-lm-analytics="gtag"]'));
+  assert(slowHits.length === 0, "no collection request while gtag.js is held");
+  await rejectFromFooter(slow);
+  assert(await slow.evaluate((id) => window["ga-disable-" + id] === true, ID), "revoke sets ga-disable before gtag.js runs");
+  release(gate);
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  assert(slowHits.length === 0, "no collection request after revoke while gtag.js was still loading");
 
-await page.goto(BASE + "/?email=person@example.com&pick=1-2-3", { waitUntil: "domcontentloaded", timeout: 30000 });
-await page.waitForSelector("#analytics-allow");
-assert(net.hits.length === 0, "no analytics request before a choice");
-assert(await page.evaluate(() => localStorage.getItem("lotterymigo_analytics")) === null, "no analytics choice stored before a click");
+  const page = await browser.newPage();
+  const hits = await watch(page, null);
+  await page.goto(server.origin + "/", { waitUntil: "domcontentloaded" });
+  await page.evaluate(() => localStorage.removeItem("lotterymigo_analytics"));
+  await page.goto(server.origin + "/privacy.html?" + QUERY, { waitUntil: "domcontentloaded" });
+  await page.evaluate(() => {
+    const link = document.createElement("a");
+    link.id = "leak-link";
+    link.href = "/powerball/number/21.html?" + "email=test-only&q=test-only";
+    link.textContent = "Open number";
+    document.body.appendChild(link);
+  });
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.evaluate(() => document.querySelector("#leak-link").click())
+  ]);
+  assert(hits.length === 0, "number page sent no analytics before opt-in");
+  await allow(page);
+  await page.waitForFunction(() => performance.getEntriesByType("resource").some((entry) => entry.name.includes("gtag/js")));
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+  await page.evaluate(() => {
+    const link = document.createElement("a");
+    link.href = "https://example.com/leave?email=test-only&q=test-only";
+    link.textContent = "Leave";
+    link.id = "outbound";
+    document.body.appendChild(link);
+    const form = document.createElement("form");
+    form.action = "/search?q=test-only";
+    const input = document.createElement("input");
+    input.name = "q";
+    input.value = "test-only";
+    form.appendChild(input);
+    document.body.appendChild(form);
+    input.focus();
+    link.addEventListener("click", (event) => event.preventDefault());
+    form.addEventListener("submit", (event) => event.preventDefault());
+    link.click();
+    if (form.requestSubmit) form.requestSubmit();
+    window.scrollTo(0, document.body.scrollHeight);
+    window.dispatchEvent(new Event("pagehide"));
+  });
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  const byHost = new Map();
+  hits.forEach((hit) => {
+    const host = new URL(hit.url).host;
+    if (!byHost.has(host)) byHost.set(host, []);
+    byHost.get(host).push(hit);
+  });
+  assert(byHost.size > 0, "real gtag.js produced an intercepted collection request");
+  let sampleView = null;
+  byHost.forEach((hostHits, host) => {
+    const events = eventsOf(hostHits);
+    const pageViews = events.filter((event) => event.en === "page_view");
+    assert(pageViews.length === 1, host + " page_view count was " + pageViews.length + " (" + events.map((event) => event.en).join(", ") + ")");
+    assertClean(events, host);
+    sampleView = pageViews[0];
+  });
+  assert(sampleView.dl === server.origin + "/powerball/number/21.html", "page_view dl was " + sampleView.dl);
+  assert(sampleView.dr === server.origin + "/privacy.html", "page_view dr was " + sampleView.dr);
 
-const adsButton = await page.$(".ads-notice button");
-if (adsButton) await adsButton.click();
-assert(await page.evaluate(() => localStorage.getItem("lotterymigo_ads_notice")) === "ok", "advertising notice can still be dismissed");
-assert(await page.evaluate(() => localStorage.getItem("lotterymigo_analytics")) === null, "advertising dismissal is not analytics consent");
-assert(net.hits.length === 0, "no analytics request after the advertising notice");
+  const cookiesBefore = await page.evaluate(() => document.cookie);
+  assert(/(?:^|; )_ga=|_ga_/.test(cookiesBefore), "real gtag.js set a _ga cookie: " + cookiesBefore);
+  const hitCount = hits.length;
+  await rejectFromFooter(page);
+  const cookiesAfter = await page.evaluate(() => document.cookie);
+  assert(!/(?:^|; )_ga=|_ga_/.test(cookiesAfter), "revoke expired _ga and _ga_* cookies");
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    window.dispatchEvent(new Event("pagehide"));
+  });
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  assert(hits.length === hitCount, "current page sent no further hit after revoke");
 
-await page.click("#analytics-reject");
-await page.waitForFunction(() => localStorage.getItem("lotterymigo_analytics") === "denied");
-assert(net.hits.length === 0, "reject does not load analytics");
-await page.reload({ waitUntil: "domcontentloaded" });
-assert(await page.evaluate(() => localStorage.getItem("lotterymigo_analytics")) === "denied", "reject is saved");
-assert(!(await page.$("#analytics-allow")), "saved reject does not show the initial dialog");
-assert(net.hits.length === 0, "a later load after reject makes no analytics request");
+  const laterMark = hits.length;
+  await page.goto(server.origin + "/learn/index.html?" + QUERY, { waitUntil: "domcontentloaded" });
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  assert(hits.length === laterMark, "later page sent no collection after revoke");
+  assert(!(await page.$("#analytics-allow")), "later page kept the saved reject");
 
-hold.gtag = true;
-await page.evaluate(() => localStorage.removeItem("lotterymigo_analytics"));
-await page.goto(BASE + "/powerball/number/21.html?token=secret&email=person@example.com", {
-  waitUntil: "domcontentloaded",
-  referer: "https://example.com/from?email=person@example.com&pick=9"
-});
-await page.waitForSelector("#analytics-allow");
-await page.click("#analytics-allow");
-await page.waitForFunction(() => document.querySelectorAll('script[data-lm-analytics="gtag"]').length === 1);
-assert(net.hits.some((url) => url.includes("/gtag/js?id=" + ID)), "allow starts one gtag.js request for the existing id");
-assert(!net.hits.some((url) => url.includes("/g/collect") || url.includes("google-analytics.com/g/collect")), "no collect while gtag.js is still loading");
-await page.click("#analytics-manage");
-await page.waitForSelector("#analytics-reject");
-await page.click("#analytics-reject");
-await page.waitForFunction((id) => localStorage.getItem("lotterymigo_analytics") === "denied" && window["ga-disable-" + id] === true, {}, ID);
-net.release();
-await new Promise((resolve) => setTimeout(resolve, 400));
-const collectDuringRace = net.hits.filter((url) => url.includes("collect"));
-assert(collectDuringRace.length === 0, "revoke during gtag.js load produced no collect request");
-const queued = await page.evaluate(() => {
-  const layer = window.dataLayer || [];
-  return layer.some((entry) => Array.from(entry)[1] === "page_view");
-});
-assert(queued === false, "revoke during gtag.js load left no queued page_view");
+  const context = await browser.createBrowserContext();
+  const tabA = await context.newPage();
+  const tabB = await context.newPage();
+  const hitsA = await watch(tabA, null);
+  const hitsB = await watch(tabB, null);
+  await tabA.goto(server.origin + "/?" + QUERY, { waitUntil: "domcontentloaded" });
+  await allow(tabA);
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  assert(eventsOf(hitsA).some((event) => event.en === "page_view"), "first tab sent a page view");
+  await tabB.bringToFront();
+  await tabB.goto(server.origin + "/faq.html?" + QUERY, { waitUntil: "domcontentloaded" });
+  await tabB.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+  const tabBEvents = eventsOf(hitsB);
+  assert(tabBEvents.some((event) => event.en === "page_view"), "second tab sent a page view while allowed");
+  assertClean(tabBEvents, "two-tab");
+  assert(tabBEvents.every((event) => !event.dl || event.dl === server.origin + "/faq.html"), "second tab document URL was " + tabBEvents.map((event) => event.dl).join(" "));
+  assertClean(eventsOf(hitsA), "first-tab");
+  const markB = hitsB.length;
+  await rejectFromFooter(tabA);
+  await tabB.waitForFunction((id) => window["ga-disable-" + id] === true, {}, ID);
+  await tabB.evaluate(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+    window.dispatchEvent(new Event("pagehide"));
+  });
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  assert(hitsB.length === markB, "other open tab sent nothing after revoke");
+  await context.close();
 
-const afterRevoke = net.hits.length;
-await page.goto(BASE + "/learn/index.html?token=still-secret", { waitUntil: "domcontentloaded" });
-await new Promise((resolve) => setTimeout(resolve, 300));
-assert(net.hits.length === afterRevoke, "a later page after revoke made no analytics request");
-assert(!(await page.$("#analytics-allow")), "a later page after revoke did not reopen the initial dialog");
+  const missing = await browser.newPage();
+  const missingHits = await watch(missing, null);
+  await missing.goto(server.origin + "/", { waitUntil: "domcontentloaded" });
+  await missing.evaluate(() => localStorage.removeItem("lotterymigo_analytics"));
+  await missing.goto(server.origin + "/not-a-real-lottery-path?" + QUERY, { waitUntil: "domcontentloaded" });
+  await allow(missing);
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+  const missingEvents = eventsOf(missingHits);
+  assert(missingEvents.some((event) => event.en === "page_view"), "404 path sent a page view");
+  assert(missingEvents.every((event) => !event.dl || event.dl === server.origin + "/not-a-real-lottery-path"), "404 document URL was the path alone");
+  assertClean(missingEvents, "404");
 
-await page.evaluate(() => localStorage.removeItem("lotterymigo_analytics"));
-await page.goto(BASE + "/privacy.html?email=person@example.com", { waitUntil: "domcontentloaded" });
-await page.evaluate(() => {
-  const link = document.createElement("a");
-  link.id = "leak-link";
-  link.href = "/megamillions/number/10.html?email=person@example.com";
-  link.textContent = "Open number";
-  document.body.appendChild(link);
-});
-await Promise.all([
-  page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-  page.click("#leak-link")
-]);
-await page.waitForSelector("#analytics-allow");
-const beforeAllow = net.hits.length;
-await page.click("#analytics-allow");
-await page.waitForFunction(() => (window.__lmGtagCalls || []).length > 0);
-const seen = await calls(page);
-const configs = seen.filter((entry) => entry[0] === "config");
-const views = seen.filter((entry) => entry[0] === "event" && entry[1] === "page_view");
-assert(configs.length === 1, "config ran " + configs.length + " times");
-assert(configs[0][2] && configs[0][2].send_page_view === false, "config did not disable the automatic page_view");
-assert(views.length === 1, "explicit page_view count was " + views.length);
-const params = views[0][2];
-assert(params.page_path === "/megamillions/number/10.html", "page_path was " + params.page_path);
-assert(params.page_location === "http://127.0.0.1:8772/megamillions/number/10.html", "page_location is path only");
-assert(params.page_referrer === "http://127.0.0.1:8772/privacy.html", "page_referrer drops the query string");
-assert(!JSON.stringify(seen).includes("person@example.com"), "analytics commands omit the email query");
-assert(!JSON.stringify(seen).includes("token="), "analytics commands omit token queries");
-const collectUrls = net.hits.slice(beforeAllow).filter((url) => url.includes("collect"));
-assert(collectUrls.length === 1, "one collect request after allow");
-assert(!collectUrls.some((url) => url.includes("auto=1")), "no automatic page_view collect");
-assert(!collectUrls.some((url) => url.includes("email") || url.includes("secret")), "collect URL has no query secret");
-assert(net.hits.filter((url) => url.includes("/gtag/js")).length === 2, "gtag.js was requested only for the two allow attempts");
-
-await page.click("#analytics-manage");
-await page.waitForSelector("#analytics-allow");
-await page.click("#analytics-allow");
-assert((await calls(page)).filter((entry) => entry[0] === "event" && entry[1] === "page_view").length === 1, "re-allowing on the same page did not send another page_view");
-
-const native = await browser.newPage();
-const nativeHold = { gtag: false };
-const nativeNet = await instrument(native, nativeHold);
-await native.evaluateOnNewDocument(() => {
-  window.Capacitor = { isNativePlatform: function () { return true; } };
-});
-await native.goto(BASE + "/", { waitUntil: "domcontentloaded" });
-await new Promise((resolve) => setTimeout(resolve, 300));
-assert(nativeNet.hits.length === 0, "native shell made no analytics request");
-assert(!(await native.$("#analytics-manage")), "native shell showed no analytics choices");
-
-await browser.close();
-console.log(results.join("\n"));
-console.log("analytics consent tests passed");
-console.log("collect URLs after the successful opt-in:", collectUrls.length);
+  console.log(results.join("\n"));
+  console.log("analytics consent tests passed");
+  console.log("intercepted collection requests:", hits.length + slowHits.length + hitsA.length + hitsB.length + missingHits.length);
+} finally {
+  await browser.close();
+  await server.close();
+}

@@ -2,7 +2,7 @@
 
 The website is a statistics site. It no longer shows a points board, a winner of the day, or a scratch game, and the page does not write `dailyScores`. Google sign-in and saved number picks remain. `firestore.rules` is unchanged in this change so the live database is not edited from the repo. Old `users` point fields and `dailyScores` rows can be deleted later from the Firebase console. The rules can later drop the points and `dailyScores` sections. Do not delete that data until you have decided you do not need it.
 
-The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The page does not load Firebase Analytics, even though `measurementId` is in that file.
+The Firebase project **lotterymigo** already exists. Its public web config is filled in at `assets/site-config.js`. The website loads Google Analytics 4 for measurement ID `G-YN21YZ62BC` only after the visitor presses Allow analytics. The app build removes that script.
 
 The web API key is not a secret server password. It still must be restricted by the authorized domains and the Firestore rules in this repo. Do not put a service-account private key in this file. `tipUrl` is `https://buymeacoffee.com/nabinp` on the website. The app build clears that value, and the page also hides the button inside Capacitor. `firestoreEnabled` is `true` because Firestore exists and `firestore.rules` is published. Leave the timezone as `America/New_York` unless you intentionally change the daily cutoff and the words on the page.
 

@@ -1824,6 +1824,31 @@ html.lm-contrast .lm-reveal {
 .key-facts p { margin: 0; }
 .updated-line { color: var(--muted); font-size: 0.95rem; }
 
+.analytics-choice {
+  background: #0c110f;
+  color: #f4f7f4;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin: 8px auto;
+  width: min(40rem, calc(100% - 16px));
+  position: relative;
+  z-index: 30;
+}
+.analytics-choice h2 { margin: 0 0 4px; font-size: 1.05rem; line-height: 1.25; }
+.analytics-choice p { margin: 0 0 8px; color: #f4f7f4; line-height: 1.35; font-size: 0.95rem; }
+.analytics-choice a { color: #d6ff6a; }
+.analytics-status { margin-bottom: 8px; }
+.analytics-choice-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.analytics-choice .btn { min-height: 44px; padding: 0.4rem 0.9rem; }
+.analytics-choice .btn-quiet {
+  background: #1a221e;
+  color: #f4f7f4;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+.analytics-manage { margin: 8px 0 0; }
+.analytics-manage .btn { min-height: 44px; }
+
 @keyframes lm-aurora {
   from { transform: translate3d(0, 0, 0) scale(1); }
   to { transform: translate3d(-2.5%, 1.5%, 0) scale(1.08); }

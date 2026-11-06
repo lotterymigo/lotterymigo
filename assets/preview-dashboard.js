@@ -263,7 +263,10 @@ dialog.addEventListener("click", (event) => {
   if (event.target === dialog) dialog.close();
 });
 dialog.addEventListener("close", () => {
-  if (lastFocus && lastFocus.focus) lastFocus.focus();
+  const back = lastFocus;
+  setTimeout(() => {
+    if (back && back.focus) back.focus();
+  }, 0);
 });
 
 document.querySelectorAll("[data-game]").forEach((button) => {

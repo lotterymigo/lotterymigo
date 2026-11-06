@@ -95,16 +95,26 @@
     return params.toString();
   }
 
+  function payloadText(data) {
+    if (data == null) return "";
+    if (typeof data === "string") return data;
+    if (typeof URLSearchParams !== "undefined" && data instanceof URLSearchParams) return data.toString();
+    return null;
+  }
+
   function sanitizeCollect(url, body) {
+    var text = payloadText(body);
+    if (text === null) return { block: true };
     var parsed = new URL(url, location.origin);
     var shared = sanitizeParams(parsed.searchParams);
     if (!shared) return { block: true };
-    var lines = String(body || "").split(/\r?\n/).filter(function (line) { return line.length; });
+    var lines = text.split(/\r?\n/).filter(function (line) { return line.length; });
     var kept = [];
     lines.forEach(function (line) {
       var params = sanitizeParams(new URLSearchParams(line));
       if (params) kept.push(serializeParams(params));
     });
+    if (lines.length && !kept.length) return { block: true };
     parsed.search = shared.toString();
     return { block: false, url: parsed.toString(), body: kept.join("\n") };
   }
@@ -122,9 +132,9 @@
       navigator.sendBeacon = function (url, data) {
         if (!isCollectUrl(url)) return beacon.call(navigator, url, data);
         if (!collectionAllowed()) return true;
-        var cleaned = sanitizeCollect(String(url), typeof data === "string" ? data : "");
+        var cleaned = sanitizeCollect(String(url), data);
         if (cleaned.block) return true;
-        return beacon.call(navigator, cleaned.url, cleaned.body || data);
+        return beacon.call(navigator, cleaned.url, cleaned.body);
       };
     }
     var origFetch = window.fetch;
@@ -133,15 +143,13 @@
         var url = typeof input === "string" ? input : (input && input.url);
         if (!isCollectUrl(url)) return origFetch.apply(this, arguments);
         if (!collectionAllowed()) return Promise.resolve(new Response(null, { status: 204 }));
-        var body = init && typeof init.body === "string" ? init.body : "";
-        var cleaned = sanitizeCollect(String(url), body);
+        if (typeof input !== "string") return Promise.resolve(new Response(null, { status: 204 }));
+        var rawBody = init ? init.body : undefined;
+        var cleaned = sanitizeCollect(String(url), rawBody === undefined ? "" : rawBody);
         if (cleaned.block) return Promise.resolve(new Response(null, { status: 204 }));
-        if (typeof input === "string") {
-          var nextInit = init ? Object.assign({}, init) : {};
-          if (body) nextInit.body = cleaned.body;
-          return origFetch.call(this, cleaned.url, nextInit);
-        }
-        return origFetch.call(this, cleaned.url, init);
+        var nextInit = init ? Object.assign({}, init) : {};
+        if (rawBody != null) nextInit.body = cleaned.body;
+        return origFetch.call(this, cleaned.url, nextInit);
       };
     }
     var origOpen = XMLHttpRequest.prototype.open;
@@ -154,11 +162,34 @@
     XMLHttpRequest.prototype.send = function (body) {
       if (!isCollectUrl(this.__lmUrl)) return origSend.apply(this, arguments);
       if (!collectionAllowed()) return;
-      var cleaned = sanitizeCollect(String(this.__lmUrl), typeof body === "string" ? body : "");
+      var cleaned = sanitizeCollect(String(this.__lmUrl), body === undefined ? "" : body);
       if (cleaned.block) return;
       origOpen.call(this, this.__lmMethod || "POST", cleaned.url);
-      return origSend.call(this, cleaned.body || body);
+      return origSend.call(this, cleaned.body);
     };
+  }
+
+  function gaCookieDomain() {
+    var host = String(location.hostname || "").toLowerCase();
+    if (host === "lotterymigo.com" || (host.length > 16 && host.slice(-16) === ".lotterymigo.com")) return "lotterymigo.com";
+    return "auto";
+  }
+
+  function cookieExpiryDomains() {
+    var host = location.hostname;
+    var domains = [""];
+    if (!host || host === "localhost") return domains;
+    domains.push(host);
+    if (host.indexOf(".") !== -1) domains.push("." + host);
+    var parts = host.split(".");
+    var i;
+    for (i = 1; i < parts.length; i++) {
+      var parent = parts.slice(i).join(".");
+      if (parent.indexOf(".") === -1) break;
+      domains.push(parent);
+      domains.push("." + parent);
+    }
+    return domains;
   }
 
   function expireGaCookies() {
@@ -167,13 +198,12 @@
       var name = part.split("=")[0].replace(/^\s+/, "");
       if (name === "_ga" || name.indexOf("_ga_") === 0) names.push(name);
     });
+    var domains = cookieExpiryDomains();
     names.forEach(function (name) {
       var expiry = name + "=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-      document.cookie = expiry;
-      document.cookie = expiry + "; domain=" + location.hostname;
-      if (location.hostname.indexOf(".") !== -1) {
-        document.cookie = expiry + "; domain=." + location.hostname;
-      }
+      domains.forEach(function (domain) {
+        document.cookie = domain ? expiry + "; domain=" + domain : expiry;
+      });
     });
   }
 
@@ -195,6 +225,7 @@
     window.gtag("config", id, {
       page_location: params.page_location,
       page_referrer: params.page_referrer,
+      cookie_domain: gaCookieDomain(),
       allow_google_signals: false,
       allow_ad_personalization_signals: false
     });
@@ -211,10 +242,6 @@
     scriptEl.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(id);
     scriptEl.setAttribute("data-lm-analytics", "gtag");
     document.head.appendChild(scriptEl);
-    setTimeout(function () {
-      if (cancelled || readChoice() !== "granted" || window["ga-disable-" + id]) return;
-      if (window.gtag) window.gtag("event", "user_engagement");
-    }, 500);
   }
 
   function applyGranted() {

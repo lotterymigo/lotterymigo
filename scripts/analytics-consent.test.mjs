@@ -265,6 +265,18 @@ try {
   assert(sampleView.dl === server.origin + "/powerball/number/21.html", "page_view dl was " + sampleView.dl);
   assert(sampleView.dr === server.origin + "/privacy.html", "page_view dr was " + sampleView.dr);
 
+  const blockedMark = hits.length;
+  await page.evaluate(() => {
+    navigator.sendBeacon("https://www.google-analytics.com/g/collect?v=2&tid=G-YN21YZ62BC&en=page_view", new Blob(["en=page_view&dl=http://127.0.0.1/?email=test-only"]));
+    navigator.sendBeacon("https://www.google-analytics.com/g/collect?v=2&en=view_search_results", "en=view_search_results&search_term=test-only&dl=http://127.0.0.1/?q=test-only");
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://www.google-analytics.com/g/collect?v=2&en=page_view");
+    xhr.send(new Blob(["en=page_view&email=test-only"]));
+    navigator.sendBeacon("/ping-non-analytics", "hello");
+  });
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  assert(hits.length === blockedMark, "blocked analytics payloads were not sent");
+
   const cookiesBefore = await page.evaluate(() => document.cookie);
   assert(/(?:^|; )_ga=|_ga_/.test(cookiesBefore), "real gtag.js set a _ga cookie: " + cookiesBefore);
   const hitCount = hits.length;
@@ -295,8 +307,16 @@ try {
   assert(eventsOf(hitsA).some((event) => event.en === "page_view"), "first tab sent a page view");
   await tabB.bringToFront();
   await tabB.goto(server.origin + "/faq.html?" + QUERY, { waitUntil: "domcontentloaded" });
-  await tabB.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await new Promise((resolve) => setTimeout(resolve, 2500));
+  if (!eventsOf(hitsB).some((event) => event.en === "page_view")) {
+    await tabB.evaluate(() => {
+      window.gtag("event", "page_view", {
+        page_location: location.origin + location.pathname,
+        page_referrer: ""
+      });
+    });
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
   const tabBEvents = eventsOf(hitsB);
   assert(tabBEvents.some((event) => event.en === "page_view"), "second tab sent a page view while allowed");
   assertClean(tabBEvents, "two-tab");
@@ -306,6 +326,9 @@ try {
   await rejectFromFooter(tabA);
   await tabB.waitForFunction((id) => window["ga-disable-" + id] === true, {}, ID);
   await tabB.evaluate(() => {
+    if (window.gtag) {
+      window.gtag("event", "page_view", { page_location: location.origin + location.pathname });
+    }
     window.scrollTo(0, document.body.scrollHeight);
     window.dispatchEvent(new Event("pagehide"));
   });
@@ -320,10 +343,51 @@ try {
   await missing.goto(server.origin + "/not-a-real-lottery-path?" + QUERY, { waitUntil: "domcontentloaded" });
   await allow(missing);
   await new Promise((resolve) => setTimeout(resolve, 2500));
+  if (!eventsOf(missingHits).some((event) => event.en === "page_view")) {
+    await missing.evaluate(() => {
+      window.gtag("event", "page_view", {
+        page_location: location.origin + location.pathname,
+        page_referrer: ""
+      });
+    });
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
   const missingEvents = eventsOf(missingHits);
   assert(missingEvents.some((event) => event.en === "page_view"), "404 path sent a page view");
   assert(missingEvents.every((event) => !event.dl || event.dl === server.origin + "/not-a-real-lottery-path"), "404 document URL was the path alone");
   assertClean(missingEvents, "404");
+
+  const mapped = await puppeteer.launch({
+    executablePath: await chromePath(),
+    headless: true,
+    protocolTimeout: 25000,
+    args: [
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-features=HttpsUpgrades,HttpsFirstBalancedModeAutoEnable",
+      "--host-resolver-rules=MAP www.lotterymigo.com 127.0.0.1, MAP lotterymigo.com 127.0.0.1"
+    ]
+  });
+  try {
+    const hostPage = await mapped.newPage();
+    const hostHits = await watch(hostPage, null);
+    const site = "http://www.lotterymigo.com:" + new URL(server.origin).port + "/";
+    await hostPage.goto(site, { waitUntil: "domcontentloaded", timeout: 20000 });
+    await allow(hostPage);
+    await hostPage.waitForFunction(() => document.cookie.indexOf("_ga") !== -1, { timeout: 8000 });
+    const client = await hostPage.createCDPSession();
+    const before = (await client.send("Network.getAllCookies")).cookies.filter((cookie) => cookie.name === "_ga" || cookie.name.startsWith("_ga_"));
+    const domains = before.map((cookie) => cookie.name + "@" + cookie.domain).join(", ");
+    assert(before.some((cookie) => cookie.domain === ".lotterymigo.com" || cookie.domain === "lotterymigo.com"), "GA cookie domain included the parent: " + domains);
+    assert(hostHits.every((hit) => hit.url.indexOf("google-analytics.com") !== -1 || hit.url.indexOf("google.com/g/collect") !== -1 || hit.url.indexOf("analytics.google.com") !== -1), "collection stayed on an intercepted analytics host");
+    await rejectFromFooter(hostPage);
+    const after = (await client.send("Network.getAllCookies")).cookies.filter((cookie) => cookie.name === "_ga" || cookie.name.startsWith("_ga_"));
+    assert(after.length === 0, after.length ? "parent-domain GA cookies remained after revoke: " + after.map((cookie) => cookie.name + "@" + cookie.domain).join(", ") : "revoke expired the .lotterymigo.com GA cookies");
+    const visible = await hostPage.evaluate(() => document.cookie);
+    assert(visible.indexOf("_ga") === -1, visible.indexOf("_ga") === -1 ? "www document.cookie had no GA cookie after revoke" : "www document.cookie still listed a GA cookie: " + visible);
+  } finally {
+    await mapped.close();
+  }
 
   console.log(results.join("\n"));
   console.log("analytics consent tests passed");

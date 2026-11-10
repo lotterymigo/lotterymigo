@@ -61,13 +61,15 @@
   </div>
 
   <header class="site-header">
-    <div class="nav-wrap">
-      <nav class="dash-nav" aria-label="Site pages">
+    <div class="header-bar">
+      <div class="header-top">
         <a class="brand" href="/">
           <img src="icons/logo.svg" width="36" height="36" alt="" />
           <span>LotteryMigo</span>
         </a>
         <a class="tip-chip hidden" data-tip="header" hidden></a>
+      </div>
+      <nav class="nav" aria-label="Site pages">
         <a href="#section-stats" aria-current="page">Stats</a>
         <a href="powerball/results.html">Powerball results</a>
         <a href="megamillions/results.html">Mega Millions results</a>
@@ -80,6 +82,12 @@
       </nav>
     </div>
   </header>
+
+  <div id="legal-alert-banner" class="guarantee-bar">
+    <p class="wrap guarantee-line"><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or number ideas <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions. This website uses Google AdSense, which may store cookies to show and measure ads. <a href="terms.html">Terms</a> <a href="privacy.html">Privacy</a> <button type="button" class="btn btn-gold" onclick="dismissLegalAlert()">OK, hide this note</button></p>
+  </div>
+
+  <main id="main" tabindex="-1">
     <div class="hero">
       <div class="hero-copy">
         <p class="kicker">Current-game archive</p>
@@ -107,12 +115,6 @@
         <div class="float-bounds" id="float-bounds"></div>
       </div>
     </div>
-
-  <div id="legal-alert-banner" class="guarantee-bar">
-    <p class="wrap guarantee-line"><strong>Zero Win Guarantee:</strong> Lottery draws are independent random trials. Past frequencies, statistical heatmaps, or number ideas <u>do not guarantee any win</u>. LotteryMigo is not affiliated with MUSL or Mega Millions. This website uses Google AdSense, which may store cookies to show and measure ads. <a href="terms.html">Terms</a> <a href="privacy.html">Privacy</a> <button type="button" class="btn btn-gold" onclick="dismissLegalAlert()">OK, hide this note</button></p>
-  </div>
-
-  <main id="main" tabindex="-1">
     <section id="section-stats" class="sheet">
       <p id="live" class="sr" aria-live="polite"></p>
       <div id="stage"><p class="loading" id="loading">Loading drawings from the public archive.</p></div>
@@ -511,7 +513,8 @@
 
     function publishDrawLoad() {
       applyCurrentDraws();
-      document.dispatchEvent(new CustomEvent('lm-draws-ready'));
+      window.__lmResolvedDraws = drawData;
+      document.dispatchEvent(new CustomEvent('lm-draws-ready', { detail: drawData }));
     }
 
     async function loadOfficialDraws() {

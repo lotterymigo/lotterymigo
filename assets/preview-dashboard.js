@@ -295,16 +295,28 @@ document.querySelectorAll("[data-window]").forEach((button) => {
   });
 });
 
-const sharedDraws = fetch("/data/draws.json").then(async (response) => {
+const homepage = document.body.classList.contains("page");
+const sharedDraws = homepage ? null : fetch("/data/draws.json").then(async (response) => {
   if (!response.ok) throw new Error("The draw archive returned status " + response.status + ".");
   return response.json();
 });
-window.__lmSharedDraws = sharedDraws;
+if (sharedDraws) window.__lmSharedDraws = sharedDraws;
+
+function waitForResolvedDraws() {
+  if (window.__lmResolvedDraws) return Promise.resolve(window.__lmResolvedDraws);
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), 8000);
+    document.addEventListener("lm-draws-ready", (event) => {
+      clearTimeout(timer);
+      resolve(event.detail || window.__lmResolvedDraws || null);
+    }, { once: true });
+  });
+}
 
 async function boot() {
   try {
-    archive = await sharedDraws;
-    if (!archive.games || !archive.games.POWERBALL || !archive.games.MEGAMILLIONS) {
+    archive = homepage ? await waitForResolvedDraws() : await sharedDraws;
+    if (!archive || !archive.games || !archive.games.POWERBALL || !archive.games.MEGAMILLIONS) {
       throw new Error("The archive does not include both games.");
     }
     const fetched = archive.fetchedAt ? formatDate(String(archive.fetchedAt).slice(0, 10)) : "the file date";
@@ -319,7 +331,8 @@ async function boot() {
 
 boot();
 
-const MOTION_KEY = "lotterymigo_preview_motion";
+const PREVIEW_MOTION_KEY = "lotterymigo_preview_motion";
+const SITE_MOTION_KEY = "lotterymigo_motion";
 const FLOATERS = [
   { n: 21, kind: "white", name: "white ball", home: [0.08, 0.42] },
   { n: 7, kind: "white", name: "white ball", home: [0.28, 0.18] },
@@ -330,7 +343,21 @@ const FLOATERS = [
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const bounds = document.getElementById("float-bounds");
 const motionButton = document.getElementById("motion-toggle");
-let motionWanted = localStorage.getItem(MOTION_KEY) !== "off";
+function readStorage(key) {
+  try { return localStorage.getItem(key); } catch (err) { return null; }
+}
+function writeStorage(key, value) {
+  try { localStorage.setItem(key, value); } catch (err) {}
+}
+function decorationWanted() {
+  if (homepage && typeof window.lmMotionAllowed === "boolean") return window.lmMotionAllowed;
+  const site = readStorage(SITE_MOTION_KEY);
+  if (site === "off") return false;
+  if (motionQuery.matches && site !== "on") return false;
+  if (!homepage && readStorage(PREVIEW_MOTION_KEY) === "off") return false;
+  return true;
+}
+let motionWanted = decorationWanted();
 let stageVisible = true;
 let pageVisible = document.visibilityState !== "hidden";
 let rafId = 0;
@@ -382,13 +409,17 @@ function placeHomes() {
   });
 }
 
+function settleBall(ball) {
+  ball.mode = "drift";
+  ball.vx = 0;
+  ball.vy = 0;
+  ball.el.classList.remove("is-lit");
+}
+
 function impulse(ball) {
-  if (!motionAllowed() || ball.focused && motionQuery.matches) {
+  if (!motionAllowed()) {
     ball.el.classList.add("is-lit");
     return;
-  }
-  if (ball.focused) {
-    ball.el.classList.add("is-lit");
   }
   ball.mode = "bounce";
   ball.vx = (Math.random() * 2 - 1) * 320;
@@ -418,11 +449,9 @@ function tick(now) {
       ball.vx *= 0.985;
       ball.vy *= 0.985;
       if (Math.hypot(ball.vx, ball.vy) < 22) {
-        ball.mode = "drift";
         ball.homeX = ball.x;
         ball.homeY = ball.y;
-        ball.vx = 0;
-        ball.vy = 0;
+        settleBall(ball);
       }
     } else {
       const t = now / 1000;
@@ -435,44 +464,76 @@ function tick(now) {
 }
 
 function syncLoop() {
-  if (motionAllowed() || floaters.some((ball) => ball.mode === "bounce")) {
-    if (!rafId) {
-      lastTick = 0;
-      rafId = requestAnimationFrame(tick);
-    }
-  } else stopLoop();
+  if (!motionAllowed()) {
+    stopLoop();
+    return;
+  }
+  if (!rafId) {
+    lastTick = 0;
+    rafId = requestAnimationFrame(tick);
+  }
 }
 
 function stopLoop() {
   if (rafId) cancelAnimationFrame(rafId);
   rafId = 0;
+  floaters.forEach(settleBall);
   placeHomes();
 }
 
-motionButton.addEventListener("click", () => {
-  motionWanted = !motionWanted;
-  try { localStorage.setItem(MOTION_KEY, motionWanted ? "on" : "off"); } catch (err) {}
-  floaters.forEach((ball) => { ball.mode = "drift"; ball.vx = 0; ball.vy = 0; });
+function paintSiteMotion(allowed) {
+  const siteBtn = document.getElementById("lm-motion-toggle");
+  if (!siteBtn) return;
+  siteBtn.setAttribute("aria-pressed", allowed ? "true" : "false");
+  siteBtn.textContent = allowed ? "Moving balls on" : "Moving balls off";
+}
+
+function refreshMotion() {
+  motionWanted = decorationWanted();
   paintMotionButton();
-  if (motionWanted) syncLoop();
-  else stopLoop();
-});
-motionQuery.addEventListener("change", () => {
-  paintMotionButton();
-  floaters.forEach((ball) => { ball.mode = "drift"; });
+  paintSiteMotion(motionWanted);
   if (motionAllowed()) syncLoop();
   else stopLoop();
+}
+
+window.lmSyncMotion = refreshMotion;
+
+motionButton.addEventListener("click", () => {
+  const site = readStorage(SITE_MOTION_KEY);
+  if (!homepage && site === "off") return;
+  const next = !decorationWanted();
+  writeStorage(homepage ? SITE_MOTION_KEY : PREVIEW_MOTION_KEY, next ? "on" : "off");
+  if (homepage) {
+    window.lmMotionAllowed = next;
+    document.documentElement.classList.toggle("lm-motion-off", !next);
+  }
+  refreshMotion();
+});
+function onMotionPreferenceChange() {
+  if (homepage && readStorage(SITE_MOTION_KEY) !== "on" && readStorage(SITE_MOTION_KEY) !== "off") {
+    window.lmMotionAllowed = !motionQuery.matches;
+    document.documentElement.classList.toggle("lm-motion-off", motionQuery.matches);
+  }
+  refreshMotion();
+}
+if (motionQuery.addEventListener) motionQuery.addEventListener("change", onMotionPreferenceChange);
+else if (motionQuery.addListener) motionQuery.addListener(onMotionPreferenceChange);
+window.addEventListener("storage", (event) => {
+  if (event.key !== SITE_MOTION_KEY && event.key !== PREVIEW_MOTION_KEY) return;
+  if (event.key === SITE_MOTION_KEY) {
+    window.lmMotionAllowed = event.newValue === "on" ? true : event.newValue === "off" ? false : !motionQuery.matches;
+    document.documentElement.classList.toggle("lm-motion-off", window.lmMotionAllowed === false);
+  }
+  refreshMotion();
 });
 document.addEventListener("visibilitychange", () => {
   pageVisible = document.visibilityState !== "hidden";
-  if (motionAllowed()) syncLoop();
-  else if (!floaters.some((ball) => ball.mode === "bounce")) stopLoop();
+  refreshMotion();
 });
 if ("IntersectionObserver" in window) {
   const watcher = new IntersectionObserver((entries) => {
     stageVisible = entries[0].isIntersecting;
-    if (motionAllowed()) syncLoop();
-    else if (!floaters.some((ball) => ball.mode === "bounce")) stopLoop();
+    refreshMotion();
   }, { threshold: 0.05 });
   watcher.observe(document.getElementById("float-stage"));
 }

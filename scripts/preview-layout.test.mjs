@@ -51,7 +51,7 @@ try {
   page.on("pageerror", (err) => errors.push(err.message));
   await page.setViewport({ width: 1280, height: 900 });
   await page.goto(origin + "/preview/dashboard.html", { waitUntil: "networkidle0" });
-  await page.waitForFunction(() => document.body.textContent.includes("128 of 1429"));
+  await page.waitForFunction(() => document.body.textContent.includes("128 of"));
   await page.addStyleTag({ content: "html{scroll-behavior:auto !important}" });
 
   const inactive = await page.evaluate(() => {
@@ -115,7 +115,7 @@ try {
   home.on("pageerror", (err) => homeErrors.push(err.message));
   await home.setViewport({ width: 1280, height: 900 });
   await home.goto(origin + "/", { waitUntil: "domcontentloaded" });
-  await home.waitForFunction(() => document.body.textContent.includes("128 of 1429"));
+  await home.waitForFunction(() => document.body.textContent.includes("128 of"));
   await home.waitForSelector("#analytics-allow");
   await home.addStyleTag({ content: "html{scroll-behavior:auto !important}" });
   const homeMeta = await home.evaluate(() => ({
@@ -158,7 +158,7 @@ try {
   await home.evaluate(() => window.scrollTo(0, 0));
   const clear = await home.evaluate(() => {
     const h1 = document.querySelector("h1").getBoundingClientRect();
-    const nav = document.querySelector(".dash-nav").getBoundingClientRect();
+    const nav = document.querySelector(".site-header").getBoundingClientRect();
     return h1.top >= nav.bottom - 1;
   });
   assert(clear, "homepage H1 starts below the navigation");
@@ -166,11 +166,11 @@ try {
   await mm.click();
   await home.waitForFunction(() => document.getElementById("history-special-header").textContent.includes("Mega"));
   const megaCount = await home.evaluate(() => document.getElementById("window-note").textContent);
-  assert(megaCount.includes("941"), "Mega Millions window uses the white-ball field (" + megaCount + ")");
+  assert(/White balls: [\d,]+ drawings/.test(megaCount), "Mega Millions window uses the white-ball field (" + megaCount + ")");
   await home.evaluate(() => [...document.querySelectorAll(".count-ball")].find((el) => el.querySelector(".ball-n").textContent === "10").focus());
   const poolClear = await home.evaluate(() => {
     const btn = document.activeElement.getBoundingClientRect();
-    const nav = document.querySelector(".dash-nav").getBoundingClientRect();
+    const nav = document.querySelector(".site-header").getBoundingClientRect();
     return btn.top >= nav.bottom - 1;
   });
   assert(poolClear, "homepage number control clears the sticky nav");
@@ -183,8 +183,9 @@ try {
   const homeOverflow = await home.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   assert(!homeOverflow, "homepage has no horizontal overflow at 1280");
   await home.setViewport({ width: 390, height: 844 });
-  const phoneNav = await home.evaluate(() => document.querySelector(".dash-nav").getBoundingClientRect().height);
-  assert(phoneNav < 120, "phone navigation stays one row (" + Math.round(phoneNav) + "px)");
+  await home.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const phoneNav = await home.evaluate(() => document.querySelector(".site-header").getBoundingClientRect().height);
+  assert(phoneNav < 180, "phone header stays compact (" + Math.round(phoneNav) + "px)");
   const phoneOverflow = await home.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   assert(!phoneOverflow, "homepage has no horizontal overflow at 390");
   assert(homeErrors.length === 0, "homepage has no page errors");

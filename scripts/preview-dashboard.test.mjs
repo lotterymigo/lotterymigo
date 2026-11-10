@@ -60,7 +60,7 @@ assert(html.includes('content="noindex, nofollow"'), "preview is noindex");
 assert(!html.includes("adsbygoogle") && !html.includes("ca-pub-"), "preview does not load AdSense");
 assert(!html.includes("analytics.js") && !html.includes("gtag") && !html.includes("G-YN21YZ62BC"), "preview does not load Analytics");
 assert(html.includes("preview-dashboard.js") && html.includes("preview-dashboard.css"), "preview uses its own assets");
-assert(html.includes('href="/#section-account"') && html.includes('href="/#section-stats"'), "preview links to the existing account and CSV controls");
+assert(html.includes('href="/#section-account"') && html.includes('href="/#section-heatmap"'), "preview links to the account and the chart");
 assert(tableCaption("Powerball", "Powerball") === "Powerball in the selected window", "caption does not repeat Powerball");
 assert(tableCaption("Powerball", "White balls") === "Powerball White balls in the selected window", "white-ball caption keeps the game name");
 assert(tableCaption("Mega Millions", "Mega Ball") === "Mega Millions Mega Ball in the selected window", "Mega Ball caption keeps both names");

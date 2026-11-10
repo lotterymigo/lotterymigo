@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Dash Fallback";
+  src: local("Liberation Sans"), local("Arial");
+  size-adjust: 100%;
+  ascent-override: 92%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
 body.home-dash {
   --dash-ink: #07101c;
   --dash-paper: #e7eef6;
@@ -5,7 +13,7 @@ body.home-dash {
   --dash-muted: #5c6b7e;
   --dash-line: rgba(16, 32, 51, 0.12);
   --dash-focus: #d6ff6a;
-  --dash-font: "Outfit", "Segoe UI", sans-serif;
+  --dash-font: "Outfit", "Dash Fallback", sans-serif;
   --pb: #e11d3a;
   --mm: #1d4ed8;
   color-scheme: dark;
@@ -32,8 +40,11 @@ body.home-dash.is-mm {
     radial-gradient(700px 420px at 8% 16%, rgba(214, 255, 106, 0.08), transparent 50%),
     var(--dash-ink);
 }
-img { max-width: 100%; }
-button, input { font: inherit; }
+body.home-dash .hero img,
+body.home-dash .sheet img { max-width: 100%; }
+body.home-dash .hero button,
+body.home-dash .sheet button,
+body.home-dash .sheet input { font: inherit; }
 body.home-dash .hero :focus-visible,
 body.home-dash .sheet :focus-visible,
 body.home-dash .dash-nav :focus-visible,
@@ -107,8 +118,39 @@ body.home-dash .float-ball:focus-visible {
   text-decoration: none;
 }
 .dash-nav a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
-.brand { gap: 8px; font-weight: 650; padding-right: 4px; }
-.brand img { display: block; }
+.dash-nav .brand,
+body.home-dash .header-top .brand { gap: 8px; font-weight: 650; padding-right: 4px; }
+.dash-nav .brand img,
+body.home-dash .header-top .brand img { display: block; }
+body.home-dash .site-header .header-bar {
+  width: min(1120px, calc(100% - 16px));
+  max-width: calc(100vw - 16px);
+  margin: 8px auto 0;
+  padding: 6px 10px;
+  border-radius: 24px;
+  background: rgba(10, 16, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-sizing: border-box;
+}
+body.home-dash .header-top,
+body.home-dash .header-actions {
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+}
+body.home-dash .header-bar:not(.nav-collapsed) > .nav a,
+body.home-dash .header-bar.nav-collapsed > .nav.is-open a {
+  color: #f4f7fb;
+  min-height: 44px;
+}
+body.home-dash .header-bar.nav-collapsed > .nav.is-open {
+  background: #10192a;
+  z-index: 60;
+}
+body.home-dash .nav-menu-btn,
+body.home-dash .display-toggle { min-height: 44px; }
+body.home-dash .tip-chip,
+body.home-dash .tip-chip:hover { color: #1a1404; text-decoration: none; }
 .preview-tag {
   padding: 0 10px;
   border-radius: 999px;
@@ -133,6 +175,12 @@ body.home-dash .float-ball:focus-visible {
   font-weight: 700;
   color: #9eb0c8;
 }
+.hero h1,
+.hero .lede,
+.hero .kicker,
+.hero .controls,
+.hero .window-note,
+.float-head p { font-family: Outfit, "Dash Fallback", sans-serif; }
 .hero h1 {
   margin: 0;
   font-weight: 500;
@@ -140,10 +188,10 @@ body.home-dash .float-ball:focus-visible {
   line-height: 0.98;
   font-size: clamp(2.5rem, 6vw, 4.7rem);
 }
-.lede { max-width: 42rem; color: #c5d2e4; font-size: 1.08rem; line-height: 1.45; }
+.hero .lede { max-width: 42rem; color: #c5d2e4; font-size: 1.08rem; line-height: 1.45; }
 .hero .controls { display: grid; gap: 10px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 8.75rem); }
 .hero .seg { display: flex; flex-wrap: wrap; gap: 8px; }
-.hero .seg-btn, .pool-btn, .count-ball {
+.hero .seg-btn, .sheet .pool-btn, .count-ball {
   min-height: 44px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -189,13 +237,13 @@ body.home-dash .sheet .tone-success,
 body.home-dash .sheet .tone-warn,
 body.home-dash .sheet .key-facts h2 { color: #142033; }
 body.home-dash .sheet .lm-help { color: #3d4d63; }
-.loading, .error {
+.sheet .loading, .sheet .error {
   margin: 0;
   padding: 28px;
   border-radius: 20px;
   background: #fff;
 }
-.error { border: 1px solid #e11d3a; }
+.sheet .error { border: 1px solid #e11d3a; }
 
 .bento {
   display: grid;
@@ -230,7 +278,7 @@ body.home-dash .sheet .lm-help { color: #3d4d63; }
 .metric-bonus { grid-area: bonus; }
 body.home-dash.is-pb .metric-bonus { background: #ffe8ec; }
 body.home-dash.is-mm .metric-bonus { background: #e7eeff; }
-.meta { color: var(--dash-muted); font-size: 0.92rem; }
+.sheet .meta { color: var(--dash-muted); font-size: 0.92rem; }
 .metric-count .meta, .metric-overdue .meta { color: #c5d0e0; }
 
 .pool-switch {
@@ -259,7 +307,7 @@ body.home-dash.is-mm .metric-bonus { background: #e7eeff; }
 .sheet .pool-btn,
 .sheet .count-ball,
 .sheet th button { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 8.75rem); }
-.grid {
+.sheet .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
   gap: 8px;

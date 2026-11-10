@@ -22,6 +22,7 @@ const GUIDES = [
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
+      ['/learn/lottery-odds-vs-everyday-events.html', 'Lottery odds compared with everyday events'],
       ['/powerball/numbers.html', 'Powerball number statistics'],
       ['/powerball/results.html', 'Recent Powerball results']
     ]
@@ -40,6 +41,7 @@ const GUIDES = [
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
+      ['/learn/lottery-odds-vs-everyday-events.html', 'Lottery odds compared with everyday events'],
       ['/megamillions/numbers.html', 'Mega Millions number statistics'],
       ['/megamillions/results.html', 'Recent Mega Millions results']
     ]
@@ -57,6 +59,7 @@ const GUIDES = [
       ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
       ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
+      ['/learn/lottery-odds-vs-everyday-events.html', 'Lottery odds compared with everyday events'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
       ['/powerball/results.html', 'Recent Powerball results'],
       ['/megamillions/results.html', 'Recent Mega Millions results']
@@ -71,10 +74,29 @@ const GUIDES = [
     blurb: 'A combination count for both games, the difference between any-prize odds and jackpot odds, and the limits of a jackpot expected-value shortcut.',
     file: 'understanding-the-odds.html',
     related: [
+      ['/learn/lottery-odds-vs-everyday-events.html', 'Lottery odds compared with everyday events'],
       ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
       ['/learn/hot-cold-overdue.html', 'Hot, cold, and overdue numbers'],
       ['/learn/how-powerball-works.html', 'How Powerball works'],
       ['/learn/how-mega-millions-works.html', 'How Mega Millions works']
+    ]
+  },
+  {
+    slug: 'lottery-odds-vs-everyday-events',
+    title: 'Lottery Odds Compared With Everyday Events | LotteryMigo',
+    description: 'Jackpot and lower-tier odds for Powerball and Mega Millions, set beside published NWS lightning figures and 2024 National Safety Council lifetime odds.',
+    kicker: 'Guide',
+    h1: 'Lottery odds compared with everyday events',
+    blurb: 'Jackpot and lower-tier odds for both games, set beside National Weather Service lightning figures and National Safety Council lifetime odds, with the time frame of each one.',
+    file: 'lottery-odds-vs-everyday-events.html',
+    published: '2026-11-10',
+    related: [
+      ['/learn/understanding-the-odds.html', 'Understanding the odds'],
+      ['/learn/how-powerball-works.html', 'How Powerball works'],
+      ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
+      ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
+      ['/powerball/results.html', 'Recent Powerball results'],
+      ['/megamillions/results.html', 'Recent Mega Millions results']
     ]
   },
   {

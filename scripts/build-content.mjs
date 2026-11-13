@@ -23,6 +23,7 @@ const GUIDES = [
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/learn/lottery-odds-vs-everyday-events.html', 'Lottery odds compared with everyday events'],
+      ['/learn/history-of-powerball-and-mega-millions.html', 'A history of Powerball and Mega Millions'],
       ['/powerball/numbers.html', 'Powerball number statistics'],
       ['/powerball/results.html', 'Recent Powerball results']
     ]
@@ -42,6 +43,7 @@ const GUIDES = [
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/learn/lottery-odds-vs-everyday-events.html', 'Lottery odds compared with everyday events'],
+      ['/learn/history-of-powerball-and-mega-millions.html', 'A history of Powerball and Mega Millions'],
       ['/megamillions/numbers.html', 'Mega Millions number statistics'],
       ['/megamillions/results.html', 'Recent Mega Millions results']
     ]
@@ -60,9 +62,32 @@ const GUIDES = [
       ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/understanding-the-odds.html', 'Understanding the odds'],
       ['/learn/lottery-odds-vs-everyday-events.html', 'Lottery odds compared with everyday events'],
+      ['/learn/history-of-powerball-and-mega-millions.html', 'A history of Powerball and Mega Millions'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
       ['/powerball/results.html', 'Recent Powerball results'],
       ['/megamillions/results.html', 'Recent Mega Millions results']
+    ]
+  },
+  {
+    slug: 'history-of-powerball-and-mega-millions',
+    title: 'History of Powerball and Mega Millions | LotteryMigo',
+    description: 'How Lotto America became Powerball and The Big Game became Mega Millions, covering prices, matrices, add-ons, draw nights, and record jackpots.',
+    kicker: 'Guide',
+    h1: 'A history of Powerball and Mega Millions',
+    blurb: 'How Lotto America became Powerball in 1992, how The Big Game became Mega Millions, and the price, matrix, add-on, and draw-night changes since.',
+    file: 'history-of-powerball-and-mega-millions.html',
+    published: '2026-11-13',
+    related: [
+      ['/learn/how-powerball-works.html', 'How Powerball works'],
+      ['/learn/how-mega-millions-works.html', 'How Mega Millions works'],
+      ['/learn/powerball-vs-mega-millions.html', 'Powerball vs Mega Millions'],
+      ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
+      ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
+      ['/learn/understanding-the-odds.html', 'Understanding the odds'],
+      ['/powerball/results.html', 'Recent Powerball results'],
+      ['/megamillions/results.html', 'Recent Mega Millions results'],
+      ['/powerball/numbers.html', 'Powerball number statistics'],
+      ['/megamillions/numbers.html', 'Mega Millions number statistics']
     ]
   },
   {
@@ -141,6 +166,7 @@ const GUIDES = [
     file: 'biggest-lottery-jackpots.html',
     published: '2026-11-03',
     related: [
+      ['/learn/history-of-powerball-and-mega-millions.html', 'A history of Powerball and Mega Millions'],
       ['/learn/how-lottery-jackpots-grow.html', 'How lottery jackpots grow'],
       ['/learn/what-to-do-if-you-win-the-lottery.html', 'What to do if you win the lottery'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
@@ -159,6 +185,7 @@ const GUIDES = [
     blurb: 'The share of each ticket that reaches the jackpot, how a missed drawing rolls that money forward, and why interest rates change the 30-payment annuity.',
     file: 'how-lottery-jackpots-grow.html',
     related: [
+      ['/learn/history-of-powerball-and-mega-millions.html', 'A history of Powerball and Mega Millions'],
       ['/learn/lump-sum-annuity-taxes.html', 'Lump sum, annuity, and taxes'],
       ['/learn/biggest-lottery-jackpots.html', 'The biggest lottery jackpots'],
       ['/learn/how-powerball-works.html', 'How Powerball works'],

@@ -1,6 +1,6 @@
 {
   "source": "NY Open Data (data.ny.gov)",
-  "fetchedAt": "2026-11-12T17:51:57.716Z",
+  "fetchedAt": "2026-11-14T16:19:39.720Z",
   "games": {
     "POWERBALL": {
       "datasetId": "d6yy-54nr",
@@ -24303,9 +24303,21 @@
       "datasetId": "5xaw-6ayf",
       "name": "Lottery Mega Millions Winning Numbers: Beginning 2002",
       "sourceUrl": "https://data.ny.gov/d/5xaw-6ayf",
-      "latestDrawDate": "2026-11-10",
-      "drawCount": 2556,
+      "latestDrawDate": "2026-11-13",
+      "drawCount": 2557,
       "draws": [
+        {
+          "date": "2026-11-13",
+          "whites": [
+            10,
+            22,
+            33,
+            49,
+            57
+          ],
+          "special": 18,
+          "multiplier": null
+        },
         {
           "date": "2026-11-10",
           "whites": [

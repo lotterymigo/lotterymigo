@@ -21,6 +21,57 @@ function contrast(fg, bg) {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
+async function assertDashboardText(page, label) {
+  const rows = await page.evaluate(() => {
+    function parse(c) {
+      const m = String(c).match(/rgba?\(([^)]+)\)/);
+      if (!m) return null;
+      const p = m[1].split(",").map((part) => parseFloat(part));
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    }
+    function bgOf(el) {
+      let node = el;
+      while (node) {
+        const bg = getComputedStyle(node).backgroundColor;
+        const c = parse(bg);
+        if (c && c.a >= 0.92) return bg;
+        node = node.parentElement;
+      }
+      return getComputedStyle(document.body).backgroundColor;
+    }
+    const seen = new Set();
+    const out = [];
+    for (const root of document.querySelectorAll(".sheet, .detail-card")) {
+      if (root.closest("dialog") && !root.closest("dialog").open) continue;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let n;
+      while ((n = walker.nextNode())) {
+        const text = n.textContent.replace(/\s+/g, " ").trim();
+        if (!text) continue;
+        const el = n.parentElement;
+        if (!el || seen.has(el)) continue;
+        const cs = getComputedStyle(el);
+        if (cs.display === "none" || cs.visibility === "hidden") continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 2 || rect.height < 2) continue;
+        seen.add(el);
+        const px = parseFloat(cs.fontSize);
+        const bold = Number(cs.fontWeight) >= 700;
+        out.push({
+          text: text.slice(0, 70),
+          color: cs.color,
+          bg: bgOf(el),
+          large: px >= 24 || (bold && px >= 18.67)
+        });
+      }
+    }
+    return out;
+  });
+  const bad = rows.filter((row) => contrast(row.color, row.bg) + 0.02 < (row.large ? 3 : 4.5));
+  assert(rows.length > 10, label + " measured " + rows.length + " dashboard text nodes");
+  assert(bad.length === 0, label + " dashboard text meets WCAG AA" + (bad.length ? ": " + bad.slice(0, 5).map((row) => "'" + row.text + "' " + contrast(row.color, row.bg).toFixed(2) + ":1").join(" | ") : ""));
+}
+
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, "http://127.0.0.1");
@@ -189,6 +240,39 @@ try {
   const phoneOverflow = await home.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   assert(!phoneOverflow, "homepage has no horizontal overflow at 390");
   assert(homeErrors.length === 0, "homepage has no page errors");
+
+  await home.setViewport({ width: 1280, height: 900 });
+  await home.evaluate(() => {
+    document.documentElement.classList.remove("lm-contrast");
+    document.documentElement.style.setProperty("--lm-font", "18px");
+  });
+  await home.click("#game-pb");
+  await home.waitForFunction(() => document.body.classList.contains("is-pb") && document.body.textContent.includes("Most frequent Powerball"));
+  await assertDashboardText(home, "Powerball");
+  await home.evaluate(() => [...document.querySelectorAll(".pool-btn")].find((el) => el.textContent === "Powerball").click());
+  await assertDashboardText(home, "Powerball bonus pool");
+  await home.click("#game-mm");
+  await home.waitForFunction(() => document.body.classList.contains("is-mm") && document.body.textContent.includes("Most frequent Mega Ball"));
+  await assertDashboardText(home, "Mega Millions");
+  await home.evaluate(() => [...document.querySelectorAll(".count-ball")].find((el) => el.querySelector(".ball-n").textContent === "10").click());
+  await home.waitForSelector("dialog[open]");
+  await assertDashboardText(home, "Mega Millions detail");
+  await home.evaluate(() => document.documentElement.classList.add("lm-contrast"));
+  await assertDashboardText(home, "Mega Millions high contrast");
+  await home.keyboard.press("Escape");
+  await home.click("#game-pb");
+  await home.waitForFunction(() => document.body.textContent.includes("Most frequent Powerball"));
+  await assertDashboardText(home, "Powerball high contrast");
+  await home.evaluate(() => {
+    document.documentElement.classList.remove("lm-contrast");
+    document.documentElement.style.setProperty("--lm-font", "28px");
+  });
+  await assertDashboardText(home, "Powerball large text");
+  await home.setViewport({ width: 390, height: 844 });
+  await assertDashboardText(home, "Powerball phone");
+  await page.evaluate(() => document.querySelector(".count-ball").click());
+  await page.waitForSelector("dialog[open]");
+  await assertDashboardText(page, "preview detail");
 
   console.log(results.join("\n"));
   console.log("preview layout tests passed");

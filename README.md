@@ -62,4 +62,4 @@ Winning numbers live in `data/draws.json`. `scripts/fetch-draws.mjs` downloads t
 - Powerball: dataset [`d6yy-54nr`](https://data.ny.gov/d/d6yy-54nr)
 - Mega Millions: dataset [`5xaw-6ayf`](https://data.ny.gov/d/5xaw-6ayf)
 
-`.github/workflows/update-draws.yml` runs Tuesday, Thursday, and Sunday at 12:00 UTC, after draw nights, and can also be started by hand. It commits `data/draws.json` only when the draws changed so the host can redeploy.
+`.github/workflows/update-draws.yml` runs daily at 10:00 UTC (`0 10 * * *`), after the previous night’s drawing, and can also be started by hand. It commits `data/draws.json` only when the draws changed so the host can redeploy.

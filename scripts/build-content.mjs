@@ -1285,9 +1285,42 @@ function historyRows(draws) {
 }
 
 function replaceElement(html, id, inner) {
-  const pattern = new RegExp(`(<([a-z0-9]+)[^>]*id="${id}"[^>]*>)[\\s\\S]*?(</\\2>)`);
-  if (!pattern.test(html)) throw new Error(`Home page is missing #${id}`);
-  return html.replace(pattern, `$1${inner}</$2>`);
+  const openRe = new RegExp(`<([a-z0-9]+)([^>]*\\bid="${id}"[^>]*)>`, 'i');
+  const match = openRe.exec(html);
+  if (!match) throw new Error(`Home page is missing #${id}`);
+  const tag = match[1].toLowerCase();
+  const openEnd = match.index + match[0].length;
+  const token = new RegExp(`</?${tag}\\b[^>]*>`, 'gi');
+  token.lastIndex = openEnd;
+  let depth = 1;
+  let closeAt = -1;
+  let step;
+  while ((step = token.exec(html))) {
+    depth += step[0].startsWith('</') ? -1 : 1;
+    if (depth === 0) {
+      closeAt = step.index;
+      break;
+    }
+  }
+  if (closeAt < 0) throw new Error(`Home page #${id} is not closed`);
+  return html.slice(0, openEnd) + inner + html.slice(closeAt);
+}
+
+function heatMarkup(freqMap, maxN) {
+  const values = [];
+  for (let n = 1; n <= maxN; n += 1) values.push(freqMap.get(n) || 0);
+  const ranked = values.slice().sort((a, b) => a - b);
+  const midCut = ranked[Math.floor(ranked.length * 0.45)] || 0;
+  const highCut = ranked[Math.floor(ranked.length * 0.8)] || 0;
+  const cells = [];
+  for (let n = 1; n <= maxN; n += 1) {
+    const count = freqMap.get(n) || 0;
+    let tone = 'heat-cell heat-low';
+    if (count > highCut) tone = 'heat-cell heat-high';
+    else if (count > midCut) tone = 'heat-cell heat-mid';
+    cells.push(`<div class="${tone}" role="img" aria-label="Number ${n} was drawn ${count} times"><strong>${n}</strong><span>${count}</span></div>`);
+  }
+  return cells.join('');
 }
 
 async function refreshHome(powerballDraws, megaDraws) {
@@ -1342,6 +1375,7 @@ async function refreshHome(powerballDraws, megaDraws) {
   html = replaceElement(html, 'history-count-label', `Showing 1 to 10 of ${formatCount(sorted.length)} drawings`);
   html = replaceElement(html, 'history-table-body', historyRows(sorted));
   html = replaceElement(html, 'chart-summary', `Drawn most often in the current matrix: ${top10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. Drawn least often: ${bottom10.map(([num, count]) => `number ${num} (${count} times)`).join(', ')}. These counts describe the past only.`);
+  html = replaceElement(html, 'heatmap-grid', heatMarkup(freq, 69));
   html = replaceElement(html, 'key-facts', facts);
   html = replaceElement(html, 'home-dataset', JSON.stringify(dataset));
   html = html.replace(

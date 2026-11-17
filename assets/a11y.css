@@ -292,3 +292,35 @@ html.lm-contrast .skip-link:focus {
   background: #ffd000 !important;
   color: #000000 !important;
 }
+
+/* Dashboard cards use light and dark fills, and this file forces headings
+   and paragraphs to white. Paint those surfaces black so the white ink
+   still matches the background, including text that was pinned dark for
+   the light sheet. */
+html.lm-contrast .sheet,
+html.lm-contrast .metric,
+html.lm-contrast .detail-card,
+html.lm-contrast .detail-facts div,
+html.lm-contrast .sheet .table-scroll,
+html.lm-contrast .sheet thead th,
+html.lm-contrast .sheet tbody td,
+html.lm-contrast .sheet .loading,
+html.lm-contrast .sheet .error {
+  background: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+html.lm-contrast .sheet .stat-value,
+html.lm-contrast .sheet .tone-gold,
+html.lm-contrast .sheet .tone-success,
+html.lm-contrast .sheet .tone-warn,
+html.lm-contrast .sheet .key-facts h2,
+html.lm-contrast .metric .num,
+html.lm-contrast .detail-facts dt,
+html.lm-contrast .detail-facts dd,
+html.lm-contrast #detail-kicker,
+html.lm-contrast .detail-card .kicker {
+  color: #ffffff !important;
+}

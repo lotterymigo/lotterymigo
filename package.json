@@ -12,6 +12,7 @@
     "test:numbers": "node scripts/number-pages.test.mjs",
     "test:hubs": "node scripts/hub-pages.test.mjs",
     "test:payout": "node scripts/payout-illustration.test.mjs",
+    "test:heatmap": "node scripts/heatmap-fallback.test.mjs",
     "cap:sync": "npm run build:web && cap sync",
     "cap:android": "npm run build:web && cap sync android",
     "cap:ios": "npm run build:web && cap sync ios"

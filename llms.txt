@@ -13,10 +13,15 @@ LotteryMigo publishes Powerball and Mega Millions statistics from the NY Open Da
 - Hot, cold, and overdue numbers: https://www.lotterymigo.com/learn/hot-cold-overdue.html
 - FAQ: https://www.lotterymigo.com/faq.html
 - About the counts: https://www.lotterymigo.com/about.html
+- Methodology and data sources: https://www.lotterymigo.com/about.html#methodology
+
+## Author
+
+Nabin Pokhrel, creator of LotteryMigo. Nabin is a systems administrator with a background in cloud computing who built LotteryMigo to make official lottery draw data easy to explore.
 
 ## Data
 
-Official drawings are copied from NY Open Data: Powerball dataset d6yy-54nr and Mega Millions dataset 5xaw-6ayf. Number pages use the current matrix only. Powerball white balls and the red Powerball are counted from October 7, 2015. Mega Millions white balls are counted from October 31, 2017. The current Mega Ball field of 1 through 24 is counted from April 8, 2025.
+Official drawings are copied from NY Open Data: Powerball dataset d6yy-54nr and Mega Millions dataset 5xaw-6ayf. The draw file is refreshed daily at 10:00 UTC. Number pages use the current matrix only. Powerball white balls and the red Powerball are counted from October 7, 2015. Mega Millions white balls are counted from October 31, 2017. The current Mega Ball field of 1 through 24 is counted from April 8, 2025.
 
 ## No guarantees
 

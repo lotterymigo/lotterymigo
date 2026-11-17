@@ -257,7 +257,7 @@ function articleLd({ headline, description, path, published, modified }) {
     dateModified: modified,
     image: OG_IMAGE,
     mainEntityOfPage: SITE + path,
-    author: { '@id': `${SITE}/#organization` },
+    author: { '@id': `${SITE}/#person` },
     publisher: { '@id': `${SITE}/#organization` }
   };
 }
@@ -877,7 +877,7 @@ function learnIndex(liveNote) {
     <p>These guides explain the current Powerball and Mega Millions games and the limits of a frequency chart. The facts about prices, matrices, prize tiers, and taxes are paraphrased from the official pages linked in each article. LotteryMigo is not those lotteries, and a guide is not a suggestion to buy a ticket.</p>
     <p>The number statistics are a separate set of pages, generated from the same draw file as the home page chart. Start with <a href="/powerball/numbers.html">Powerball numbers</a> or <a href="/megamillions/numbers.html">Mega Millions numbers</a>, or with the <a href="/powerball/results.html">latest Powerball results</a> and <a href="/megamillions/results.html">latest Mega Millions results</a>. ${liveNote}</p>
     <ol class="guide-list">${items}</ol>
-    <p>Shorter answers are on the <a href="/faq.html">FAQ</a>. The counting method is on the <a href="/about.html">about page</a>.</p>`;
+    <p>Shorter answers are on the <a href="/faq.html">FAQ</a>. The counting method, the NY Open Data sources, and the formulas are in <a href="/about.html#methodology">Methodology and data sources</a>.</p>`;
   return renderPage({
     title: 'Powerball and Mega Millions Rules and Odds | LotteryMigo',
     description: 'Guides to Powerball and Mega Millions rules, odds, hot and overdue numbers, lump sum versus annuity, taxes, and scams. Past draws are not a forecast.',
@@ -1059,7 +1059,7 @@ for (const guide of GUIDES) {
   const guidePath = `/learn/${guide.slug}.html`;
   const guideModified = guide.published || (guide.live ? fetched : CONTENT_DATE);
   const guidePublished = guide.published || CONTENT_DATE;
-  body = `<p class="updated-line">Updated ${prettyDate(guideModified)}.</p>\n${body}`;
+  body = `<p class="updated-line">Updated ${prettyDate(guideModified)}.</p>\n<p class="byline">Nabin Pokhrel, creator of LotteryMigo</p>\n${body}`;
   const html = renderPage({
     title: guide.title,
     description: guide.description,

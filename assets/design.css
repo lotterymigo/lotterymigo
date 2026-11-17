@@ -1823,6 +1823,26 @@ html.lm-contrast .lm-reveal {
 .key-facts li,
 .key-facts p { margin: 0; }
 .updated-line { color: var(--muted); font-size: 0.95rem; }
+.byline {
+  margin: 0;
+  font-weight: 650;
+  color: var(--text);
+}
+.author-block,
+#methodology {
+  scroll-margin-top: 6.5rem;
+}
+.author-block {
+  display: grid;
+  gap: 0.65rem;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text);
+}
+.author-block h2,
+.author-block p { margin: 0; }
 
 .analytics-choice {
   background: #0c110f;

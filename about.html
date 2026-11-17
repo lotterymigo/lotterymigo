@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="/assets/a11y.css" />
   <script defer src="/assets/a11y.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4173178569579798" crossorigin="anonymous"></script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.lotterymigo.com/#organization","name":"LotteryMigo","url":"https://www.lotterymigo.com/","email":"info@lotterymigo.com","logo":{"@type":"ImageObject","url":"https://www.lotterymigo.com/icons/icon-512.png","width":512,"height":512}},{"@type":"WebSite","@id":"https://www.lotterymigo.com/#website","url":"https://www.lotterymigo.com/","name":"LotteryMigo","description":"Powerball and Mega Millions statistics, results, and guides. Past draws do not predict future results.","publisher":{"@id":"https://www.lotterymigo.com/#organization"}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.lotterymigo.com/#organization","name":"LotteryMigo","url":"https://www.lotterymigo.com/","email":"info@lotterymigo.com","logo":{"@type":"ImageObject","url":"https://www.lotterymigo.com/icons/icon-512.png","width":512,"height":512}},{"@type":"Person","@id":"https://www.lotterymigo.com/#person","name":"Nabin Pokhrel","jobTitle":"Systems administrator","description":"Nabin is a systems administrator with a background in cloud computing who built LotteryMigo to make official lottery draw data easy to explore.","url":"https://www.lotterymigo.com/about.html#author"},{"@type":"WebSite","@id":"https://www.lotterymigo.com/#website","url":"https://www.lotterymigo.com/","name":"LotteryMigo","description":"Powerball and Mega Millions statistics, results, and guides. Past draws do not predict future results.","publisher":{"@id":"https://www.lotterymigo.com/#organization"}}]}</script>
 </head>
 <body class="page page-narrow">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -74,20 +74,38 @@
       <p>LotteryMigo is an independent website about Powerball and Mega Millions. It publishes a draw archive, a page of statistics for each number in the current games, and written guides to the rules. It does not sell tickets, run a drawing, or pay prizes. It is not affiliated with the Multi-State Lottery Association, the Mega Millions Consortium, the New York Lottery, or any other state lottery. Powerball and Mega Millions are trademarks of their owners.</p>
 <p>There is no lottery desk behind the site and no staff member who can look at a ticket and declare it a winner. Questions about the site go to <a href="mailto:info@lotterymigo.com">info@lotterymigo.com</a>. Questions about a prize go to the lottery that sold the ticket.</p>
 
+<nav class="toc" aria-label="On this page">
+  <strong>On this page</strong>
+  <ol>
+    <li><a href="#author">Author</a></li>
+    <li><a href="#methodology">Methodology and data sources</a></li>
+    <li><a href="#how-a-number-page-is-calculated">How a number page is calculated</a></li>
+  </ol>
+</nav>
+
+<section id="author" class="author-block">
+  <h2>Author</h2>
+  <p class="byline">Nabin Pokhrel, creator of LotteryMigo</p>
+  <p>Nabin is a systems administrator with a background in cloud computing who built LotteryMigo to make official lottery draw data easy to explore.</p>
+</section>
+
 <h2>Why these pages exist</h2>
 <p>Official results are public, but they are spread across weekly press pages, state sites, and a large open-data file. The file is the right raw material and a poor thing to read by hand. LotteryMigo turns that file into pages a person can open: the latest drawings, the count for a single number, and a guide that says what the count can and cannot mean.</p>
 <p>The home page is the chart. It loads the full file and shows frequencies, a history table, a number generator, and a practice drum. The guides are the explanation. The number pages are the reference. Nothing in that set is a pick. Past drawings do not change the chance of the next one, and the site does not guarantee a win.</p>
 
-<h2>Where the drawings come from</h2>
+<section id="methodology">
+<h2>Methodology and data sources</h2>
+<p>The counts on LotteryMigo are official drawings copied from New York Open Data, then counted with the formulas in <a href="#how-a-number-page-is-calculated">How a number page is calculated</a>. The datasets are Powerball <a href="https://data.ny.gov/d/d6yy-54nr">d6yy-54nr</a> and Mega Millions <a href="https://data.ny.gov/d/5xaw-6ayf">5xaw-6ayf</a>. A frequency, a companion, or a gap describes drawings that already happened. None of them changes the odds of the next drawing.</p>
+<h3 id="where-the-drawings-come-from">Where the drawings come from</h3>
 <p>The archive is <code>data/draws.json</code> in the site project. A scheduled job reads two New York Open Data datasets and rewrites that file:</p>
 <ul>
   <li>Powerball, dataset <a href="https://data.ny.gov/d/d6yy-54nr">d6yy-54nr</a>. The copy used for these pages starts in February 2010.</li>
   <li>Mega Millions, dataset <a href="https://data.ny.gov/d/5xaw-6ayf">5xaw-6ayf</a>. The copy starts in May 2002.</li>
 </ul>
 <p>Each row stores a draw date, five white balls, the special ball, and a multiplier when the dataset includes one. Powerball rows usually include the Power Play multiplier. Mega Millions rows from the $5 game, beginning April 8, 2025, do not include the built-in multiplier in this dataset. The results pages leave that cell blank and say so. A blank is not a 1×.</p>
-<p>The job runs at 12:00 UTC on Tuesday, Thursday, and Sunday. Those times fall after the Monday, Wednesday, and Saturday Powerball drawings (10:59 p.m. Eastern) and after the Tuesday and Friday Mega Millions drawings (11:00 p.m. Eastern). A drawing can sit for about a day before the next run. This is not an official results wire. For a ticket, use the selling lottery’s site.</p>
+<p>The job runs daily at 10:00 UTC. That hour follows the previous night’s drawing in US Eastern time: Powerball is drawn Monday, Wednesday, and Saturday at 10:59 p.m. Eastern, and Mega Millions is drawn Tuesday and Friday at 11:00 p.m. Eastern. A drawing can still be missing until New York Open Data publishes the row. This is not an official results wire. For a ticket, use the selling lottery’s site.</p>
 
-<h2>How a number page is calculated</h2>
+<h2 id="how-a-number-page-is-calculated">How a number page is calculated</h2>
 <p>The generator is <code>scripts/build-content.mjs</code>. It reads the archive and writes static HTML, so each number has a real page in the sitemap rather than a view that only appears after a script runs in the browser.</p>
 <p>Counts are split by matrix, because the file mixes games:</p>
 <ul>
@@ -100,6 +118,7 @@
 <p>The current gap is the number of drawings since the ball last appeared in the set. It is zero when the ball is in the latest drawing. The longest gap is the longest run of missed drawings in the set, whether that run is at the start, between two hits, or still open. The average distance is the mean number of drawings from one appearance to the next, counted only when the ball has appeared at least twice, and it includes the later appearance.</p>
 <p>Companion numbers are the other white balls that showed up most often in the same drawing. Recent lines are the latest drawings in the set that included the ball. Year notes skip a partial first year and the unfinished current year when they name a busiest or quietest year. The full-file count is also shown. It is not a rate, because the older rows used different fields.</p>
 <p>None of these figures is a probability for the next drawing. The probability is on the prize chart: each legal combination is equally likely. The <a href="/learn/hot-cold-overdue.html">hot, cold, and overdue guide</a> says that at more length.</p>
+</section>
 
 <h2>Accounts, ads, and the app</h2>
 <p>You can use the statistics without an account. If sign-in is enabled, Google sign-in can store number picks you choose to save. The site does not show a points leaderboard. Details are in the <a href="/privacy.html">privacy policy</a>.</p>
@@ -122,6 +141,7 @@
         <a href="/megamillions/numbers.html">Mega Millions numbers</a>
         <a href="/faq.html">FAQ</a>
         <a href="/about.html">About</a>
+        <a href="/about.html#methodology">Methodology</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/terms.html">Terms</a>
         <a href="/contact.html">Contact</a>

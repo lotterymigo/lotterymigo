@@ -63,6 +63,14 @@ function organizationGraph() {
       }
     },
     {
+      '@type': 'Person',
+      '@id': `${SITE}/#person`,
+      name: 'Nabin Pokhrel',
+      jobTitle: 'Systems administrator',
+      description: 'Nabin is a systems administrator with a background in cloud computing who built LotteryMigo to make official lottery draw data easy to explore.',
+      url: `${SITE}/about.html#author`
+    },
+    {
       '@type': 'WebSite',
       '@id': `${SITE}/#website`,
       url: `${SITE}/`,
@@ -189,6 +197,7 @@ export function renderPage({
         <a href="/megamillions/numbers.html">Mega Millions numbers</a>
         <a href="/faq.html">FAQ</a>
         <a href="/about.html">About</a>
+        <a href="/about.html#methodology">Methodology</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/terms.html">Terms</a>
         <a href="/contact.html">Contact</a>

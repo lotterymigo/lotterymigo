@@ -464,10 +464,15 @@ function analyzePool(eraNewest, numbers, readBalls) {
       window25: Math.min(25, drawCount),
       window100: Math.min(100, drawCount),
       lines: [...appearances].reverse().slice(0, 8),
-      whiteCompanions: [...whiteCompanions.get(num).entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 3),
-      specialCompanions: [...specialCompanions.get(num).entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 3)
+      whiteCompanions: [...whiteCompanions.get(num).entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 10),
+      specialCompanions: [...specialCompanions.get(num).entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 10)
     };
   });
+  const yearDrawCounts = new Map();
+  for (const draw of chrono) {
+    const year = Number(draw.date.slice(0, 4));
+    yearDrawCounts.set(year, (yearDrawCounts.get(year) || 0) + 1);
+  }
 
   const byCount = rankMap(rows, (row) => row.count);
   const byGap = rankMap(rows, (row) => row.currentGap);
@@ -480,7 +485,7 @@ function analyzePool(eraNewest, numbers, readBalls) {
     row.gapRank = byGap.get(row.num);
     row.median = median;
   }
-  return { drawCount, chrono, rows: new Map(rows.map((row) => [row.num, row])), list: rows };
+  return { drawCount, chrono, yearDrawCounts, rows: new Map(rows.map((row) => [row.num, row])), list: rows };
 }
 
 function topPhrase(pairs, hrefFor, noun) {
@@ -588,14 +593,14 @@ function numberStory(game, row, pool, fullCount, firstDate) {
     paragraphs.push(`<p>The most recent line was ${lineHtml(row.last.draw, game)}.</p>`);
   }
 
-  const whitePhrase = topPhrase(row.whiteCompanions, game.whiteHref, 'white ball');
+  const whitePhrase = topPhrase(row.whiteCompanions.slice(0, 3), game.whiteHref, 'white ball');
   if (whitePhrase && pool.kind === 'white') {
     paragraphs.push(`<p>When ${esc(name)} was drawn, the other white balls beside it most often were ${whitePhrase}. A pair that leads this list is a pair that happened. The next drawing still takes five white balls from the full field.</p>`);
   }
   if (whitePhrase && pool.kind === 'special') {
     paragraphs.push(`<p>The white balls drawn most often in the same drawing as ${esc(name)} were ${whitePhrase}. Those are companions in the archive, not a combination the game prefers.</p>`);
   }
-  const specialPhrase = topPhrase(row.specialCompanions, game.specialHref, game.specialName);
+  const specialPhrase = topPhrase(row.specialCompanions.slice(0, 3), game.specialHref, game.specialName);
   if (specialPhrase && pool.kind === 'white') {
     paragraphs.push(`<p>The ${esc(game.specialName)} values in those same drawings were led by ${specialPhrase}.</p>`);
   }
@@ -615,6 +620,91 @@ function numberStory(game, row, pool, fullCount, firstDate) {
 
   paragraphs.push(`<p>A gap of ${comma(row.currentGap)} drawings leaves the odds unchanged. ${pool.chanceSentence} The <a href="/learn/hot-cold-overdue.html">hot, cold, and overdue guide</a> and the <a href="/learn/understanding-the-odds.html">odds guide</a> explain that at more length. This page is a record of the archive fetched ${prettyDate(pool.fetched)}.</p>`);
   return paragraphs.join('\n');
+}
+
+function rankedPairs(pairs, limit) {
+  return (pairs || []).filter((pair) => pair[1] > 0).slice(0, limit);
+}
+
+function companionTable(pairs, hrefFor, noun, caption) {
+  const rows = rankedPairs(pairs, 10);
+  if (!rows.length) return '<p>No companion balls are recorded in this set.</p>';
+  const body = rows.map(([num, count], index) => `<tr>
+      <td class="num">${index + 1}</td>
+      <td><a href="${hrefFor(num)}">${esc(noun)} ${num}</a></td>
+      <td class="num">${comma(count)}</td>
+    </tr>`).join('');
+  return `<div class="table-scroll compact"><table>
+      <caption>${esc(caption)}</caption>
+      <thead><tr><th scope="col">Rank</th><th scope="col">Ball</th><th scope="col">Times together</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table></div>`;
+}
+
+function companionSection(game, pool, row) {
+  const label = `${pool.ballLabel} ${row.num}`;
+  const whiteCaption = pool.kind === 'white'
+    ? `Other white balls drawn most often with ${label}`
+    : `White balls drawn most often with ${label}`;
+  const blocks = [
+    companionTable(row.whiteCompanions, game.whiteHref, 'white ball', whiteCaption)
+  ];
+  if (pool.kind === 'white') {
+    blocks.push(companionTable(
+      row.specialCompanions,
+      game.specialHref,
+      game.specialName,
+      `${game.specialName} values drawn most often with ${label}`
+    ));
+  }
+  return `<h2>Companion numbers</h2>
+    <p>These are the balls that showed up most often in the same drawing as ${esc(label)}, up to ten of them. A pair at the top of a table is a pair that already happened. It is not a combination the game prefers. A long gap does not change the odds.</p>
+    ${blocks.join('\n')}`;
+}
+
+function yearTable(pool, row) {
+  const end = pool.endDate || pool.end;
+  const startYear = Number(pool.start.slice(0, 4));
+  const endYear = Number(String(end).slice(0, 4));
+  const label = `${pool.ballLabel} ${row.num}`;
+  const body = [];
+  for (let year = startYear; year <= endYear; year += 1) {
+    const drawings = pool.analysis.yearDrawCounts.get(year) || 0;
+    const appearances = row.yearCounts.get(year) || 0;
+    const partial = (year === startYear && pool.start.slice(5) !== '01-01')
+      || (year === endYear && String(end).slice(5) !== '12-31');
+    const share = drawings === 0 ? '—' : `${oneDecimal((appearances / drawings) * 100)}%`;
+    body.push(`<tr>
+      <td>${year}${partial ? ' (partial)' : ''}</td>
+      <td class="num">${comma(drawings)}</td>
+      <td class="num">${comma(appearances)}</td>
+      <td class="num">${share}</td>
+    </tr>`);
+  }
+  return `<h2>Appearances by year</h2>
+    <p>Each row is one calendar year in this set. A partial year is shorter because the set starts or ends during that year. The share is appearances divided by drawings in that year. It is a description of the archive, not the chance on the next drawing. A busy year does not change the odds, and a gap does not change the odds.</p>
+    <div class="table-scroll compact"><table>
+      <caption>Year-by-year appearances of ${esc(label)}</caption>
+      <thead><tr><th scope="col">Year</th><th scope="col">Drawings</th><th scope="col">Appearances</th><th scope="col">Share of drawings</th></tr></thead>
+      <tbody>${body.join('')}</tbody>
+    </table></div>`;
+}
+
+function numberDataset(game, pool, row, description) {
+  const label = `${pool.ballLabel} ${row.num}`;
+  const source = game.id === 'powerball' ? 'https://data.ny.gov/d/d6yy-54nr' : 'https://data.ny.gov/d/5xaw-6ayf';
+  return {
+    '@type': 'Dataset',
+    name: `${label} frequency, companions, and yearly appearances`,
+    description: `${description} Companion balls and calendar-year counts are included. A gap does not change the odds.`,
+    url: SITE + pool.href(row.num),
+    creator: { '@id': `${SITE}/#organization` },
+    author: { '@id': `${SITE}/#person` },
+    dateModified: pool.fetched,
+    temporalCoverage: `${pool.start}/${pool.endDate || pool.end}`,
+    isBasedOn: source,
+    variableMeasured: 'appearances'
+  };
 }
 
 function numberPage(game, pool, row, fullCount, firstDate) {
@@ -655,6 +745,8 @@ function numberPage(game, pool, row, fullCount, firstDate) {
     </div>
     <h2>What the archive shows</h2>
     ${numberStory(game, row, pool, fullCount, firstDate)}
+    ${companionSection(game, pool, row)}
+    ${yearTable(pool, row)}
     <h2>Recent drawings in this set</h2>
     ${lines ? `<ul>${lines}</ul>` : '<p>No drawings in this set include this number.</p>'}
     ${pager}
@@ -678,7 +770,8 @@ function numberPage(game, pool, row, fullCount, firstDate) {
       { name: 'Home', path: '/' },
       { name: `${game.name} numbers`, path: game.hub },
       { name: label, path: pool.href(row.num) }
-    ]
+    ],
+    jsonLd: [numberDataset(game, pool, row, description)]
   });
 }
 

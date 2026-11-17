@@ -1844,6 +1844,71 @@ html.lm-contrast .lm-reveal {
 .author-block h2,
 .author-block p { margin: 0; }
 
+.payout-tool {
+  display: grid;
+  gap: 0.75rem;
+}
+.payout-tool label,
+.payout-results,
+.payout-note {
+  color: #f4f7f4;
+}
+.payout-tool .field {
+  background: #0c110f;
+  color: #f4f7f4;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.payout-tool .check-row { align-items: flex-start; }
+.payout-note {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  border: 2px solid #ffc107;
+  background: #1a1404;
+  font-weight: 700;
+}
+.payout-results { display: grid; gap: 0.75rem; min-width: 0; }
+.payout-compare {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+}
+.payout-column {
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--radius);
+  background: #101814;
+  color: #f4f7f4;
+}
+.payout-column h4 {
+  margin: 0 0 0.65rem;
+  color: #ffffff;
+  font-size: 1.15rem;
+}
+.payout-column dl {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+.payout-column dl > div { display: grid; gap: 0.15rem; min-width: 0; }
+.payout-column dt {
+  color: #d5ddd6;
+  font-size: 0.95rem;
+}
+.payout-column dd {
+  margin: 0;
+  color: #ffffff;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 46rem) {
+  .payout-compare { grid-template-columns: 1fr 1fr; }
+}
+#payout-illustration { scroll-margin-top: 6.5rem; }
+
 .analytics-choice {
   background: #0c110f;
   color: #f4f7f4;

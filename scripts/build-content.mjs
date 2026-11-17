@@ -827,25 +827,46 @@ function hubPage(game, whitePool, specialPool, extraPool) {
   };
   const longest = [...whitePool.analysis.list].sort((a, b) => b.currentGap - a.currentGap || a.num - b.num).slice(0, 5);
   const longestSentenceBits = longest.map((row) => `<a href="${whitePool.href(row.num)}">white ball ${row.num}</a> (${comma(row.currentGap)} drawings${row.last ? ` since ${prettyDate(row.last.date)}` : ''})`);
+  const frequencyHeading = game.id === 'powerball' ? 'Powerball number frequency' : 'Mega Millions number frequency';
+  const overdueHeading = game.id === 'powerball' ? 'Most overdue Powerball numbers' : 'Mega Millions numbers by current gap';
+  const overdueLink = game.id === 'powerball' ? 'most overdue Powerball numbers' : 'numbers by current gap';
+  const gapTable = (pool, caption) => {
+    const rows = [...pool.analysis.list].sort((a, b) => b.currentGap - a.currentGap || a.num - b.num);
+    const body = rows.map((row) => `<tr>
+      <td class="num">${comma(row.currentGap)}</td>
+      <td><a href="${pool.href(row.num)}">${esc(pool.noun)} ${row.num}</a></td>
+      <td class="num">${comma(row.count)}</td>
+      <td>${row.last ? esc(row.last.date) : '—'}</td>
+    </tr>`).join('');
+    return `<div class="table-scroll"><table>
+      <caption>${esc(caption)}</caption>
+      <thead><tr><th>Current gap</th><th>Number</th><th>Appearances</th><th>Last drawn</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table></div>`;
+  };
   const body = `
     ${keyFactsSection(game, whitePool, specialPool, gamesRaw[game.id][0])}
     <p>${esc(game.name)} number pages on LotteryMigo are counts from the NY Open Data archive, split so the current matrix is not averaged together with retired ones. The white-ball table below uses ${comma(whitePool.analysis.drawCount)} drawings from ${prettyDate(whitePool.start)} through ${prettyDate(whitePool.endDate)}. The even-split column is the count each number would have if those drawings had been shared perfectly evenly: ${comma(whitePool.analysis.drawCount)} drawings times 5, divided by ${whitePool.poolSize}.</p>
     <p>The gap column is how many drawings have passed since the number last appeared in that same set. A gap of zero means the number was in the latest drawing. A long gap is a fact about the list. It does not raise the chance that the number is drawn next. White balls are still 5 out of ${whitePool.poolSize} on the next drawing. Read the <a href="/learn/hot-cold-overdue.html">hot, cold, and overdue guide</a> before treating a rank as a tip, and the <a href="${game.guide}">rules guide</a> for the prize chart behind the odds.</p>
-    <p>The five longest current white-ball gaps in this set are ${longestSentenceBits.join(', ')}. They are listed so you can open the draw dates, not so you can treat them as due.</p>
-    <h2>White balls</h2>
+    <p>The five longest current white-ball gaps in this set are ${longestSentenceBits.join(', ')}. Every number, sorted the same way, is in the <a href="#overdue">${overdueLink}</a>. Open a row to see the draw dates. A long gap is not a sign that the number is due.</p>
+    <h2 id="frequency">${frequencyHeading}</h2>
     ${tableFor(whitePool, `${game.name} white balls, current matrix`)}
     <h2>${esc(game.specialName)}</h2>
     <p>The ${esc(game.specialName)} table uses ${comma(specialPool.analysis.drawCount)} drawings from ${prettyDate(specialPool.start)} through ${prettyDate(specialPool.endDate)}. ${game.specialNote}</p>
     ${tableFor(specialPool, `${game.name} ${game.specialName}, current field`)}
-    ${extraPool ? `<h2>Historical ${esc(game.specialName)} 25</h2><p><a href="${extraPool.href(25)}">Mega Ball 25</a> was part of the field from ${prettyDate(extraPool.start)} through ${prettyDate(extraPool.end)}. It appeared ${comma(extraPool.analysis.rows.get(25).count)} times in that window. It is not drawn under the current rules.</p>` : ''}
-    <p>Recent drawings, with a link on every ball, are on the <a href="${game.results}">${esc(game.name)} results page</a>. The home page chart uses this same current matrix, so its most common white ball should match the top of this table.</p>
+    ${extraPool ? `<h2>Historical ${esc(game.specialName)} 25</h2><p><a href="${extraPool.href(25)}">Mega Ball 25</a> was part of the field from ${prettyDate(extraPool.start)} through ${prettyDate(extraPool.end)}. It appeared ${comma(extraPool.analysis.rows.get(25).count)} times in that window. It is not drawn under the current rules, so it is not in the current-gap list.</p>` : ''}
+    <h2 id="overdue">${overdueHeading}</h2>
+    <p>This list is every number in the current field, sorted by the current gap. The longest gap is first. Tied gaps stay in number order. A gap describes drawings that already happened. It does not change the odds of the next drawing.</p>
+    ${gapTable(whitePool, `${game.name} white balls sorted by current gap`)}
+    ${gapTable(specialPool, `Current ${game.specialName} gaps`)}
+    <p>Recent drawings, with a link on every ball, are on the <a href="${game.results}">${esc(game.name)} results page</a>. The home page chart uses this same current matrix, so its most common white ball should match the top of the frequency table.</p>
     ${hubFaq(game, whitePool, specialPool).html}`;
   const hubDescription = game.id === 'powerball'
-    ? 'Powerball number frequency, last drawn date, and current gap for every white ball and Powerball since October 7, 2015. A gap is history, not a forecast.'
-    : 'Mega Millions most common numbers, last drawn dates, and gaps for the current matrix. Counts come from NY Open Data. A gap is not a forecast.';
+    ? 'Most overdue Powerball numbers by current gap, plus frequency for every white ball and red Powerball since October 7, 2015. A gap does not change the odds.'
+    : 'Mega Millions number frequency for every white ball and Mega Ball in the current field, plus the same numbers sorted by current gap. A gap is not a forecast.';
   const hubTitle = game.id === 'powerball'
-    ? 'Powerball Number Frequency and Hot Numbers | LotteryMigo'
-    : 'Mega Millions Most Common Numbers and Gaps | LotteryMigo';
+    ? 'Most Overdue Powerball Numbers and Frequency | LotteryMigo'
+    : 'Mega Millions Number Frequency and Gaps | LotteryMigo';
   return renderPage({
     title: hubTitle,
     description: hubDescription,
@@ -876,7 +897,7 @@ function hubPage(game, whitePool, specialPool, extraPool) {
 function hubFaq(game, whitePool, specialPool) {
   const verified = `Verified ${prettyDate(whitePool.fetched)}, source: NY Open Data.`;
   const counted = `The white-ball table uses ${comma(whitePool.analysis.drawCount)} drawings from ${prettyDate(whitePool.start)} through ${prettyDate(whitePool.endDate)}. Retired matrices are not averaged into that table.`;
-  const gap = 'A long gap is a fact about the list. It does not raise the chance that the number is drawn next.';
+  const gap = 'A long gap is a fact about the list. It does not raise the chance that the number is drawn next. The overdue section lists every current number, sorted by that gap.';
   const source = `These counts come from the NY Open Data archive. ${verified}`;
   const questions = [
     ['Which drawings are counted?', counted],

@@ -9,6 +9,7 @@
     "test:analytics": "node scripts/analytics-consent.test.mjs",
     "test:preview": "node scripts/preview-dashboard.test.mjs && node scripts/preview-layout.test.mjs && node scripts/homepage-integration.test.mjs",
     "test:trust": "node scripts/trust-pages.test.mjs",
+    "test:numbers": "node scripts/number-pages.test.mjs",
     "cap:sync": "npm run build:web && cap sync",
     "cap:android": "npm run build:web && cap sync android",
     "cap:ios": "npm run build:web && cap sync ios"

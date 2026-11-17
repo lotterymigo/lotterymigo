@@ -1844,6 +1844,33 @@ html.lm-contrast .lm-reveal {
 .author-block h2,
 .author-block p { margin: 0; }
 
+.payout-tool {
+  display: grid;
+  gap: 0.75rem;
+}
+.payout-tool label,
+.payout-results,
+.payout-note {
+  color: #f4f7f4;
+}
+.payout-tool .field {
+  background: #0c110f;
+  color: #f4f7f4;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.payout-tool .check-row { align-items: flex-start; }
+.payout-note {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  border: 2px solid #ffc107;
+  background: #1a1404;
+  font-weight: 700;
+}
+.payout-results { display: grid; gap: 0.75rem; }
+.prose .payout-table table { min-width: 32rem; }
+#payout-illustration { scroll-margin-top: 6.5rem; }
+
 .analytics-choice {
   background: #0c110f;
   color: #f4f7f4;

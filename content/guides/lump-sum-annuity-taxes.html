@@ -8,21 +8,58 @@
 
 <h2>Federal income tax, in general</h2>
 <p><a href="https://www.irs.gov/taxtopics/tc419">IRS Topic 419</a>, reviewed by the IRS on September 24, 2026, says gambling winnings are fully taxable and must be reported, including lottery winnings. The topic says this includes cash and the fair market value of noncash prizes. It also says you report winnings even when they are not on a Form W-2G. The form is an information return. It is not the limit of what is taxable.</p>
-<p>Topic 419 is written for casual gamblers, not for someone in the trade or business of gambling. It says losses can be deducted only if you itemize on Schedule A and only up to the gambling income you report, and that you need records. That is a summary of the topic as published. Whether itemizing makes sense, and how a large prize interacts with the rest of a return, is a question for a tax preparer. This site will not estimate a refund or a bill.</p>
+<p>Topic 419 is written for casual gamblers, not for someone in the trade or business of gambling. It says losses can be deducted only if you itemize on Schedule A and only up to the gambling income you report, and that you need records. That is a summary of the topic as published. Whether itemizing makes sense, and how a large prize interacts with the rest of a return, is a question for a tax preparer. The illustration further down applies a flat 24 percent and a state rate you type. It is not an estimate of a refund or of the tax on your return.</p>
 <p>Nonresident aliens follow different rules. Topic 419 points them to Form 1040-NR and to the IRS publications on nonresident withholding. Those rules are easy to get wrong from a secondary summary, so the official publications are the place to start.</p>
 
 <h2>Withholding is not the whole tax</h2>
 <p>The <a href="https://www.irs.gov/instructions/iw2g">Instructions for Forms W-2G and 5754</a> describe two federal withholding regimes that can apply to gambling winnings. Regular gambling withholding on lotteries is 24 percent when the winnings minus the wager are more than $5,000. The instructions say that 24 percent is figured on the full net proceeds, the winnings minus the wager, not merely on the portion above $5,000. For a state-conducted lottery, the same section says a W-2G is filed when the winnings meet the reporting threshold and are at least 300 times the wager. The instructions also say some information-return thresholds are adjusted for inflation; for calendar year 2026 they cite a $2,000 minimum for certain payments. Those thresholds move. Read the current instructions rather than a remembered cutoff.</p>
 <p>Withholding is a prepayment. The tax on the return can be higher or lower than 24 percent once the prize is added to other income. Topic 419 notes that estimated tax payments may be required. An annuity does not dodge withholding: the W-2G instructions say installment payments of $5,000 or less are still subject to regular gambling withholding if the total proceeds from the wager will exceed $5,000, and that a third party who pays an annuity withholds when the expected total exceeds that line.</p>
 <p>If a winner does not provide a taxpayer identification number, backup withholding can apply at 24 percent on winnings that are not already under regular gambling withholding. Noncash prizes have their own arithmetic in the same instructions, including a 24 percent calculation when the winner pays the withholding and a 31.58 percent calculation when the payer covers it. Lottery jackpots that are paid in cash do not need that noncash detour. It matters for a car or a similar prize.</p>
-<p>State and local taxes are a separate system. Some states tax lottery prizes, some do not, and the rate is not something a national chart on this site should invent. The selling lottery withholds what its own rules require and reports it on the claim paperwork.</p>
+<p>State and local taxes are a separate system. Some states tax lottery prizes, some do not, and the rate is not something a national chart on this site should invent. The selling lottery withholds what its own rules require and reports it on the claim paperwork. If you want to see the 24 percent figure and a state rate you choose applied to two advertised amounts, use the illustration below. It does not look up your state.</p>
+
+<h2 id="payout-illustration">An illustration of the two advertised amounts</h2>
+<p class="payout-note">Illustration only, not tax advice, not your actual tax bill.</p>
+<p>Enter the advertised annuity jackpot and the cash value, also called the cash option. Leave the federal box checked to treat 24 percent as a prepayment on the full amount you entered. Type a state rate to apply that rate to the same full amount, or leave the state rate blank. The page subtracts those illustrations from the amount. It does not calculate the tax on a real return, and it does not tell you which option to take.</p>
+<h3>Worked example</h3>
+<p>These figures are written into the page, so they stay visible with scripts turned off. They are not a current jackpot and not a quote from either lottery.</p>
+<div class="table-scroll payout-table">
+  <table>
+    <caption>Worked example: a $100,000,000 advertised annuity and a $45,000,000 cash option, with 24 percent federal withholding and a 5 percent state rate</caption>
+    <thead>
+      <tr><th scope="col">Line</th><th scope="col">Advertised annuity</th><th scope="col">Cash option</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Amount entered</td><td class="num">$100,000,000</td><td class="num">$45,000,000</td></tr>
+      <tr><td>Federal 24 percent of the full amount</td><td class="num">$24,000,000</td><td class="num">$10,800,000</td></tr>
+      <tr><td>State rate 5 percent of the full amount</td><td class="num">$5,000,000</td><td class="num">$2,250,000</td></tr>
+      <tr><td>Illustrated remainder</td><td class="num">$71,000,000</td><td class="num">$31,950,000</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>In this example the cash option is 45 percent of the advertised annuity. The remainder is the amount entered minus the two illustrated amounts. It is not a take-home paycheck. An annuity is paid over many years, so the annuity column is not the tax for one year.</p>
+<h3>Try your own amounts</h3>
+<form id="payout-form" class="payout-tool">
+  <label for="payout-annuity">Advertised annuity jackpot</label>
+  <input id="payout-annuity" name="annuity" class="field" type="text" inputmode="decimal" value="100000000" autocomplete="off" />
+  <label for="payout-cash">Cash value (cash option)</label>
+  <input id="payout-cash" name="cash" class="field" type="text" inputmode="decimal" value="45000000" autocomplete="off" />
+  <label class="check-row" for="payout-federal"><input id="payout-federal" name="federal" type="checkbox" checked /> Apply 24 percent federal withholding as a prepayment</label>
+  <label for="payout-state">State rate, percent (optional)</label>
+  <input id="payout-state" name="state" class="field" type="text" inputmode="decimal" value="5" autocomplete="off" aria-describedby="payout-state-help" />
+  <p id="payout-state-help" class="lm-help">Leave this blank to skip a state rate. The rate is applied to the full amount, not to the amount left after federal withholding.</p>
+  <button type="submit" class="btn btn-primary">Update illustration</button>
+</form>
+<div id="payout-live" class="payout-results" aria-live="polite">
+  <p>With scripts on, this spot uses the amounts in the form. With scripts off, use the worked example above. Either way: illustration only, not tax advice, not your actual tax bill.</p>
+</div>
+<script type="module" src="/assets/payout-illustration.js"></script>
 
 <h2>Claiming is a local process</h2>
 <p>A jackpot is claimed from the lottery that sold the ticket, not from LotteryMigo, not from a social-media account, and not from a caller who offers to “process” it. Mega Millions’ FAQ says claim periods vary by jurisdiction from 90 days to one year after the drawing. Powerball claim windows are also set by the selling lottery. A one-year figure you saw for one state is not a national rule.</p>
 <p>Sign the ticket and store it as the selling lottery instructs. A photo on a phone is a poor substitute for the ticket. If someone contacts you first and asks for a fee, a tax prepayment, or bank details in order to release a prize, stop and read the <a href="/learn/lottery-scams.html">scam guide</a>. Real large prizes involve the lottery’s claim center, identification, and tax forms. They do not start with a gift card.</p>
 
 <h2>What this site will not do</h2>
-<p>LotteryMigo does not compare the annuity and the cash option for the current jackpot. The comparison depends on interest rates, the winner’s other income, state tax, and whether the prize is shared. Any calculator that asks for none of that and still prints “you should take the cash” is guessing.</p>
+<p>The illustration shows the two advertised amounts after a flat withholding rate and a state rate you enter. It does not know interest rates, the winner’s other income, or whether the prize is shared, and it does not say which option to take. A tool that prints “you should take the cash” from those inputs would be guessing.</p>
 <p>The statistics pages do not know who bought a ticket. A frequency, a gap, or a generated line has no role in a tax question.</p>
 
 <h2>Sources</h2>

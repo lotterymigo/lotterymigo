@@ -68,19 +68,19 @@ export function renderIllustration(result) {
   const share = result.cashShare == null
     ? 'The advertised annuity is zero, so there is no cash share to show.'
     : `The cash option is ${(result.cashShare * 100).toFixed(1)} percent of the advertised annuity.`;
-  const row = (label, annuity, cash) => `<tr><td>${escapeHtml(label)}</td><td class="num">${formatMoney(annuity)}</td><td class="num">${formatMoney(cash)}</td></tr>`;
+  const lines = [
+    ['Amount entered', result.annuity.base, result.cash.base],
+    [federalLabel, result.annuity.federal, result.cash.federal],
+    [stateLabel, result.annuity.state, result.cash.state],
+    ['Illustrated remainder', result.annuity.remainder, result.cash.remainder]
+  ];
+  const column = (heading, index) => `<section class="payout-column"><h4>${heading}</h4><dl>${lines.map(([label, annuity, cash]) => `<div><dt>${escapeHtml(label)}</dt><dd>${formatMoney(index === 0 ? annuity : cash)}</dd></div>`).join('')}</dl></section>`;
   return `${note}
-    <div class="table-scroll payout-table"><table>
-      <caption>Illustrated withholding on the amounts you entered</caption>
-      <thead><tr><th scope="col">Line</th><th scope="col">Advertised annuity</th><th scope="col">Cash option</th></tr></thead>
-      <tbody>
-        ${row('Amount entered', result.annuity.base, result.cash.base)}
-        ${row(federalLabel, result.annuity.federal, result.cash.federal)}
-        ${row(stateLabel, result.annuity.state, result.cash.state)}
-        ${row('Illustrated remainder', result.annuity.remainder, result.cash.remainder)}
-      </tbody>
-    </table></div>
-    <p>${escapeHtml(share)} Both rates are applied to the full amount, then subtracted. This remainder is not a take-home paycheck. An annuity is paid over many years, so the annuity column is not the tax for one year.</p>`;
+    <div class="payout-compare">
+      ${column('Advertised annuity', 0)}
+      ${column('Cash option', 1)}
+    </div>
+    <p>${escapeHtml(share)} Both rates are applied to the full amount, then subtracted. This remainder is not a take-home paycheck. An annuity is paid over many years, so the annuity figures are not the tax for one year.</p>`;
 }
 
 function bindPayoutForm() {

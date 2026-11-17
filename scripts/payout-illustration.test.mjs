@@ -27,6 +27,7 @@ assert(!bad.ok && bad.errors.length === 1, 'a state rate above 100 is rejected')
 const page = await readFile(path.join(root, 'learn/lump-sum-annuity-taxes.html'), 'utf8');
 assert(page.includes('Illustration only, not tax advice, not your actual tax bill.'), 'the page states the illustration limit');
 assert(page.includes('$31,950,000'), 'the static worked example is in the HTML');
+assert(page.includes('class="payout-column"') && page.includes('>Cash option</h4>'), 'the worked example stacks annuity and cash as cards');
 assert(page.includes('id="payout-form"'), 'the calculator form is on the page');
 assert(page.includes('/assets/payout-illustration.js'), 'the page loads the illustration script');
 assert(!page.includes('This site will not estimate a refund or a bill.'), 'the old refusal to illustrate is updated');

@@ -45,6 +45,15 @@ for (const rows of [pbWhite, pbSpecial, mmWhite, mmSpecial]) {
 }
 assert(true, 'overdue tables are sorted by current gap');
 assert(!sitemap.includes('/overdue'), 'no separate overdue URLs were added');
-assert((sitemap.match(/<loc>/g) || []).length === 213, 'sitemap URL count is unchanged');
+assert(sitemap.includes('https://www.lotterymigo.com/app.html'), 'app landing page is in the sitemap');
+assert((sitemap.match(/<loc>/g) || []).length === 214, 'sitemap has the previous URLs plus /app.html');
+
+const appPage = await readFile(path.join(root, 'app.html'), 'utf8');
+assert((appPage.match(/<h1[\s>]/g) || []).length === 1, 'app landing page has one h1');
+assert(appPage.includes('Nabin Pokhrel'), 'app landing page credits Nabin Pokhrel');
+assert(/do not guarantee/i.test(appPage) && /not responsible/i.test(appPage), 'app landing page keeps the win disclaimer');
+assert(!appPage.includes('apps.apple.com') && !appPage.includes('play.google.com'), 'app landing page has no store listing links');
+assert((appPage.match(/ca-pub-4173178569579798/g) || []).length === 1, 'app landing page has one AdSense client id');
+assert((appPage.match(/assets\/analytics\.js/g) || []).length === 1, 'app landing page loads analytics.js once');
 
 console.log(results.join('\n'));

@@ -1,0 +1,500 @@
+/* Landing layout for the homepage and /app.html.
+   Adapted from Creative Tim's Awesome Landing Page
+   (https://github.com/creativetimofficial/awesome-landing-page).
+   MIT License. Copyright (c) 2017 Creative Tim.
+   Permission is granted to use, copy, modify, and distribute that
+   work, provided the copyright notice and permission notice remain
+   with substantial portions. This file does not include Bootstrap,
+   jQuery, or the template's images. The nordicgiant2/awesome-landing-page
+   collection that links to the template is CC BY 4.0
+   (https://creativecommons.org/licenses/by/4.0/). */
+
+.lp-band,
+.lp-hero,
+.lp-feature,
+.lp-step {
+  scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 8.75rem);
+}
+
+.lp-band {
+  width: 100%;
+  margin: 0;
+  padding: 2.4rem 0.9rem;
+}
+
+.lp-inner {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.lp-paper {
+  background: #f4f7fb;
+  color: #142033;
+}
+
+.lp-paper h2,
+.lp-paper h3,
+.lp-paper p,
+.lp-paper li {
+  color: #142033;
+}
+
+.lp-paper h2::before { display: none; }
+
+.lp-paper .kicker {
+  color: #12315f;
+}
+
+.lp-paper a {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.lp-lead {
+  max-width: 42rem;
+  margin: 0.4rem 0 1.1rem;
+  color: #243044;
+}
+
+.lp-source-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.8rem 0 0.7rem;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-source-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #5d7290;
+  background: #ffffff;
+  color: #102033;
+  text-decoration: none;
+}
+
+.lp-source-list a:hover {
+  background: #e7eef8;
+  text-decoration: underline;
+}
+
+.lp-feature-grid,
+.lp-step-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.lp-feature,
+.lp-step {
+  min-width: 0;
+  margin: 0;
+  padding: 1.1rem 1rem 1.15rem;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid #c5d0de;
+  color: #142033;
+}
+
+.lp-feature h3,
+.lp-step h3 {
+  margin: 0.55rem 0 0.35rem;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: #102033;
+}
+
+.lp-feature p,
+.lp-step p {
+  margin: 0 0 0.7rem;
+  color: #243044;
+}
+
+.lp-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #102033;
+}
+
+.lp-icon-pb { background: #9f1239; }
+.lp-icon-mm { background: #1e3a8a; }
+.lp-icon-ink { background: #102033; }
+
+.lp-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+body.home-dash .hero .lp-cta-row .btn-quiet,
+.lp-cta .btn-quiet,
+.lp-hero .btn-quiet {
+  background: #1a221e;
+  color: #f4f7fb;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+body.home-dash .hero .lp-cta-row .btn-primary,
+.lp-hero .lp-cta-row .btn-primary,
+.lp-cta .btn-primary {
+  background: #c6f531;
+  color: #102004;
+}
+
+.lp-cta .btn-quiet {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.lp-cta {
+  background: #102033;
+  color: #f4f7fb;
+}
+
+.lp-cta h2,
+.lp-cta p {
+  color: #f4f7fb;
+}
+
+.lp-cta h2::before { display: none; }
+
+.lp-cta .kicker { color: #ffd0d8; }
+
+.lp-cta a:not(.btn) {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.lp-note {
+  margin: 0.8rem 0 0;
+  color: #d5e2f2;
+}
+
+body.home-dash .hero {
+  position: relative;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+  grid-template-areas:
+    "copy controls"
+    "device device"
+    "drums drums";
+  align-items: end;
+  padding-top: 1.6rem;
+}
+
+body.home-dash .hero::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: 0.35rem;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e11d3a, #f4f7fb 48%, #1d4ed8);
+}
+
+body.home-dash .hero-copy { grid-area: copy; }
+body.home-dash .hero .controls { grid-area: controls; }
+
+body.home-dash .hero .float-stage.lp-device {
+  grid-area: device;
+  margin-top: 0;
+}
+
+body.home-dash .hero .lm-drums { grid-area: drums; }
+.lp-hero .lm-drums { grid-column: 1 / -1; }
+
+.lm-drums { margin-top: 0.8rem; min-width: 0; }
+.lm-drums-note {
+  margin: 0 0 0.55rem;
+  color: #d5e2f2;
+  font-size: 0.95rem;
+}
+.lm-drums-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.lm-drum {
+  margin: 0;
+  min-width: 0;
+  padding: 0.55rem 0.55rem 0.7rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #12181c;
+  color: #f4f7fb;
+}
+.lm-drum canvas {
+  display: block;
+  width: 100%;
+  height: 9.5rem;
+  border-radius: 18px;
+  background: #070908;
+}
+@media (min-width: 700px) {
+  .lm-drum canvas { height: 13rem; }
+}
+.lm-drum figcaption {
+  margin: 0.45rem 0 0;
+  color: #f4f7fb;
+  font-weight: 700;
+}
+.lm-drum figcaption span {
+  display: block;
+  margin-top: 0.1rem;
+  color: #d5e2f2;
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+.lm-drum-pb { box-shadow: inset 0 3px 0 #e11d3a; }
+.lm-drum-mm { box-shadow: inset 0 3px 0 #ffc107; }
+
+.lp-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.8fr);
+  gap: 1.4rem;
+  align-items: center;
+  width: min(1120px, calc(100% - 1.6rem));
+  margin: 0 auto;
+  padding: 1.6rem 0 0.4rem;
+  position: relative;
+}
+
+.lp-hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0.35rem;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e11d3a, #f4f7fb 48%, #1d4ed8);
+}
+
+.lp-hero h1 {
+  font-size: clamp(2.2rem, 5vw, 4.1rem);
+}
+
+.lp-hero .lede {
+  max-width: 40rem;
+  margin-top: 0.7rem;
+  color: #d5e2f2;
+  font-size: 1.08rem;
+}
+
+.lp-phone {
+  margin: 0;
+  padding: 0.85rem 0.9rem 1rem;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background-color: #12181c;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.32);
+  color: #f4f7fb;
+}
+
+.lp-phone-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.7rem;
+}
+
+.lp-phone-bar span {
+  width: 4.2rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.lp-phone p,
+.lp-phone li {
+  color: #f4f7fb;
+}
+
+.lp-phone ul {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.lp-phone li {
+  padding: 0.7rem 0.75rem;
+  border-radius: 16px;
+  background: #12181c;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.lp-phone strong { color: #ffffff; }
+
+.lp-steps-band {
+  background:
+    radial-gradient(520px 180px at 0% 0%, rgba(225, 29, 58, 0.28), transparent 70%),
+    radial-gradient(480px 180px at 100% 100%, rgba(29, 78, 216, 0.32), transparent 72%),
+    #070908;
+  color: #f4f7fb;
+}
+
+.lp-steps-band h2,
+.lp-steps-band h3,
+.lp-steps-band p,
+.lp-steps-band li {
+  color: #f4f7fb;
+}
+
+.lp-steps-band h2::before { display: none; }
+
+.lp-steps-band .kicker { color: #ffd0d8; }
+
+.lp-steps-band .lp-step {
+  background: #141a22;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f4f7fb;
+}
+
+.lp-steps-band .lp-step h3,
+.lp-steps-band .lp-step p { color: #f4f7fb; }
+
+.lp-steps-band a { color: #d6ff6a; }
+
+.lp-limit {
+  background: #ffffff;
+  color: #142033;
+}
+
+.lp-limit h2,
+.lp-limit h3,
+.lp-limit p,
+.lp-limit li { color: #142033; }
+
+.lp-limit h2::before { display: none; }
+
+.lp-limit a { color: #1d4ed8; }
+
+.lp-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.lp-prose {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.lp-prose p,
+.lp-prose li { margin: 0; }
+
+.lp-prose ul,
+.lp-prose ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+body.lp-page .site-header {
+  z-index: 40;
+  background: rgba(7, 16, 28, 0.94);
+  border: 0;
+  box-shadow: none;
+}
+
+body.lp-page .site-header .header-bar {
+  width: min(1120px, calc(100% - 16px));
+  max-width: calc(100vw - 16px);
+  margin: 8px auto 0;
+  padding: 6px 10px;
+  border-radius: 24px;
+  background: rgba(10, 16, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-sizing: border-box;
+}
+
+body.lp-page .header-top,
+body.lp-page .header-actions {
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+}
+
+body.home-dash .site-footer .nav,
+body.lp-page .site-footer .nav {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.15rem 0.6rem;
+}
+
+body.home-dash .site-footer .nav a,
+body.lp-page .site-footer .nav a {
+  white-space: normal;
+  height: auto;
+}
+
+.lp-credit {
+  margin-top: 0.8rem;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 800px) {
+  .lp-feature-grid,
+  .lp-step-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lp-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: start; }
+  body.home-dash .site-footer .nav,
+  body.lp-page .site-footer .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1000px) {
+  body.home-dash .site-footer .nav,
+  body.lp-page .site-footer .nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 861px) {
+  body.home-dash .lp-device {
+    padding: 0.9rem 0.85rem 0.85rem;
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background-color: #12181c;
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.32);
+  }
+  body.home-dash .lp-device .float-bounds { height: 168px; }
+}
+
+@media (max-width: 860px) {
+  body.home-dash .hero {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "copy"
+      "controls"
+      "device"
+      "drums";
+    align-items: stretch;
+    padding-top: 1rem;
+  }
+  body.home-dash .hero .float-stage.lp-device {
+    grid-area: device;
+  }
+  .lp-hero {
+    grid-template-columns: 1fr;
+    width: min(1120px, calc(100% - 1.4rem));
+  }
+  .lp-phone { margin-top: 0.2rem; }
+}
+
+body.home-dash .lp-band + .sheet { margin-top: 1.2rem; }

@@ -370,6 +370,17 @@ html.lm-contrast .lp-steps-band .kicker {
   color: #ffffff !important;
 }
 
+html.lm-contrast .lm-drums,
+html.lm-contrast .lm-drum,
+html.lm-contrast .lm-drums-note,
+html.lm-contrast .lm-drum figcaption,
+html.lm-contrast .lm-drum figcaption span {
+  background: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
 html.lm-contrast .lp-icon,
 html.lm-contrast .lp-icon-pb,
 html.lm-contrast .lp-icon-mm,

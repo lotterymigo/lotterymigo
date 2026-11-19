@@ -822,6 +822,7 @@ main.wrap {
 .guarantee-bar {
   background: color-mix(in srgb, var(--gold) 14%, var(--surface));
   border-bottom: 1px solid var(--line);
+  padding-inline: max(1rem, env(safe-area-inset-left, 0px)) max(1rem, env(safe-area-inset-right, 0px));
 }
 
 .guarantee-line {
@@ -829,6 +830,13 @@ main.wrap {
   padding: 0.4rem 0;
   font-size: 0.82rem;
   line-height: 1.45;
+}
+
+.guarantee-bar .guarantee-line {
+  width: min(72rem, 100%);
+  max-width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
 }
 
 .guarantee-line a {

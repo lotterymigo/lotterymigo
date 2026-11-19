@@ -324,3 +324,63 @@ html.lm-contrast #detail-kicker,
 html.lm-contrast .detail-card .kicker {
   color: #ffffff !important;
 }
+
+html.lm-contrast .lp-paper,
+html.lm-contrast .lp-feature,
+html.lm-contrast .lp-step,
+html.lm-contrast .lp-cta,
+html.lm-contrast .lp-phone,
+html.lm-contrast .lp-phone li,
+html.lm-contrast .lp-device,
+html.lm-contrast .lp-limit,
+html.lm-contrast .lp-steps-band {
+  background: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+html.lm-contrast .lp-paper h2,
+html.lm-contrast .lp-paper h3,
+html.lm-contrast .lp-paper p,
+html.lm-contrast .lp-paper li,
+html.lm-contrast .lp-paper .kicker,
+html.lm-contrast .lp-feature h3,
+html.lm-contrast .lp-feature p,
+html.lm-contrast .lp-step h3,
+html.lm-contrast .lp-step p,
+html.lm-contrast .lp-cta h2,
+html.lm-contrast .lp-cta p,
+html.lm-contrast .lp-cta .kicker,
+html.lm-contrast .lp-note,
+html.lm-contrast .lp-phone p,
+html.lm-contrast .lp-phone li,
+html.lm-contrast .lp-phone strong,
+html.lm-contrast .lp-limit h2,
+html.lm-contrast .lp-limit h3,
+html.lm-contrast .lp-limit p,
+html.lm-contrast .lp-limit li,
+html.lm-contrast .lp-steps-band h2,
+html.lm-contrast .lp-steps-band h3,
+html.lm-contrast .lp-steps-band p,
+html.lm-contrast .lp-steps-band .kicker {
+  color: #ffffff !important;
+}
+
+html.lm-contrast .lp-icon,
+html.lm-contrast .lp-icon-pb,
+html.lm-contrast .lp-icon-mm,
+html.lm-contrast .lp-icon-ink {
+  background: #ffd000 !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+html.lm-contrast .lp-source-list a,
+html.lm-contrast .lp-cta .btn-quiet,
+html.lm-contrast .lp-hero .btn-quiet,
+html.lm-contrast body.home-dash .hero .lp-cta-row .btn-quiet {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}

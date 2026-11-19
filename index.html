@@ -35,6 +35,7 @@
 
   <link rel="stylesheet" href="assets/design.css" />
   <link rel="stylesheet" href="assets/preview-dashboard.css" />
+  <link rel="stylesheet" href="assets/landing.css" />
   <link rel="stylesheet" href="assets/a11y.css" />
   <script defer src="assets/a11y.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -50,7 +51,7 @@
     })();
   </script>
 </head>
-<body class="page home-dash">
+<body class="page home-dash lp-home">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- Compliance -->
@@ -76,6 +77,7 @@
         <a href="learn/index.html">Learn</a>
         <a href="faq.html">FAQ</a>
         <a href="about.html">About</a>
+        <a href="app.html">App</a>
         <a href="#section-generator">Number ideas</a>
         <a href="#section-account">Account</a>
         <a href="privacy.html">Privacy</a>
@@ -106,8 +108,12 @@
         </div>
         <p id="hero-badge" class="window-note">Powerball uses 5 numbers from 1 to 69, plus 1 Powerball number from 1 to 26.</p>
         <p id="window-note" class="window-note">Loading the draw archive…</p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="#section-heatmap">See the heatmap</a>
+          <a class="btn btn-quiet" href="#section-about">How the counts work</a>
+        </div>
       </div>
-      <div class="float-stage" id="float-stage">
+      <div class="float-stage lp-device" id="float-stage">
         <div class="float-head">
           <p id="float-note">Decorative only. Not picks, prizes, or a prediction, and they do not change the counts.</p>
           <button type="button" id="motion-toggle" aria-pressed="true" aria-describedby="float-note">Moving balls on</button>
@@ -115,6 +121,41 @@
         <div class="float-bounds" id="float-bounds"></div>
       </div>
     </div>
+
+    <section class="lp-band lp-paper" aria-labelledby="lp-features-title">
+      <div class="lp-inner">
+        <p class="kicker">Sources, not sponsors</p>
+        <h2 id="lp-features-title">The same archive, three ways to read it</h2>
+        <p class="lp-lead">Counts on this page come from NY Open Data. They describe drawings that already happened. A frequent number is not more likely next, and a long gap does not mean a number is due.</p>
+        <ul class="lp-source-list">
+          <li><a href="https://data.ny.gov/d/d6yy-54nr">NY Open Data, Powerball</a></li>
+          <li><a href="https://data.ny.gov/d/5xaw-6ayf">NY Open Data, Mega Millions</a></li>
+          <li><a href="about.html#methodology">Methodology</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="learn/index.html">Guides</a></li>
+        </ul>
+        <div class="lp-feature-grid">
+          <article class="lp-feature">
+            <span class="lp-icon lp-icon-pb" aria-hidden="true">1</span>
+            <h3>How often each number was drawn</h3>
+            <p>The heatmap is a color grid. Each square is one white-ball number. Brighter squares were drawn more often in the current matrix. The grid below is already filled in, before any script runs.</p>
+            <a href="#section-heatmap">Open the heatmap</a>
+          </article>
+          <article class="lp-feature">
+            <span class="lp-icon lp-icon-mm" aria-hidden="true">2</span>
+            <h3>A page for every current number</h3>
+            <p>Powerball white balls 1–69 and Powerball 1–26, and Mega Millions white balls 1–70 and Mega Ball 1–24, each have a frequency and gap page. Those pages use the same current-matrix window as this dashboard. Start with <a href="powerball/numbers.html">Powerball numbers</a> or <a href="megamillions/numbers.html">Mega Millions numbers</a>.</p>
+          </article>
+          <article class="lp-feature">
+            <span class="lp-icon lp-icon-ink" aria-hidden="true">3</span>
+            <h3>Number ideas that do not change the odds</h3>
+            <p>You can build lines from a balanced mix, recent frequency, the longest gap, or a quick pick. None of these patterns raises the chance of winning. LotteryMigo is not responsible for any win or loss.</p>
+            <a href="#section-generator">Make number ideas</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section id="section-stats" class="sheet">
       <p id="live" class="sr" aria-live="polite"></p>
       <div id="stage"><p class="loading" id="loading">Loading drawings from the public archive.</p></div>
@@ -353,11 +394,12 @@
     </section>
 
     <!-- About -->
-    <section id="section-about" class="card stack">
-      <p class="kicker">About LotteryMigo</p>
+    <section id="section-about" class="card stack lp-how">
+      <p class="kicker">How it works</p>
       <h2>What this site shows</h2>
       <p>LotteryMigo is a free look at Powerball and Mega Millions. Official winning numbers come from NY Open Data. The counts on this page use the current matrix: Powerball since October 7, 2015, and Mega Millions white balls since October 31, 2017. The <a href="powerball/numbers.html">Powerball</a> and <a href="megamillions/numbers.html">Mega Millions</a> number pages list every ball in that same window, and the <a href="learn/index.html">guides</a> explain the rules. <strong>Past draws do not predict future results. This is not gambling advice, and it does not guarantee any win.</strong></p>
-      <div class="feature-grid">
+      <p class="byline">Built by <a href="about.html#author">Nabin Pokhrel</a>.</p>
+      <div class="feature-grid lp-steps">
         <div class="panel stack">
           <p class="tone-pb"><strong>1. How often</strong></p>
           <h3>Past drawings</h3>
@@ -396,6 +438,19 @@
       </div>
     </section>
     </div>
+
+    <section class="lp-band lp-cta" aria-labelledby="lp-cta-title">
+      <div class="lp-inner">
+        <p class="kicker">Keep going</p>
+        <h2 id="lp-cta-title">Use the counts, then read how they were made</h2>
+        <p>The heatmap, the latest drawings, and the number pages are the useful part of this site. Past draws do not predict the next one. Number ideas do not guarantee a win, and LotteryMigo is not responsible for any win or loss.</p>
+        <div class="lp-cta-row">
+          <a class="btn btn-primary" href="#section-heatmap">Back to the heatmap</a>
+          <a class="btn btn-quiet" href="app.html">About the Android and iOS app</a>
+        </div>
+        <p class="lp-note">There is no app-store listing in this project. The app page describes the phone shell and links back to these statistics. It does not sell tickets.</p>
+      </div>
+    </section>
   </main>
 
   <dialog id="detail" aria-labelledby="detail-title">
@@ -419,6 +474,7 @@
         <div>
           <strong>LotteryMigo.com</strong>
           <span class="muted block">Free number tools. Not a place to buy tickets.</span>
+          <p class="byline">Built by <a href="about.html#author">Nabin Pokhrel</a>.</p>
         </div>
         <nav class="nav" aria-label="Site pages">
           <a href="#section-stats">Stats</a>
@@ -430,6 +486,7 @@
           <a href="faq.html">FAQ</a>
           <a href="about.html">About</a>
           <a href="about.html#methodology">Methodology</a>
+          <a href="app.html">App</a>
           <a href="privacy.html">Privacy Policy</a>
           <a href="terms.html">Terms</a>
           <a href="contact.html">Contact</a>
@@ -438,6 +495,7 @@
       </div>
       <p id="tip-note" class="tip-note hidden" data-tip="note" hidden></p>
       <p><strong>DISCLAIMER:</strong> LotteryMigo does not guarantee any lottery win or prize outcome. Powerball® and Mega Millions® are registered trademarks of their respective consortiums. LotteryMigo is not sponsored by or affiliated with any state or national lottery agency. © 2026 LotteryMigo.com. All rights reserved.</p>
+      <p class="lp-credit">Landing layout adapted from <a href="https://github.com/creativetimofficial/awesome-landing-page">Creative Tim’s Awesome Landing Page</a> (MIT License, copyright 2017 Creative Tim). The <a href="https://github.com/nordicgiant2/awesome-landing-page">nordicgiant2/awesome-landing-page</a> collection that points to it is CC BY 4.0.</p>
     </div>
   </footer>
 

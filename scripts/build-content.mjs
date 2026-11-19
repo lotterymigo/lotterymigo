@@ -1406,6 +1406,7 @@ await refreshHome(gamesRaw.powerball, gamesRaw.megamillions);
 
 const staticUrls = [
   ['/', [gamesRaw.powerball[0]?.date, gamesRaw.megamillions[0]?.date].filter(Boolean).sort().at(-1) || fetched],
+  ['/app.html', '2026-11-19'],
   ['/privacy.html', CONTENT_DATE],
   ['/terms.html', CONTENT_DATE],
   ['/contact.html', CONTENT_DATE]
@@ -1441,6 +1442,7 @@ const linkTargets = new Set(written.map((page) => `/${page.rel}`));
 linkTargets.add('/privacy.html');
 linkTargets.add('/terms.html');
 linkTargets.add('/contact.html');
+linkTargets.add('/app.html');
 linkTargets.add('/');
 const missing = [];
 for (const page of written) {

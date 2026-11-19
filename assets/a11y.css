@@ -190,7 +190,8 @@ html.lm-contrast .line-card,
 html.lm-contrast .compliance,
 html.lm-contrast .guarantee-bar,
 html.lm-contrast .lm-a11y-bar,
-html.lm-contrast .nav-results-panel {
+html.lm-contrast .nav-results-panel,
+html.lm-contrast .nav-more-panel {
   background: #000000 !important;
   background-image: none !important;
   color: #ffffff !important;
@@ -240,7 +241,9 @@ html.lm-contrast .field,
 html.lm-contrast .display-toggle,
 html.lm-contrast .nav-menu-btn,
 html.lm-contrast .nav-results > summary,
+html.lm-contrast .nav-more > summary,
 html.lm-contrast .nav-results-panel,
+html.lm-contrast .nav-more-panel,
 html.lm-contrast .lm-a11y-bar button,
 html.lm-contrast .lm-a11y-bar a {
   background: #000000 !important;
